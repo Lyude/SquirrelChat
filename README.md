@@ -1,0 +1,1 @@
+Don't expect this to work at all right now, a ton of effort still needs to be put into this to get this anywhere near ready for every day use. In addition, expect the code to be somewhat messy until then.
