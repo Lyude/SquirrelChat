@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <stdbool.h>
+#include <fcntl.h>
 
 struct network_buffer ** socket_table;
 
@@ -34,7 +35,7 @@ struct network_buffer * new_network_buffer() {
     network->connection_status = DISCONNECTED;
 
     //XXX: Added just for testing purposes
-    network->address = "irc.ponychat.net";
+    network->address = "rainbowdash.ponychat.net";
     network->port = "6667";
     network->nickname = "LyudeTEST";
     network->username = "LyudeTEST";
@@ -90,6 +91,9 @@ int connect_network_buffer(struct network_buffer * buffer) {
         if (buffer->socket == -1)
             continue;
 
+        // Set the socket as non-blocking
+        fcntl(buffer->socket, F_SETFD, O_NONBLOCK);
+
         // Try to connect to the created socket
         if (connect(buffer->socket, rp->ai_addr, rp->ai_addrlen) != -1)
             break;
@@ -112,12 +116,7 @@ int connect_network_buffer(struct network_buffer * buffer) {
     send_to_network(buffer, "USER %s X X :%s\r\n",
                     buffer->username, buffer->real_name);
 
-    // Store the correct ai address in the buffer struct
-    memcpy(&buffer->ai_addr, rp->ai_addr, sizeof(struct sockaddr));
-    buffer->ai_addrlen = rp->ai_addrlen;
-
     buffer->connection_status = CONNECTED;
-    //socket_table[buffer->socket] = buffer;
     buffer->input_channel = g_io_channel_unix_new(buffer->socket);
     g_io_channel_set_encoding(buffer->input_channel, NULL, NULL);
     g_io_channel_set_buffered(buffer->input_channel, FALSE);

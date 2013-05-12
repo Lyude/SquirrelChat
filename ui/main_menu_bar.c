@@ -54,8 +54,7 @@ void connect_current_network() {
                        &buffer, -1);
 
     // Begin the new thread
-    pthread_create(&buffer->connection_thread, NULL, connect_network_buffer,
-                   buffer);
+    connect_network_buffer(buffer); 
 }
 
 // Connects all the signals for the items in the menu bar

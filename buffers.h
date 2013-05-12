@@ -4,6 +4,8 @@
 #ifndef BUFFERS_H
 #define BUFFERS_H 
 
+#include "irc_macros.h"
+
 #include <gtk/gtk.h>
 #include <glib.h>
 #include <netdb.h>
@@ -20,15 +22,16 @@ struct network_buffer {
     char * real_name;
 
     int socket;
-    struct sockaddr ai_addr;
-    socklen_t ai_addrlen;
     
     enum {
         DISCONNECTED,
         CONNECTING,
         CONNECTED
     } connection_status;
-    pthread_t connection_thread;
+
+    char recv_buffer[IRC_MSG_BUF_LEN];
+    int buffer_cursor;
+    size_t buffer_fill_len;
     GIOChannel * input_channel;
 
     GtkTextBuffer * buffer;
