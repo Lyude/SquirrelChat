@@ -12,12 +12,6 @@
 #include <stdbool.h>
 #include <fcntl.h>
 
-struct network_buffer ** socket_table;
-
-void _init_vars_buffers_c() {
-    socket_table = malloc(sysconf(_SC_OPEN_MAX));
-}
-
 /* Creates a new network buffer and adds it to the network tree
  * NOTE: The struct is automatically sanitized by this function, so there is no
  * need to do it yourself

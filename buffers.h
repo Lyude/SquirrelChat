@@ -46,8 +46,6 @@ int connect_network_buffer(struct network_buffer * buffer);
 void print_to_network_buffer(struct network_buffer * buffer,
                              char * message, ...);
 
-extern struct network_buffer ** socket_table;
-
 void free_chat_buffer(void * this_does_nothing);
 
 void network_tree_cursor_changed_handler(GtkTreeSelection *treeselection,
