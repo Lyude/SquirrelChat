@@ -51,7 +51,7 @@ struct network_buffer * get_current_network() {
     GtkTreeIter selected_row;
     struct network_buffer * network;
     gtk_tree_selection_get_selected(
-            gtk_tree_view_get_selection(network_tree),
+            gtk_tree_view_get_selection(GTK_TREE_VIEW(network_tree)),
             &network_tree_store, &selected_row);
     gtk_tree_model_get(GTK_TREE_MODEL(network_tree_store),
                        &selected_row, 1, &network, -1);

@@ -122,7 +122,7 @@ int connect_network_buffer(struct network_buffer * buffer) {
     g_io_channel_set_buffered(buffer->input_channel, FALSE);
 
     g_io_add_watch_full(buffer->input_channel, G_PRIORITY_DEFAULT, G_IO_IN,
-                        net_input_handler, buffer, NULL);
+                        (GIOFunc)net_input_handler, buffer, NULL);
 
     freeaddrinfo(results);
     return 0;

@@ -22,7 +22,7 @@ void send_to_network(struct network_buffer * buffer,
     char send_buffer[IRC_MSG_BUF_LEN];
 
     va_start(args, msg);
-    msg_len = vsnprintf(&send_buffer, IRC_MSG_LEN, msg, args);
+    msg_len = vsnprintf(&send_buffer[0], IRC_MSG_LEN, msg, args);
     va_end(args);
 
     send(buffer->socket, &send_buffer, msg_len, 0);

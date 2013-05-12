@@ -17,8 +17,8 @@ void create_main_text_input() {
  * the text input has focus)
  */
 void main_text_input_activate_callback() {
-    print_to_network_buffer(get_current_network(),
-                            "%s\n", gtk_entry_get_text(main_text_input));
+    print_to_network_buffer(get_current_network(), "%s\n",
+                            gtk_entry_get_text(GTK_ENTRY(main_text_input)));
 }
 
 void connect_main_text_input_signals() {
