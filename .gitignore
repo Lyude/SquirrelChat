@@ -1,0 +1,8 @@
+# Files from vim
+.*.sw?
+
+# CMake files
+cmake_install.cmake
+CMakeFiles/
+CMakeCache.txt
+Makefile
