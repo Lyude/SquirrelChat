@@ -44,7 +44,7 @@ bool check_for_messages(struct network_buffer * buffer,
          * rest of the message to be received
          */
         if (buffer->buffer_cursor < buffer->buffer_fill_len) {
-            buffer->buffer_fill_len = IRC_MSG_LEN - buffer->buffer_cursor;
+            buffer->buffer_fill_len -= buffer->buffer_cursor;
             memmove(&buffer->recv_buffer[0],
                     &buffer->recv_buffer[buffer->buffer_cursor],
                     buffer->buffer_fill_len);
