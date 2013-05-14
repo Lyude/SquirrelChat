@@ -1,12 +1,12 @@
 #ifndef MAIN_MENU_H
 #define MAIN_MENU_H
 
+#include "chat_window.h"
+
 #include <gtk/gtk.h>
 
-extern GtkWidget * main_menu_bar;
-
-void create_main_menu_bar();
-void connect_main_menu_bar_signals();
+void create_main_menu_bar(struct chat_window * window);
+void connect_main_menu_bar_signals(struct chat_window * window);
 
 #endif /* MAIN_MENU_H */
 

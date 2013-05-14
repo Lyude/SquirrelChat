@@ -13,9 +13,10 @@ add_executable(TailChat
                buffers.c
                net_io.c
                net_input_handler.c
-               ui/network_panel.c
-               ui/main_text_input.c
-               ui/main_text_view.c
+               ui/chat_window.c
+               ui/network_tree.c
+               ui/command_box.c
+               ui/chat_viewer.c
                ui/main_menu_bar.c)
 
 target_link_libraries(TailChat ${GTK3_LIBRARIES} pthread)
