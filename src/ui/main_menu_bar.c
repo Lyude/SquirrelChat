@@ -10,7 +10,7 @@ void create_main_menu_bar(struct chat_window * window) {
     window->main_menu_bar = gtk_menu_bar_new();
     window->main_menu = gtk_menu_new();
 
-    window->main_menu_item = gtk_menu_item_new_with_label("TailChat");
+    window->main_menu_item = gtk_menu_item_new_with_label("SquirrelChat");
     window->connect_menu_item = gtk_menu_item_new_with_label("Connect");
     window->new_server_buffer_menu_item =
         gtk_menu_item_new_with_label("New server");
