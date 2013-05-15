@@ -15,7 +15,7 @@ struct chat_window * create_new_chat_window() {
     struct chat_window * new_window = malloc(sizeof(struct chat_window));
 
     new_window->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title(GTK_WINDOW(new_window->window), "TailChat");
+    gtk_window_set_title(GTK_WINDOW(new_window->window), "SquirrelChat");
     gtk_window_set_position(GTK_WINDOW(new_window->window), GTK_WIN_POS_CENTER);
     gtk_window_set_default_size(GTK_WINDOW(new_window->window), 640, 480);
 
