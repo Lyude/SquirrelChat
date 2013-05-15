@@ -40,17 +40,19 @@ void connect_current_network(GtkMenuItem * menuitem,
     GtkTreeIter selected_row;
     struct network_buffer * buffer;
 
-    // Find which row is selected
-    gtk_tree_selection_get_selected(gtk_tree_view_get_selection(
-                                    GTK_TREE_VIEW(window->network_tree)),
-                                    &window->network_tree_store,
-                                    &selected_row);
+    /* Find out if there's a row selected and if so, connect the associated
+     * buffer
+     */
+    if (gtk_tree_selection_get_selected(gtk_tree_view_get_selection(
+                                        GTK_TREE_VIEW(window->network_tree)),
+                                        &window->network_tree_store,
+                                        &selected_row)) {
+        // Get the network buffer for the selected row
+        gtk_tree_model_get(GTK_TREE_MODEL(window->network_tree_store),
+                           &selected_row, 1, &buffer, -1);
 
-    // Get the network buffer for the selected row
-    gtk_tree_model_get(GTK_TREE_MODEL(window->network_tree_store),
-                       &selected_row, 1, &buffer, -1);
-
-    connect_network_buffer(buffer); 
+        connect_network_buffer(buffer);
+    }
 }
 
 // Connects all the signals for the items in the menu bar
