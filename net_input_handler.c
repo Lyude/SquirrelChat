@@ -11,30 +11,27 @@
 #include <errno.h>
 
 /* Checks for messages waiting in a network's buffer
- * If there is still unparsed data waiting in the buffer and check_for_messages
- * needs to be called again, returns true, otherwise false.
+ * If there is still a message waiting in the network's buffer, it returns it
+ * and moves the buffer cursor forward. Otherwise returns null. NULL is returned
+ * and errno is set in the event of an error.
  */
-bool check_for_messages(struct network_buffer * buffer,
-                        char ** output) {
+char * check_for_messages(struct network_buffer * buffer) {
     char * next_terminator = strstr(&buffer->recv_buffer[buffer->buffer_cursor],
                                     "\r\n");
+    char * output;
 
     // If a message was found, remove the terminator, set output variable
     if (next_terminator != NULL) {
         *next_terminator = '\0';
         *(next_terminator + 1) = '\0';
-        *output = &buffer->recv_buffer[buffer->buffer_cursor];
+        output = &buffer->recv_buffer[buffer->buffer_cursor];
         buffer->buffer_cursor = (int)(next_terminator -
                                       &buffer->recv_buffer[0]) + 2;
 
         // Check if there's potentially another message in the buffer
-        if (buffer->buffer_cursor + 1 < buffer->buffer_fill_len) {
-            return true;
-        }
-        else {
+        if (buffer->buffer_cursor + 1 >= buffer->buffer_fill_len) {
             buffer->buffer_cursor = 0;
             buffer->buffer_fill_len = 0;
-            return false;
         }
     }
     else {
@@ -56,8 +53,9 @@ bool check_for_messages(struct network_buffer * buffer,
             errno = EMSGSIZE;
 
         buffer->buffer_cursor = 0;
-        return false;
+        return NULL;
     }
+    return output;
 }
 
 
@@ -74,7 +72,7 @@ gboolean net_input_handler(GIOChannel *source,
     buffer->buffer_fill_len += recv_result;
 
     // Temporary, just for testing
-    while (check_for_messages(buffer, &msg)) {
+    while ((msg = check_for_messages(buffer)) != NULL) {
         print_to_network_buffer(buffer, "%s\n", msg);
         printf("%s\n", msg);
     }
