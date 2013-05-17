@@ -40,17 +40,17 @@ void create_network_tree(struct chat_window * window) {
 
 // Adds an empty network buffer to the network tree
 void add_network(struct chat_window * window,
-                 struct network_buffer * buffer) {
+                 struct irc_network * network) {
     gtk_tree_store_append(window->network_tree_store,
                           &network_tree_toplevel, NULL);
     gtk_tree_store_set(window->network_tree_store, &network_tree_toplevel,
-                       0, "untitled", 1, buffer, -1);
+                       0, "untitled", 1, network, -1);
 }
 
 // Get's the currently selected network in the network tree
-struct network_buffer * get_current_network(struct chat_window * window) {
+struct irc_network * get_current_network(struct chat_window * window) {
     GtkTreeIter selected_row;
-    struct network_buffer * network;
+    struct irc_network * network;
     gtk_tree_selection_get_selected(
             gtk_tree_view_get_selection(GTK_TREE_VIEW(window->network_tree)),
             &window->network_tree_store, &selected_row);
@@ -60,21 +60,23 @@ struct network_buffer * get_current_network(struct chat_window * window) {
 }
 
 // Callbacks
+/* TODO: Modify this handler to also work with all types of buffers, not just
+ * network buffers
+ */
 void cursor_changed_handler(GtkTreeSelection *treeselection,
                             struct chat_window * window) {
-    struct network_buffer * network;
+    struct irc_network * network;
     GtkTreeModel * network_list_model =
         gtk_tree_view_get_model(gtk_tree_selection_get_tree_view(treeselection));
     GtkTreeIter selected_row;
     
-    gtk_tree_selection_get_selected(treeselection, &network_list_model, &selected_row);
+    gtk_tree_selection_get_selected(treeselection, &network_list_model,
+                                    &selected_row);
 
     gtk_tree_model_get(network_list_model, &selected_row,
                        1, &network, -1);
-
-    // Change the buffer the chat viewer is using to the one of the selected row
-    gtk_text_view_set_buffer(GTK_TEXT_VIEW(window->chat_viewer),
-                             network->buffer);
+    
+    change_active_buffer(window, network->buffer);
 }
 
 /* Connects the signals for the network tree

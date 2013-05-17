@@ -1,8 +1,8 @@
 /* Data structures for storing information and buffers for an IRC network, and
  * functions for handling said structures
  */
-#ifndef BUFFERS_H
-#define BUFFERS_H 
+#ifndef __IRC_NETWORK_H__
+#define __IRC_NETWORK_H__ 
 
 #include "irc_macros.h"
 
@@ -10,7 +10,7 @@
 #include <glib.h>
 #include <netdb.h>
 
-struct network_buffer {
+struct irc_network {
     // Network information
     char * name;
     char * address;
@@ -34,17 +34,16 @@ struct network_buffer {
     size_t buffer_fill_len;
     GIOChannel * input_channel;
 
-    GtkTextBuffer * buffer;
-    GHashTable * chat_buffers;
+    struct buffer_info * buffer;
 };
 
-struct network_buffer * new_network_buffer();
-void free_network_buffer(struct network_buffer * buffer,
-                         GtkTreeStore * network_tree_store);
+struct irc_network * new_irc_network();
+void free_irc_network(struct irc_network * network,
+                      GtkTreeStore * network_tree_store);
 
-int connect_network_buffer(struct network_buffer * buffer);
-void print_to_network_buffer(struct network_buffer * buffer,
-                             char * message, ...);
+int connect_irc_network(struct irc_network * network);
+void print_to_irc_network(struct irc_network * network,
+                          char * message, ...);
 
 void free_chat_buffer(void * this_does_nothing);
 

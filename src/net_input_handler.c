@@ -3,7 +3,7 @@
  * appropriate callbacks, etc.
  */
 #include "net_input_handler.h"
-#include "buffers.h"
+#include "irc_network.h"
 #include "net_io.h"
 
 #include <glib.h>
@@ -15,8 +15,8 @@
  * and moves the buffer cursor forward. Otherwise returns null. NULL is returned
  * and errno is set in the event of an error.
  */
-char * check_for_messages(struct network_buffer * buffer) {
-    char * next_terminator = strstr(&buffer->recv_buffer[buffer->buffer_cursor],
+char * check_for_messages(struct irc_network * network) {
+    char * next_terminator = strstr(&network->recv_buffer[network->buffer_cursor],
                                     "\r\n");
     char * output;
 
@@ -24,14 +24,14 @@ char * check_for_messages(struct network_buffer * buffer) {
     if (next_terminator != NULL) {
         *next_terminator = '\0';
         *(next_terminator + 1) = '\0';
-        output = &buffer->recv_buffer[buffer->buffer_cursor];
-        buffer->buffer_cursor = (int)(next_terminator -
-                                      &buffer->recv_buffer[0]) + 2;
+        output = &network->recv_buffer[network->buffer_cursor];
+        network->buffer_cursor = (int)(next_terminator -
+                                      &network->recv_buffer[0]) + 2;
 
         // Check if there's potentially another message in the buffer
-        if (buffer->buffer_cursor + 1 >= buffer->buffer_fill_len) {
-            buffer->buffer_cursor = 0;
-            buffer->buffer_fill_len = 0;
+        if (network->buffer_cursor + 1 >= network->buffer_fill_len) {
+            network->buffer_cursor = 0;
+            network->buffer_fill_len = 0;
         }
     }
     else {
@@ -40,19 +40,19 @@ char * check_for_messages(struct network_buffer * buffer) {
          * after the position of the cursor. Make sure there is space for the
          * rest of the message to be received
          */
-        if (buffer->buffer_cursor < buffer->buffer_fill_len) {
-            buffer->buffer_fill_len -= buffer->buffer_cursor;
-            memmove(&buffer->recv_buffer[0],
-                    &buffer->recv_buffer[buffer->buffer_cursor],
-                    buffer->buffer_fill_len);
+        if (network->buffer_cursor < network->buffer_fill_len) {
+            network->buffer_fill_len -= network->buffer_cursor;
+            memmove(&network->recv_buffer[0],
+                    &network->recv_buffer[network->buffer_cursor],
+                    network->buffer_fill_len);
         }
 
         // If the message is longer then the max allowed length, report an error
-        else if (buffer->buffer_cursor == 0 &&
-                 buffer->buffer_fill_len >= IRC_MSG_LEN)
+        else if (network->buffer_cursor == 0 &&
+                 network->buffer_fill_len >= IRC_MSG_LEN)
             errno = EMSGSIZE;
 
-        buffer->buffer_cursor = 0;
+        network->buffer_cursor = 0;
         return NULL;
     }
     return output;
@@ -61,19 +61,18 @@ char * check_for_messages(struct network_buffer * buffer) {
 
 gboolean net_input_handler(GIOChannel *source,
                            GIOCondition condition,
-                           struct network_buffer * buffer) {
+                           struct irc_network * network) {
     char * msg;
     int recv_result;
 
-    recv_result = recv(buffer->socket,
-                       &buffer->recv_buffer[buffer->buffer_fill_len],
-                       IRC_MSG_LEN - buffer->buffer_fill_len, 0);
+    recv_result = recv(network->socket,
+                       &network->recv_buffer[network->buffer_fill_len],
+                       IRC_MSG_LEN - network->buffer_fill_len, 0);
 
-    buffer->buffer_fill_len += recv_result;
+    network->buffer_fill_len += recv_result;
 
     // Temporary, just for testing
-    while ((msg = check_for_messages(buffer)) != NULL) {
-        print_to_network_buffer(buffer, "%s\n", msg);
+    while ((msg = check_for_messages(network)) != NULL) {
         printf("%s\n", msg);
     }
 

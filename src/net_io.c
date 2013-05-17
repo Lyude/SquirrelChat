@@ -7,7 +7,7 @@
 #include <netdb.h>
 #include <string.h>
 #include <errno.h>
-#include "buffers.h"
+#include "irc_network.h"
 #include "net_io.h"
 #include "irc_macros.h"
 
@@ -15,7 +15,7 @@
 #include <string.h>
 
 // Sends a message to a currently connected IRC network
-void send_to_network(struct network_buffer * buffer,
+void send_to_network(struct irc_network * buffer,
                      char * msg, ...) {
     va_list args;
     size_t msg_len;

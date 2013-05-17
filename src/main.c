@@ -10,7 +10,7 @@ int main(int argc, char *argv[]) {
 
     gtk_init(&argc, &argv);
 
-    struct chat_window * window = create_new_chat_window();
+    struct chat_window * window = create_new_chat_window(NULL);
 
     gtk_main();
 

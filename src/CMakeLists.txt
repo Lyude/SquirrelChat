@@ -6,13 +6,12 @@ add_definitions(${GTK3_CFLAG_OTHER})
 
 add_executable(squirrelchat
                main.c
-               buffers.c
                net_io.c
                net_input_handler.c
+               irc_network.c
                ui/chat_window.c
                ui/network_tree.c
-               ui/command_box.c
-               ui/chat_viewer.c
+               ui/buffer.c
                ui/main_menu_bar.c)
 
 target_link_libraries(squirrelchat ${GTK3_LIBRARIES})

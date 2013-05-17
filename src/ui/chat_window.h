@@ -1,6 +1,9 @@
 #ifndef CHAT_WINDOW_H
 #define CHAT_WINDOW_H
 
+#include "../irc_network.h"
+#include "buffer.h"
+
 #include <gtk/gtk.h>
 
 /* Struct containing all the important widgets for a window, passed to most
@@ -23,15 +26,16 @@ struct chat_window {
     GtkTreeStore * network_tree_store;
     GtkTreeIter network_tree_toplevel;
 
-    GtkWidget * chat_viewer_and_user_list_pane;
+    GtkWidget * buffer_pane;
 
-    GtkWidget * command_and_chat_viewer_container;
-    GtkWidget * scrolled_window_container_for_chat_viewer;
-    GtkWidget * chat_viewer;
-    GtkWidget * command_box;
+    struct buffer_info * current_buffer;
 };
 
-struct chat_window * create_new_chat_window();
+// TODO: Remove the "create_" part in the function name
+struct chat_window * create_new_chat_window(struct irc_network * network);
+
+void change_active_buffer(struct chat_window * window,
+                          struct buffer_info * new_buffer);
 
 #endif // CHAT_WINDOW_H
 
