@@ -72,5 +72,6 @@ void change_active_buffer(struct chat_window * window,
         gtk_paned_add2(GTK_PANED(window->buffer_pane),
                        new_buffer->chat_and_command_box_container);
     gtk_widget_show_all(window->window);
+    window->current_buffer = new_buffer;
 }
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
