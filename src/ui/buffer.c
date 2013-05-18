@@ -1,13 +1,70 @@
 #include "buffer.h"
+#include "../irc_network.h"
+#include "chat_window.h"
+#include "../commands.h"
 
 #include <gtk/gtk.h>
 #include <stdlib.h>
+#include <string.h>
 
-struct buffer_info * new_buffer(enum buffer_type type) {
+void command_box_activated_handler(GtkEntry * entry,
+                                   struct buffer_info * buffer) {
+    char * input = gtk_entry_get_text(entry);
+    guint16 input_len = gtk_entry_get_text_length(entry);
+    // If the input is a blank message or a blank command, do nothing
+    switch (input_len) {
+        case 0:
+            return;
+            break;
+        case 1:
+            if (input[0] == '/')
+                return;
+            break;
+        case 2:
+            if (input[0] == '/' && input[1] == '/')
+                return;
+            break;
+    }
+
+    // Check whether or not the input is a command and act accordingly
+    if (input[0] == '/' && input[1] != '/') {
+        char * param_start;
+        char * command_end;
+        char * command;
+    
+        // Eat the /
+        input++;
+
+        // Extract the name of the command
+        command_end = strchr(input, ' ');
+        if (command_end == NULL) {
+            command = input;
+            param_start = NULL;
+        }
+        else {
+            *command_end = '\0';
+            command = input;
+            input = command_end + 1;
+
+            // Extract the parameters
+            for (param_start = input; *param_start == ' '; ++param_start);
+        }
+
+        call_command(buffer, command, param_start);
+    }
+
+    gtk_entry_set_text(entry, "");
+}
+
+struct buffer_info * new_buffer(enum buffer_type type,
+                                struct irc_network * network) {
     struct buffer_info * buffer = malloc(sizeof(struct buffer_info));
     buffer->type = type;
+    buffer->parent_network = network;
 
-    buffer->chat_viewer = gtk_text_view_new();
+    buffer->buffer = gtk_text_buffer_new(NULL);
+
+    buffer->chat_viewer = gtk_text_view_new_with_buffer(buffer->buffer);
     gtk_text_view_set_editable(GTK_TEXT_VIEW(buffer->chat_viewer), FALSE);
     gtk_text_view_set_cursor_visible(GTK_TEXT_VIEW(buffer->chat_viewer), FALSE);
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(buffer->chat_viewer),
@@ -27,6 +84,10 @@ struct buffer_info * new_buffer(enum buffer_type type) {
                        buffer->scrolled_window_for_chat_viewer, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(buffer->chat_and_command_box_container),
                        buffer->command_box, FALSE, FALSE, 0);
+
+    // Connect signals
+    g_signal_connect(buffer->command_box, "activate",
+                     G_CALLBACK(command_box_activated_handler), buffer);
 
     // Add a userlist if the buffer is a channel buffer
     if (type == CHANNEL) {

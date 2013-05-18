@@ -4,9 +4,12 @@
 #include <errno.h>
 #include <string.h>
 
+#include "commands.h"
 #include "ui/chat_window.h"
 
 int main(int argc, char *argv[]) {
+
+    init_irc_commands();
 
     gtk_init(&argc, &argv);
 

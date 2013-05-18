@@ -32,7 +32,7 @@ struct irc_network * new_irc_network() {
     network->username = "LyudeTEST";
     network->real_name = "LyudeTEST";
 
-    network->buffer = new_buffer(NETWORK);
+    network->buffer = new_buffer(NETWORK, network);
 
     return network;
 }

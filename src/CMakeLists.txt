@@ -9,6 +9,7 @@ add_executable(squirrelchat
                net_io.c
                net_input_handler.c
                irc_network.c
+               commands.c
                trie.c
                ui/chat_window.c
                ui/network_tree.c
