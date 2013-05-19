@@ -73,7 +73,7 @@ static trie_e *retrieval(trie * trie, char * tkey, int create)
 {
     trie_e *n;
     char key[U_TRIE_KEY_MAX];
-    uint c, nib = 0; /* even=high, odd=low */
+    unsigned int c, nib = 0; /* even=high, odd=low */
 
     strncpy(key, tkey, U_TRIE_KEY_MAX);
 
