@@ -24,6 +24,7 @@
 #include <gtk/gtk.h>
 #include <glib.h>
 #include <netdb.h>
+#include <stdbool.h>
 
 struct irc_network {
     // Network information
@@ -38,11 +39,7 @@ struct irc_network {
 
     int socket;
     
-    enum {
-        DISCONNECTED,
-        CONNECTING,
-        CONNECTED
-    } connection_status;
+    bool connected;
 
     char recv_buffer[IRC_MSG_BUF_LEN];
     int buffer_cursor;

@@ -38,9 +38,6 @@ struct irc_network * new_irc_network() {
     struct irc_network * network = malloc(sizeof(struct irc_network));
     memset(network, 0, sizeof(struct irc_network));
 
-    // Set the network as disconnected
-    network->connection_status = DISCONNECTED;
-
     //XXX: Added just for testing purposes
     network->address = "rainbowdash.ponychat.net";
     network->port = "6667";
@@ -69,7 +66,6 @@ int connect_irc_network(struct irc_network * network) {
     struct addrinfo * results; // Stores the result list from getaddrinfo
     int func_result;
 
-    network->connection_status = CONNECTING;
     print_to_buffer(network->buffer, "Attempting to connect to %s:%s...\n",
                     network->address, network->port);
 
@@ -84,7 +80,6 @@ int connect_irc_network(struct irc_network * network) {
     if (func_result != 0) {
         print_to_buffer(network->buffer, "CONNECTION ERROR: %s\n",
                         gai_strerror(func_result));
-        network->connection_status = DISCONNECTED;
         return -1;
     }
 
@@ -114,7 +109,6 @@ int connect_irc_network(struct irc_network * network) {
     if (rp == NULL) {
         print_to_buffer(network->buffer, "CONNECTION ERROR: %s\n",
                         strerror(errno));
-        network->connection_status = DISCONNECTED;
         freeaddrinfo(results);
         return -1;
     }
@@ -124,7 +118,7 @@ int connect_irc_network(struct irc_network * network) {
     send_to_network(network, "USER %s X X :%s\r\n",
                     network->username, network->real_name);
 
-    network->connection_status = CONNECTED;
+    network->connected = true;
     network->input_channel = g_io_channel_unix_new(network->socket);
     g_io_channel_set_encoding(network->input_channel, NULL, NULL);
     g_io_channel_set_buffered(network->input_channel, FALSE);
