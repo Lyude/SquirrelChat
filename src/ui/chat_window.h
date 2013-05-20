@@ -47,7 +47,13 @@ struct chat_window {
     GtkTreeStore * network_tree_store;
     GtkTreeIter network_tree_toplevel;
 
-    GtkWidget * buffer_pane;
+    GtkWidget * chat_viewer_and_user_list_pane;
+
+    GtkWidget * chat_viewer;
+    GtkWidget * scrolled_window_for_chat_viewer;
+    GtkWidget * command_box;
+
+    GtkWidget * user_list;
 
     struct buffer_info * current_buffer;
 };

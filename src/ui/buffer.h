@@ -37,16 +37,11 @@ enum buffer_type {
 struct buffer_info {
     enum buffer_type type;
     struct irc_network * parent_network;
-    GtkWidget * chat_viewer;
     GtkTextBuffer * buffer;
-    GtkWidget * scrolled_window_for_chat_viewer;
-    GtkWidget * command_box;
-    GtkWidget * chat_and_command_box_container;
+    double buffer_scroll_pos;
+    GtkEntryBuffer * command_box_buffer;
 
-    // Only used for channel buffers
-    GtkWidget * user_list;
     GtkListStore * user_list_store;
-    GtkWidget * chat_viewer_and_user_list_pane;
 };
 
 struct buffer_info * new_buffer(enum buffer_type type,

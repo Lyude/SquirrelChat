@@ -28,7 +28,10 @@ add_executable(squirrelchat
                ui/chat_window.c
                ui/network_tree.c
                ui/buffer.c
-               ui/main_menu_bar.c)
+               ui/main_menu_bar.c
+               ui/command_box.c
+               ui/chat_viewer.c
+               ui/user_list.c)
 
 target_link_libraries(squirrelchat ${GTK3_LIBRARIES})
 
