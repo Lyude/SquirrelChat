@@ -17,6 +17,7 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ui/buffer.h"
 #include "net_input_handler.h"
 #include "irc_network.h"
 #include "net_io.h"
@@ -80,9 +81,24 @@ gboolean net_input_handler(GIOChannel *source,
     char * msg;
     int recv_result;
 
+    errno = 0;
     recv_result = recv(network->socket,
                        &network->recv_buffer[network->buffer_fill_len],
                        IRC_MSG_LEN - network->buffer_fill_len, 0);
+
+    if (recv_result == 0) {
+        print_to_buffer(network->buffer, "Disconnected.\n");
+        close(network->socket);
+        return FALSE;
+    }
+    else if (recv_result == -1) {
+        print_to_buffer(network->buffer,
+                        "Error: %s\n"
+                        "Closing connection.\n",
+                        strerror(errno));
+        close(network->socket);
+        return FALSE;
+    }
 
     network->buffer_fill_len += recv_result;
 

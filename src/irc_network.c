@@ -39,11 +39,8 @@ struct irc_network * new_irc_network() {
     memset(network, 0, sizeof(struct irc_network));
 
     //XXX: Added just for testing purposes
-    network->address = "rainbowdash.ponychat.net";
-    network->port = "6667";
-    network->nickname = "LyudeTEST";
-    network->username = "LyudeTEST";
-    network->real_name = "LyudeTEST";
+    network->username = "SquirrelChat";
+    network->real_name = "SquirrelChat";
 
     network->buffer = new_buffer(NETWORK, network);
 
@@ -128,6 +125,13 @@ int connect_irc_network(struct irc_network * network) {
 
     freeaddrinfo(results);
     return 0;
+}
+
+// 
+void disconnect_irc_network(struct irc_network * network,
+                            char * msg) {
+    send_to_network(network, "QUIT :%s\r\n", msg ? msg : "");
+    network->connected = false;
 }
 
 void free_chat_buffer(void * this_does_nothing) {

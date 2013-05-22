@@ -18,11 +18,12 @@
 #include "../commands.h"
 
 #include <string.h>
+#include <stdlib.h>
 #include <gtk/gtk.h>
 
 void command_box_activated_handler(GtkEntry * entry,
                                    struct chat_window * window) {
-    char * input = gtk_entry_get_text(entry);
+    char * input = strdup(gtk_entry_get_text(entry));
     guint16 input_len = gtk_entry_get_text_length(entry);
     // If the input is a blank message or a blank command, do nothing
     switch (input_len) {
@@ -66,6 +67,7 @@ void command_box_activated_handler(GtkEntry * entry,
         call_command(window->current_buffer, command, param_start);
     }
 
+    free(input);
     gtk_entry_set_text(entry, "");
 }
 

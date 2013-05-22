@@ -17,6 +17,10 @@
 #ifndef CHAT_H
 #define CHAT_H
 
-void free_chat_buffer(void * buffer); // this does nothing as of now
+#include "irc_network.h"
+
+void send_privmsg(struct irc_network * network,
+                  char * recepient,
+                  char * message);
 
 #endif /* CHAT_H */

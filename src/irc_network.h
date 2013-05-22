@@ -54,8 +54,8 @@ void free_irc_network(struct irc_network * network,
                       GtkTreeStore * network_tree_store);
 
 int connect_irc_network(struct irc_network * network);
-void print_to_irc_network(struct irc_network * network,
-                          char * message, ...);
+void disconnect_irc_network(struct irc_network * network,
+                            char * msg);
 
 void free_chat_buffer(void * this_does_nothing);
 

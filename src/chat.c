@@ -14,5 +14,15 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-void free_chat_buffer(void * buffer) {}
+#include "irc_network.h"
+#include "net_io.h"
+
+// TODO: Add support for splitting messages over 512 chars
+void send_privmsg(struct irc_network * network,
+                  char * recepient,
+                  char * msg) {
+    send_to_network(network, "PRIVMSG %s :%s\r\n",
+                    recepient, msg);
+}
+
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

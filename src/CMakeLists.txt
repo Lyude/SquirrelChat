@@ -24,7 +24,9 @@ add_executable(squirrelchat
                net_input_handler.c
                irc_network.c
                commands.c
+               builtin_commands.c
                trie.c
+               chat.c
                ui/chat_window.c
                ui/network_tree.c
                ui/buffer.c
