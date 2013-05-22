@@ -18,7 +18,7 @@ project(SquirrelChat C)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
 
-add_definitions("-D_POSIX_SOURCE")
+add_definitions("-D_POSIX_C_SOURCE=200809L") # Let's not be discriminate :)
 
 # C11 is only partially supported in gcc versions 4.3 and up, and fully
 # supported in versions 4.8 and up. So we need to account for this.
