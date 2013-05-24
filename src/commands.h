@@ -34,21 +34,21 @@ struct irc_command_info {
 #define IRC_CMD_ARGC_MAX USHRT_MAX
 #define IRC_CMD_SYNTAX_ERR -1
 
-void init_irc_commands();
+extern void init_irc_commands();
 
-void add_irc_command(char * command,
-                     irc_command_callback * callback,
-                     unsigned short argc_max,
-                     char * syntax_msg,
-                     char * help_msg);
-void del_irc_command(char * command);
-void call_command(struct buffer_info * buffer,
-                  char * command,
-                  char * params);
-void print_command_syntax(struct buffer_info * buffer,
-                          char * command);
-void print_command_help(struct buffer_info * buffer,
-                        char * command);
+extern void add_irc_command(char * command,
+                            irc_command_callback * callback,
+                            unsigned short argc_max,
+                            char * syntax_msg,
+                            char * help_msg);
+extern void del_irc_command(char * command);
+extern void call_command(struct buffer_info * buffer,
+                         char * command,
+                         char * params);
+extern void print_command_syntax(struct buffer_info * buffer,
+                                 char * command);
+extern void print_command_help(struct buffer_info * buffer,
+                               char * command);
 
 #endif // __COMMANDS_H__
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

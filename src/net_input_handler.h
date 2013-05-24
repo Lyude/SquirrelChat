@@ -21,8 +21,8 @@
 
 #include <glib.h>
 
-gboolean net_input_handler(GIOChannel *source,
-                           GIOCondition condition,
-                           struct irc_network * buffer);
+extern gboolean net_input_handler(GIOChannel *source,
+                                  GIOCondition condition,
+                                  struct irc_network * buffer);
 
 #endif // NET_INPUT_HANDLER_H

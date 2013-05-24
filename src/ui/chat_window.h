@@ -59,10 +59,10 @@ struct chat_window {
 };
 
 // TODO: Remove the "create_" part in the function name
-struct chat_window * create_new_chat_window(struct irc_network * network);
+extern struct chat_window * create_new_chat_window(struct irc_network * network);
 
-void change_active_buffer(struct chat_window * window,
-                          struct buffer_info * new_buffer);
+extern void change_active_buffer(struct chat_window * window,
+                                 struct buffer_info * new_buffer);
 
 #endif // CHAT_WINDOW_H
 

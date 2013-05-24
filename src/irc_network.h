@@ -49,17 +49,17 @@ struct irc_network {
     struct buffer_info * buffer;
 };
 
-struct irc_network * new_irc_network();
-void free_irc_network(struct irc_network * network,
-                      GtkTreeStore * network_tree_store);
+extern struct irc_network * new_irc_network();
+extern void free_irc_network(struct irc_network * network,
+                             GtkTreeStore * network_tree_store);
 
-int connect_irc_network(struct irc_network * network);
-void disconnect_irc_network(struct irc_network * network,
-                            char * msg);
+extern int connect_irc_network(struct irc_network * network);
+extern void disconnect_irc_network(struct irc_network * network,
+                                   char * msg);
 
-void free_chat_buffer(void * this_does_nothing);
+extern void free_chat_buffer(void * this_does_nothing);
 
-void network_tree_cursor_changed_handler(GtkTreeSelection *treeselection,
-                                         GtkTextView *chat_viewer);
+extern void network_tree_cursor_changed_handler(GtkTreeSelection *treeselection,
+                                                GtkTextView *chat_viewer);
 #endif /* BUFFERS_H */
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

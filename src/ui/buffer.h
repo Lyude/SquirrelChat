@@ -44,12 +44,12 @@ struct buffer_info {
     GtkListStore * user_list_store;
 };
 
-struct buffer_info * new_buffer(enum buffer_type type,
-                                struct irc_network * network);
-void destroy_buffer(struct buffer_info * buffer);
+extern struct buffer_info * new_buffer(enum buffer_type type,
+                                       struct irc_network * network);
+extern void destroy_buffer(struct buffer_info * buffer);
 
-void print_to_buffer(struct buffer_info * buffer,
-                     char * message, ...);
+extern void print_to_buffer(struct buffer_info * buffer,
+                            char * message, ...);
 
 #endif /* __BUFFER_H__ */    
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

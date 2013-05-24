@@ -21,13 +21,13 @@
 
 #include "buffer.h"
 
-void create_network_tree(struct chat_window * window);
-void connect_network_tree_signals(struct chat_window * window);
+extern void create_network_tree(struct chat_window * window);
+extern void connect_network_tree_signals(struct chat_window * window);
 
-struct irc_network * get_current_network(struct chat_window * window);
+extern struct irc_network * get_current_network(struct chat_window * window);
 
-void add_network(struct chat_window * window,
-                 struct irc_network * network);
+extern void add_network(struct chat_window * window,
+                        struct irc_network * network);
 
 #endif /* NETWORK_TREE_H */
 

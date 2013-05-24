@@ -22,7 +22,7 @@ typedef void (*irc_message_callback)(struct irc_network *,
                                      short,      // argc
                                      char*[]);    // argv
 
-void init_message_parser();
-void process_irc_message(struct irc_network * network, char * msg);
+extern void init_message_parser();
+extern void process_irc_message(struct irc_network * network, char * msg);
 #endif
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
