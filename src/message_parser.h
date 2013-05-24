@@ -18,7 +18,7 @@
 #include "irc_network.h"
 
 typedef void (*irc_message_callback)(struct irc_network *,
-                                     char *,     // address
+                                     char *,     // hostmask
                                      short,      // argc
                                      char*[]);    // argv
 

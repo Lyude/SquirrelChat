@@ -63,7 +63,7 @@ void init_message_parser() {
 
 void process_irc_message(struct irc_network * network, char * msg) {
     char * cursor;
-    char * address;
+    char * hostmask;
     char * command;
     char * params;
     short numeric;
@@ -75,7 +75,7 @@ void process_irc_message(struct irc_network * network, char * msg) {
     /* TODO: Maybe figure out a better behavior for when bad messages are
      * received...
      */
-    if ((address = strtok_r(msg, " ", &cursor)) == NULL)
+    if ((hostmask = strtok_r(msg, " ", &cursor)) == NULL)
         return;
     if ((command = strtok_r(NULL, " ", &cursor)) == NULL)
         return;
@@ -105,12 +105,12 @@ void process_irc_message(struct irc_network * network, char * msg) {
 
     if ((numeric = numeric_to_short(command)) != -1) {
         if (numeric > 0 && numeric <= IRC_NUMERIC_MAX && numerics[numeric] != NULL)
-            numerics[numeric](network, address, argc, argv);
+            numerics[numeric](network, hostmask, argc, argv);
         else {
             print_to_buffer(network->buffer,
                             "Error parsing message: unknown numeric: %i\n"
                             "Received from: \"%s\"\n"
-                            "Args: [ ", numeric, address);
+                            "Args: [ ", numeric, hostmask);
             for (short i = 0; i < argc; i++)
                 print_to_buffer(network->buffer, "\"%s\", ", argv[i]);
             print_to_buffer(network->buffer, " ]\n");
@@ -123,7 +123,7 @@ void process_irc_message(struct irc_network * network, char * msg) {
         print_to_buffer(network->buffer,
                         "Error parsing message: unknown message type: \"%s\"\n"
                         "Received from: \"%s\"\n"
-                        "Args: [ ", command, address);
+                        "Args: [ ", command, hostmask);
         for (short i = 0; i < argc; i++)
             print_to_buffer(network->buffer, "\"%s\", ", argv[i]);
         print_to_buffer(network->buffer, " ]\n");
