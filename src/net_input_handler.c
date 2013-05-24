@@ -21,6 +21,7 @@
 #include "net_input_handler.h"
 #include "irc_network.h"
 #include "net_io.h"
+#include "message_parser.h"
 
 #include <glib.h>
 #include <string.h>
@@ -104,7 +105,7 @@ gboolean net_input_handler(GIOChannel *source,
 
     // Temporary, just for testing
     while ((msg = check_for_messages(network)) != NULL) {
-        printf("%s\n", msg);
+        process_irc_message(network, msg);
     }
 
     return TRUE;

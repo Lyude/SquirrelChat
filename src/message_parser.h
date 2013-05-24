@@ -1,4 +1,4 @@
-/*
+/* 
  * Copyright (C) 2013 Stephen Chandler Paul
  *
  * This file is free software: you may copy it, redistribute it and/or modify it
@@ -13,28 +13,16 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
+#ifndef __MESSAGE_PARSER_H__
+#define __MESSAGE_PARSER_H__
+#include "irc_network.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gtk/gtk.h>
-#include <errno.h>
-#include <string.h>
+typedef void (*irc_message_callback)(struct irc_network *,
+                                     char *,     // address
+                                     short,      // argc
+                                     char*[]);    // argv
 
-#include "commands.h"
-#include "message_parser.h"
-#include "ui/chat_window.h"
-
-int main(int argc, char *argv[]) {
-
-    init_irc_commands();
-    init_message_parser();
-
-    gtk_init(&argc, &argv);
-
-    struct chat_window * window = create_new_chat_window(NULL);
-
-    gtk_main();
-
-    return 0;
-}
+void init_message_parser();
+void process_irc_message(struct irc_network * network, char * msg);
+#endif
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
