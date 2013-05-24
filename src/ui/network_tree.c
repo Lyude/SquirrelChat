@@ -48,6 +48,8 @@ void create_network_tree(struct chat_window * window) {
                                        network_tree_renderer, "text", 0);
     gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(window->network_tree),
                                       FALSE);
+    gtk_tree_view_set_show_expanders(GTK_TREE_VIEW(window->network_tree),
+                                     TRUE);
     gtk_tree_selection_set_mode(gtk_tree_view_get_selection(
                                 GTK_TREE_VIEW(window->network_tree)),
                                 GTK_SELECTION_SINGLE);
@@ -56,10 +58,19 @@ void create_network_tree(struct chat_window * window) {
 // Adds an empty network buffer to the network tree
 void add_network(struct chat_window * window,
                  struct irc_network * network) {
+    GtkTreePath * toplevel_path;
     gtk_tree_store_append(window->network_tree_store,
                           &network_tree_toplevel, NULL);
     gtk_tree_store_set(window->network_tree_store, &network_tree_toplevel,
-                       0, "untitled", 1, network, -1);
+                       0, "untitled", 1, network->buffer, -1);
+
+    toplevel_path = 
+        gtk_tree_model_get_path(GTK_TREE_MODEL(window->network_tree_store),
+                                &network_tree_toplevel);
+
+    network->row = gtk_tree_row_reference_new(
+            GTK_TREE_MODEL(window->network_tree_store),
+            toplevel_path);
 }
 
 // Get's the currently selected network in the network tree
@@ -80,7 +91,7 @@ struct irc_network * get_current_network(struct chat_window * window) {
  */
 void cursor_changed_handler(GtkTreeSelection *treeselection,
                             struct chat_window * window) {
-    struct irc_network * network;
+    struct buffer_info * buffer;
     GtkTreeModel * network_list_model =
         gtk_tree_view_get_model(gtk_tree_selection_get_tree_view(treeselection));
     GtkTreeIter selected_row;
@@ -89,9 +100,9 @@ void cursor_changed_handler(GtkTreeSelection *treeselection,
                                     &selected_row);
 
     gtk_tree_model_get(network_list_model, &selected_row,
-                       1, &network, -1);
+                       1, &buffer, -1);
     
-    change_active_buffer(window, network->buffer);
+    change_active_buffer(window, buffer);
 }
 
 /* Connects the signals for the network tree

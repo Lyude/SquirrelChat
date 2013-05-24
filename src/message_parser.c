@@ -15,6 +15,7 @@
  */
 
 #include "message_parser.h"
+#include "message_types.h"
 
 #include "trie.h"
 #include "irc_network.h"
@@ -53,6 +54,11 @@ short numeric_to_short(char * numeric) {
 void init_message_parser() {
     message_types = trie_new(trie_strtoupper);
     numerics = calloc(IRC_NUMERIC_MAX, sizeof(irc_message_callback*));
+
+    // Add in the built in message types
+    trie_set(message_types, "JOIN", join_msg_callback);
+    trie_set(message_types, "PRIVMSG", privmsg_msg_callback);
+    trie_set(message_types, "PING", ping_msg_callback);
 }
 
 void process_irc_message(struct irc_network * network, char * msg) {
@@ -119,7 +125,7 @@ void process_irc_message(struct irc_network * network, char * msg) {
     }
     // Attempt to look up the command
     else if ((callback = trie_get(message_types, command)) != NULL)
-        callback(network, command, argc, argv, trailing);
+        callback(network, hostmask, argc, argv, trailing);
     else {
         print_to_buffer(network->buffer,
                         "Error parsing message: unknown message type: \"%s\"\n"

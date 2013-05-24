@@ -20,6 +20,7 @@
 #define __IRC_NETWORK_H__ 
 
 #include "irc_macros.h"
+#include "trie.h"
 
 #include <gtk/gtk.h>
 #include <glib.h>
@@ -46,7 +47,10 @@ struct irc_network {
     size_t buffer_fill_len;
     GIOChannel * input_channel;
 
+    GtkTreeRowReference * row;
+
     struct buffer_info * buffer;
+    trie * buffers;
 };
 
 extern struct irc_network * new_irc_network();

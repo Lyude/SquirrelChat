@@ -44,6 +44,8 @@ struct irc_network * new_irc_network() {
 
     network->buffer = new_buffer(NETWORK, network);
 
+    network->buffers = trie_new(trie_strtolower);
+
     return network;
 }
 
