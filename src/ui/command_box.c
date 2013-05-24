@@ -45,23 +45,24 @@ void command_box_activated_handler(GtkEntry * entry,
         char * param_start;
         char * command_end;
         char * command;
-    
-        // Eat the /
-        input++;
+        char * cursor;
+
+        // Start the cursor right after the /
+        cursor = input + 1;
 
         // Extract the name of the command
         command_end = strchr(input, ' ');
         if (command_end == NULL) {
-            command = input;
+            command = cursor;
             param_start = NULL;
         }
         else {
             *command_end = '\0';
-            command = input;
-            input = command_end + 1;
+            command = cursor;
+            cursor = command_end + 1;
 
             // Extract the parameters
-            for (param_start = input; *param_start == ' '; ++param_start);
+            for (param_start = cursor; *param_start == ' '; ++param_start);
         }
 
         call_command(window->current_buffer, command, param_start);
