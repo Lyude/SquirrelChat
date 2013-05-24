@@ -133,4 +133,10 @@ void process_irc_message(struct irc_network * network, char * msg) {
         print_to_buffer(network->buffer, " ]\n");
     }
 }
+
+void split_irc_hostmask(char * hostmask, char ** nickname, char ** address) {
+    char * saveptr;
+    *nickname = strtok_r(hostmask, "!", &saveptr);
+    *address = strtok_r(hostmask, "!", &saveptr);
+}
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
