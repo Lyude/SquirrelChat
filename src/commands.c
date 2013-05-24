@@ -25,15 +25,9 @@
 
 trie * command_trie;
 
-// Converts a string to lowercase, used to canonize strings by the trie
-void strtolower(char * s) {
-    for (int i = 0; s[i] != '\0'; i++)
-        s[i] = tolower(s[i]);
-}
-
 // Sets up the commands trie and adds the default client commands to said trie
 void init_irc_commands() {
-    command_trie = trie_new(strtolower);
+    command_trie = trie_new(trie_strtolower);
     add_builtin_commands();
 }
 

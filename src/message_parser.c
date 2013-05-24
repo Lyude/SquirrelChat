@@ -50,14 +50,8 @@ short numeric_to_short(char * numeric) {
         return result;
 }
 
-// Used by trie for looking up types
-void strtoupper(char * s) {
-    for (int i = 0; s[i] != '\0'; i++)
-        s[i] = toupper(s[i]);
-}
-
 void init_message_parser() {
-    message_types = trie_new(strtoupper);
+    message_types = trie_new(trie_strtoupper);
     numerics = calloc(IRC_NUMERIC_MAX, sizeof(irc_message_callback*));
 }
 

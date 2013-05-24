@@ -63,4 +63,7 @@ extern void *trie_get(trie * trie, char * key);
 extern void trie_each(trie * trie, void(*cb)(), void * priv);
 extern void *trie_del(trie * trie, char * key);
 
+extern void trie_strtolower(char * s);
+extern void trie_strtoupper(char * s);
+
 #endif

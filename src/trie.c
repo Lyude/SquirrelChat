@@ -35,6 +35,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "trie.h"
 
 static void __null_canonize(char * s) { }
@@ -169,4 +170,14 @@ void *trie_del(trie * trie, char * key)
     }
 
     return val;
+}
+
+void trie_strtolower(char * s) {
+    for (int i = 0; s[i] != '\0'; i++)
+        s[i] = tolower(s[i]);
+}
+
+void trie_strtoupper(char * s) {
+    for (int i = 0; s[i] != '\0'; i++)
+        s[i] = toupper(s[i]);
 }
