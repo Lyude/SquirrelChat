@@ -53,9 +53,7 @@ void print_to_buffer(struct buffer_info * buffer,
                      char * message, ...) {
     va_list args;
     char * parsed_message;
-    gchar * parsed_message_utf8;
     size_t parsed_message_len;
-    size_t parsed_message_utf8_len;
     GtkTextIter end_of_buffer;
 
     // Parse the message passed to this function
@@ -63,18 +61,9 @@ void print_to_buffer(struct buffer_info * buffer,
     parsed_message_len = vsnprintf(NULL, 0, message, args);
 
     va_start(args, message);
-    parsed_message = malloc(parsed_message_len);
+    parsed_message = alloca(parsed_message_len);
     vsnprintf(parsed_message, parsed_message_len + 1, message, args);
     va_end(args);
-
-    /* FIXME (maybe): String is already supposed to be in utf8, but glib doesn't
-     * think so, so we convert it to glib's liking
-     */
-    parsed_message_utf8 = g_locale_to_utf8(parsed_message,
-                                           parsed_message_len,
-                                           &parsed_message_utf8_len,
-                                           NULL, NULL);
-    free(parsed_message);
     
     // Figure out where the end of the buffer is
     gtk_text_buffer_get_end_iter(buffer->buffer, &end_of_buffer);
@@ -84,9 +73,8 @@ void print_to_buffer(struct buffer_info * buffer,
      */
 
     // Print the message
-    gtk_text_buffer_insert(buffer->buffer, &end_of_buffer, parsed_message_utf8,
-                           parsed_message_utf8_len);
-    free(parsed_message_utf8);
+    gtk_text_buffer_insert(buffer->buffer, &end_of_buffer, parsed_message,
+                           parsed_message_len);
 }
 
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
