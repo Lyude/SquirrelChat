@@ -81,6 +81,7 @@ void process_irc_message(struct irc_network * network, char * msg) {
 
     char * argv[MAX_POSSIBLE_PARAMS];
     short argc;
+    char * trailing = NULL;
     for (argc = 0; ; argc++) {
         char * param_end;
         
@@ -88,8 +89,7 @@ void process_irc_message(struct irc_network * network, char * msg) {
          * processing spaces
          */
         if (*cursor == ':') {
-            argv[argc] = cursor + 1;
-            argc++;
+            trailing = cursor + 1;
             break;
         }
 
@@ -104,12 +104,14 @@ void process_irc_message(struct irc_network * network, char * msg) {
 
     if ((numeric = numeric_to_short(command)) != -1) {
         if (numeric > 0 && numeric <= IRC_NUMERIC_MAX && numerics[numeric] != NULL)
-            numerics[numeric](network, hostmask, argc, argv);
+            numerics[numeric](network, hostmask, argc, argv, trailing);
         else {
             print_to_buffer(network->buffer,
                             "Error parsing message: unknown numeric: %i\n"
                             "Received from: \"%s\"\n"
-                            "Args: [ ", numeric, hostmask);
+                            "Trailing: \"%s\"\n"
+                            "Args: [ ",
+                            numeric, hostmask, trailing ? trailing : "(N/A)");
             for (short i = 0; i < argc; i++)
                 print_to_buffer(network->buffer, "\"%s\", ", argv[i]);
             print_to_buffer(network->buffer, " ]\n");
@@ -117,12 +119,15 @@ void process_irc_message(struct irc_network * network, char * msg) {
     }
     // Attempt to look up the command
     else if ((callback = trie_get(message_types, command)) != NULL)
-        callback(network, command, argc, argv);
+        callback(network, command, argc, argv, trailing);
     else {
         print_to_buffer(network->buffer,
                         "Error parsing message: unknown message type: \"%s\"\n"
                         "Received from: \"%s\"\n"
-                        "Args: [ ", command, hostmask ? hostmask : "(N/A)");
+                        "Trailing: \"%s\"\n"
+                        "Args: [ ", 
+                        command, hostmask ? hostmask : "(N/A)",
+                        trailing ? trailing : "(N/A)");
         for (short i = 0; i < argc; i++)
             print_to_buffer(network->buffer, "\"%s\", ", argv[i]);
         print_to_buffer(network->buffer, " ]\n");
