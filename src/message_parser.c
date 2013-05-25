@@ -62,17 +62,22 @@ void process_irc_message(struct irc_network * network, char * msg) {
     char * params;
     short numeric;
     irc_message_callback callback;
-    
-    // Eat the first ':' at the beginning of every message
-    msg++;
 
     /* TODO: Maybe figure out a better behavior for when bad messages are
      * received...
      */
-    if ((hostmask = strtok_r(msg, " ", &cursor)) == NULL)
-        return;
-    if ((command = strtok_r(NULL, " ", &cursor)) == NULL)
-        return;
+    // Check to see if the message has a sender
+    if (msg[0] == ':') {
+        if ((hostmask = strtok_r(msg+1, " ", &cursor)) == NULL)
+            return;
+        if ((command = strtok_r(NULL, " ", &cursor)) == NULL)
+            return;
+    }
+    else {
+        hostmask = NULL;
+        if ((command = strtok_r(msg, " ", &cursor)) == NULL)
+            return;
+    }
 
     char * argv[MAX_POSSIBLE_PARAMS];
     short argc;
@@ -117,7 +122,7 @@ void process_irc_message(struct irc_network * network, char * msg) {
         print_to_buffer(network->buffer,
                         "Error parsing message: unknown message type: \"%s\"\n"
                         "Received from: \"%s\"\n"
-                        "Args: [ ", command, hostmask);
+                        "Args: [ ", command, hostmask ? hostmask : "(N/A)");
         for (short i = 0; i < argc; i++)
             print_to_buffer(network->buffer, "\"%s\", ", argv[i]);
         print_to_buffer(network->buffer, " ]\n");
