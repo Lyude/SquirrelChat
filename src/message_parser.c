@@ -102,6 +102,8 @@ void process_irc_message(struct irc_network * network, char * msg) {
 
         else if ((param_end = strchr(cursor, ' ')) == NULL) {
             argv[argc] = cursor;
+            if (argc == 0)
+                argc++;
             break;
         }
         *param_end = '\0';

@@ -80,21 +80,26 @@ void part_msg_callback(struct irc_network * network,
                        char * argv[],
                        char * trailing) {
     struct buffer_info * buffer;
+    char * channel_name;
     char * nickname;
     char * address;
     split_irc_hostmask(hostmask, &nickname, &address);
 
     if (argc < 1) {
-        print_to_buffer(network->buffer,
-                        "Error parsing message: Received PART from %s without "
-                        "a channel!\n", nickname);
-        return;
+        if ((channel_name = trailing) == NULL) {
+            print_to_buffer(network->buffer,
+                            "Error parsing message: Received PART from %s "
+                            "without a channel!\n", nickname);
+            return;
+        }
     }
+    else
+        channel_name = argv[0];
 
-    if ((buffer = trie_get(network->buffers, argv[0])) == NULL) {
+    if ((buffer = trie_get(network->buffers, channel_name)) == NULL) {
         print_to_buffer(network->buffer,
                         "Received a PART message for %s, but we're not in that "
-                        "channel!\n", argv[0]);
+                        "channel!\n", channel_name);
         return;
     }
 
