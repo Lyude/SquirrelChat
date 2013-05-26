@@ -17,6 +17,7 @@
 #include "irc_network.h"
 #include "ui/buffer.h"
 #include "net_io.h"
+#include "irc_macros.h"
 
 #include <string.h>
 
@@ -57,41 +58,30 @@ void privmsg_msg_callback(struct irc_network * network,
     char * nickname;
     char * address;
     split_irc_hostmask(hostmask, &nickname, &address);
-    // Check if the message was received from a channel or a user
-    if (argc == 1) { // Channel
-        struct buffer_info * channel;
+    struct buffer_info * buffer;
         
-        // Make sure the channel exists, otherwise throw an error
-        if ((channel = trie_get(network->buffers, argv[0])) == NULL) {
-            print_to_buffer(network->buffer,
-                            "Error parsing message: Received a message from "
-                            "\"%s\", but we're not in that channel?",
-                            argv[0]);
-            return;
-        }
-        print_to_buffer(channel, "<%s> %s\n", nickname, trailing);
+    /* Since a channel buffer is always created whenever we join a channel, and
+     * we cannot receive messages from channels we're not in, then the only time
+     * we won't be able to find a buffer is when a new user messages us, so we
+     * can just go ahead and make a new query buffer.
+     */
+    if ((buffer = trie_get(network->buffers, argv[0])) == NULL) {
+        buffer = new_buffer(QUERY, network);
+        GtkTreeModel * network_tree_model;
+        GtkTreeIter network_iter;
+        GtkTreeIter buffer_iter;
+
+        network_tree_model = gtk_tree_row_reference_get_model(network->row);
+        gtk_tree_model_get_iter(network_tree_model, &network_iter,
+                                gtk_tree_row_reference_get_path(network->row));
+
+        gtk_tree_store_append(GTK_TREE_STORE(network_tree_model),
+                              &buffer_iter, &network_iter);
+        gtk_tree_store_set(GTK_TREE_STORE(network_tree_model), &buffer_iter,
+                           0, nickname, 1, buffer, -1);
     }
-    else { // User
-        struct buffer_info * query;
-
-        // If we have no buffer for this user, make one
-        if ((query = trie_get(network->buffers, argv[0])) == NULL) {
-            query = new_buffer(QUERY, network);
-            GtkTreeModel * network_tree_model;
-            GtkTreeIter network_iter;
-            GtkTreeIter query_iter;
-
-            network_tree_model = gtk_tree_row_reference_get_model(network->row);
-            gtk_tree_model_get_iter(network_tree_model, &network_iter,
-                                    gtk_tree_row_reference_get_path(network->row));
-
-            gtk_tree_store_append(GTK_TREE_STORE(network_tree_model),
-                                  &query_iter, &network_iter);
-            gtk_tree_store_set(GTK_TREE_STORE(network_tree_model), &query_iter,
-                               0, nickname, 1, query, -1);
-        }
-        print_to_buffer(query, "<%s> %s\n", nickname, trailing);
-    }
+    
+    print_to_buffer(buffer, "<%s> %s\n", nickname, trailing);
 }
 
 void ping_msg_callback(struct irc_network * network,
