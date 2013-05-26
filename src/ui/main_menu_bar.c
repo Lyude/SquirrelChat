@@ -68,6 +68,7 @@ void new_network_menu_item_callback(GtkMenuItem * menuitem,
 void about_menu_item_callback(GtkMenuItem * menuitem,
                               struct chat_window * window) {
     char * authors[] = { "Stephen Chandler Paul",
+                         "Quora Dodrill",
                          NULL };
     char * copyright = "Copyright ©2013 Stephen Chandler Paul\n"
                        "Copyright ©2013 SquirrelChat Developers\n"
