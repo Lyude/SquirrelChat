@@ -57,6 +57,7 @@ void init_message_parser() {
 
     // Add in the built in message types
     trie_set(message_types, "JOIN", join_msg_callback);
+    trie_set(message_types, "PART", part_msg_callback);
     trie_set(message_types, "PRIVMSG", privmsg_msg_callback);
     trie_set(message_types, "PING", ping_msg_callback);
 }

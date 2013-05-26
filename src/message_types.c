@@ -74,6 +74,51 @@ void join_msg_callback(struct irc_network * network,
     }
 }
 
+void part_msg_callback(struct irc_network * network,
+                       char * hostmask,
+                       short argc,
+                       char * argv[],
+                       char * trailing) {
+    struct buffer_info * buffer;
+    char * nickname;
+    char * address;
+    split_irc_hostmask(hostmask, &nickname, &address);
+
+    if (argc < 1) {
+        print_to_buffer(network->buffer,
+                        "Error parsing message: Received PART from %s without "
+                        "a channel!\n", nickname);
+        return;
+    }
+
+    if ((buffer = trie_get(network->buffers, argv[0])) == NULL) {
+        print_to_buffer(network->buffer,
+                        "Received a PART message for %s, but we're not in that "
+                        "channel!\n", argv[0]);
+        return;
+    }
+
+    // Check if we're the one the part message is coming from
+    if (strcmp(network->nickname, nickname) == 0) {
+        // Remove the buffer from the network tree
+        GtkTreeModel * network_tree_model;
+        GtkTreeIter buffer_row;
+        network_tree_model = gtk_tree_row_reference_get_model(buffer->row);
+        gtk_tree_model_get_iter(network_tree_model,
+                                &buffer_row,
+                                gtk_tree_row_reference_get_path(buffer->row));
+
+        gtk_tree_store_remove(GTK_TREE_STORE(network_tree_model), &buffer_row);
+
+        destroy_buffer(buffer);
+    }
+    else {
+        print_to_buffer(buffer, 
+                        "* %s (%s) has left the channel\n", nickname, address);
+        //TODO: Add code in here to remove the user from the user list
+    }
+}
+
 void privmsg_msg_callback(struct irc_network * network,
                           char * hostmask,
                           short argc,

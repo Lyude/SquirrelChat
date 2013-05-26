@@ -22,6 +22,11 @@ extern void join_msg_callback(struct irc_network * network,
                               short argc,
                               char * argv[],
                               char * trailing);
+extern void part_msg_callback(struct irc_network * network,
+                              char * hostmask,
+                              short argc,
+                              char * argv[],
+                              char * trailing);
 extern void privmsg_msg_callback(struct irc_network * network,
                                  char * hostmask,
                                  short argc,
