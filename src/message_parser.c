@@ -21,6 +21,7 @@
 #include "irc_network.h"
 #include "irc_numerics.h"
 #include "ui/buffer.h"
+#include "chat.h"
 
 #include <string.h>
 #include <stdlib.h>
