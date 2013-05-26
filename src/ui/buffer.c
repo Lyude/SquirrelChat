@@ -29,6 +29,7 @@ struct buffer_info * new_buffer(char * buffer_name,
     struct buffer_info * buffer = malloc(sizeof(struct buffer_info));
     buffer->type = type;
     buffer->buffer_name = (type != NETWORK) ? strdup(buffer_name) : NULL;
+    buffer->row = NULL;
     buffer->parent_network = network;
     buffer->buffer_scroll_pos = 0;
     buffer->buffer = gtk_text_buffer_new(NULL);

@@ -37,6 +37,7 @@ enum buffer_type {
 struct buffer_info {
     enum buffer_type type;
     char * buffer_name;
+    GtkTreeRowReference * row;
 
     struct irc_network * parent_network;
     GtkTextBuffer * buffer;

@@ -51,6 +51,10 @@ void join_msg_callback(struct irc_network * network,
                                &channel_iter, &network_iter);
         gtk_tree_store_set(GTK_TREE_STORE(network_tree_model), &channel_iter,
                            0, trailing, 1, new_channel, -1);
+        
+        // Store a reference to the row in the buffer
+        new_channel->row = gtk_tree_row_reference_new(network_tree_model,
+                gtk_tree_model_get_path(network_tree_model, &channel_iter));
     }
     else {
         struct buffer_info * buffer;
@@ -96,6 +100,9 @@ void privmsg_msg_callback(struct irc_network * network,
                               &buffer_iter, &network_iter);
         gtk_tree_store_set(GTK_TREE_STORE(network_tree_model), &buffer_iter,
                            0, nickname, 1, buffer, -1);
+
+        network->row = gtk_tree_row_reference_new(network_tree_model,
+                gtk_tree_model_get_path(network_tree_model, &buffer_iter));
     }
     
     print_to_buffer(buffer, "<%s> %s\n", nickname, trailing);
