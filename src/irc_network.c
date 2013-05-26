@@ -65,6 +65,16 @@ int connect_irc_network(struct irc_network * network) {
     struct addrinfo * results; // Stores the result list from getaddrinfo
     int func_result;
 
+    // Make sure the server is set
+    if (network->address == NULL) {
+        print_to_buffer(network->buffer, "You forgot to set a server!\n");
+        return -1;
+    }
+
+    // Set a default nickname when the user does not set one
+    if (network->nickname == NULL)
+        network->nickname = getlogin();
+
     print_to_buffer(network->buffer, "Attempting to connect to %s:%s...\n",
                     network->address, network->port);
 
