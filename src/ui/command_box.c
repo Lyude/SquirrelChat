@@ -16,6 +16,7 @@
 
 #include "chat_window.h"
 #include "../commands.h"
+#include "../chat.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -66,7 +67,14 @@ void command_box_activated_handler(GtkEntry * entry,
         }
 
         call_command(window->current_buffer, command, param_start);
-    }
+    } else {
+		send_privmsg(window->current_buffer->parent_network, 
+		             window->current_buffer->buffer_name, 
+		             input);
+		print_to_buffer(window->current_buffer, "<%s> %s\n", 
+		                window->current_buffer->parent_network->nickname, 
+		                input);
+	}
 
     free(input);
     gtk_entry_set_text(entry, "");
