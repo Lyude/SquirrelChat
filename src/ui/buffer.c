@@ -50,6 +50,7 @@ void destroy_buffer(struct buffer_info * buffer) {
     g_object_unref(buffer->command_box_buffer);
 
     free(buffer->buffer_name);
+    gtk_tree_row_reference_free(buffer->row);
     free(buffer);
 }
 
