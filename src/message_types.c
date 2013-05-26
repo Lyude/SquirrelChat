@@ -66,7 +66,7 @@ void join_msg_callback(struct irc_network * network,
             return;
         }
 
-        print_to_buffer(buffer, "%s (%s) has joined %s\n",
+        print_to_buffer(buffer, "* %s (%s) has joined %s\n",
                         nickname, address, trailing);
     }
 }
