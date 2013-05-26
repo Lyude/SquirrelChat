@@ -51,6 +51,10 @@ void add_builtin_commands() {
                     "/join #foobar,#moo; cow <-- joins the channel #foobar with "
                     "no password and also joins the channel #moo with the "
                     "password \"cow\".");
+    add_irc_command("part", cmd_part, 1,
+                    "/part [channel[,...]] [part_message]",
+                    "Parts the current channel or a comma-seperated list of "
+                    "channels, optionally with a message.\n");
     add_irc_command("connect", cmd_connect, 0,
                     "/connect",
                      "Starts a connection with the IRC server for the current"
@@ -148,6 +152,24 @@ short cmd_join(struct buffer_info * buffer,
                         argv[0]);
     else
         print_to_buffer(buffer, "Not connected!\n");
+    return 0;
+}
+
+// Max argc: 1
+short cmd_part(struct buffer_info * buffer,
+               unsigned short argc,
+               char * argv[],
+               char * trailing) {
+    if (argc < 1) {
+        if (buffer->type == CHANNEL)
+            send_to_network(buffer->parent_network, "PART %s\r\n",
+                            buffer->buffer_name);
+        else
+            print_to_buffer(buffer, "You're not in a channel!\n");
+    }
+    else
+        send_to_network(buffer->parent_network, "PART %s :%s\r\n",
+                        argv[0], trailing ? trailing : "");
     return 0;
 }
 

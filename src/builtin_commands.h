@@ -40,6 +40,10 @@ extern short cmd_join(struct buffer_info * buffer,
                       unsigned short argc,
                       char * argv[],
                       char * trailing);
+extern short cmd_part(struct buffer_info * buffer,
+                      unsigned short argc,
+                      char * argv[],
+                      char * trailing);
 extern short cmd_connect(struct buffer_info * buffer,
                          unsigned short argc,
                          char * argv[],
