@@ -30,8 +30,12 @@ void join_msg_callback(struct irc_network * network,
     char * address;
     split_irc_hostmask(hostmask, &nickname, &address);
 
+    if (trailing == NULL)
+        print_to_buffer(network->buffer,
+                        "Error parsing message: Received a JOIN from %s, but "
+                        "no channel was specified\n", nickname);
     // Check if we're the user joining a channel
-    if (strcmp(network->nickname, nickname) == 0) {
+    else if (strcmp(network->nickname, nickname) == 0) {
         GtkTreeModel * network_tree_model;
         GtkTreeIter network_iter;
         GtkTreeIter channel_iter;
@@ -47,6 +51,19 @@ void join_msg_callback(struct irc_network * network,
                                &channel_iter, &network_iter);
         gtk_tree_store_set(GTK_TREE_STORE(network_tree_model), &channel_iter,
                            0, trailing, 1, new_channel, -1);
+    }
+    else {
+        struct buffer_info * buffer;
+        if ((buffer = trie_get(network->buffers, trailing)) == NULL) {
+            print_to_buffer(network->buffer,
+                            "Error parsing message: received JOIN from %s for "
+                            "%s, but we're not in that channel!\n",
+                            nickname, trailing);
+            return;
+        }
+
+        print_to_buffer(buffer, "%s (%s) has joined %s\n",
+                        nickname, address, trailing);
     }
 }
 
