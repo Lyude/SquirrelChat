@@ -6,3 +6,6 @@ cmake_install.cmake
 CMakeFiles/
 CMakeCache.txt
 Makefile
+
+# Squirrelchat binary
+squirrelchat
