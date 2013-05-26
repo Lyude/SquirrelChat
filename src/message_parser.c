@@ -143,6 +143,6 @@ void process_irc_message(struct irc_network * network, char * msg) {
 void split_irc_hostmask(char * hostmask, char ** nickname, char ** address) {
     char * saveptr;
     *nickname = strtok_r(hostmask, "!", &saveptr);
-    *address = strtok_r(hostmask, "!", &saveptr);
+    *address = strtok_r(NULL, "!", &saveptr);
 }
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
