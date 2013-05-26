@@ -39,7 +39,7 @@ void join_msg_callback(struct irc_network * network,
         GtkTreeModel * network_tree_model;
         GtkTreeIter network_iter;
         GtkTreeIter channel_iter;
-        struct buffer_info * new_channel = new_buffer(CHANNEL, network);
+        struct buffer_info * new_channel = new_buffer(trailing, CHANNEL, network);
 
         trie_set(network->buffers, trailing, new_channel);
         // Add a new row as a child of the network
@@ -83,7 +83,7 @@ void privmsg_msg_callback(struct irc_network * network,
      * can just go ahead and make a new query buffer.
      */
     if ((buffer = trie_get(network->buffers, argv[0])) == NULL) {
-        buffer = new_buffer(QUERY, network);
+        buffer = new_buffer(nickname, QUERY, network);
         GtkTreeModel * network_tree_model;
         GtkTreeIter network_iter;
         GtkTreeIter buffer_iter;

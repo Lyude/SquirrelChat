@@ -36,6 +36,8 @@ enum buffer_type {
  */
 struct buffer_info {
     enum buffer_type type;
+    char * buffer_name;
+
     struct irc_network * parent_network;
     GtkTextBuffer * buffer;
     double buffer_scroll_pos;
@@ -44,7 +46,8 @@ struct buffer_info {
     GtkListStore * user_list_store;
 };
 
-extern struct buffer_info * new_buffer(enum buffer_type type,
+extern struct buffer_info * new_buffer(char * buffer_name,
+                                       enum buffer_type type,
                                        struct irc_network * network);
 extern void destroy_buffer(struct buffer_info * buffer);
 

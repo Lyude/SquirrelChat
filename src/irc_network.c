@@ -42,7 +42,7 @@ struct irc_network * new_irc_network() {
     network->username = "SquirrelChat";
     network->real_name = "SquirrelChat";
 
-    network->buffer = new_buffer(NETWORK, network);
+    network->buffer = new_buffer(NULL, NETWORK, network);
 
     network->buffers = trie_new(trie_strtolower);
 

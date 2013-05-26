@@ -23,10 +23,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct buffer_info * new_buffer(enum buffer_type type,
+struct buffer_info * new_buffer(char * buffer_name,
+                                enum buffer_type type,
                                 struct irc_network * network) {
     struct buffer_info * buffer = malloc(sizeof(struct buffer_info));
     buffer->type = type;
+    buffer->buffer_name = (type != NETWORK) ? strdup(buffer_name) : NULL;
     buffer->parent_network = network;
     buffer->buffer_scroll_pos = 0;
     buffer->buffer = gtk_text_buffer_new(NULL);
@@ -46,6 +48,7 @@ void destroy_buffer(struct buffer_info * buffer) {
     g_object_unref(buffer->buffer);
     g_object_unref(buffer->command_box_buffer);
 
+    free(buffer->buffer_name);
     free(buffer);
 }
 
