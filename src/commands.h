@@ -20,16 +20,16 @@
 #include "ui/chat_window.h"
 
 // irc_command_callback(current buffer, argv, argc, trailing)
-typedef short (irc_command_callback)(struct buffer_info *,
-                                     unsigned short,
-                                     char*[],
-                                     char*);
+typedef short (*irc_command_callback)(struct buffer_info *,
+                                      unsigned short,
+                                      char*[],
+                                      char*);
 
 struct irc_command_info {
     unsigned short argc_max; // Specifies max size of argv
     char * syntax_msg;
     char * help_msg;
-    irc_command_callback * callback;
+    irc_command_callback callback;
 };
 #define IRC_CMD_ARGC_MAX USHRT_MAX
 #define IRC_CMD_SYNTAX_ERR -1
@@ -37,7 +37,7 @@ struct irc_command_info {
 extern void init_irc_commands();
 
 extern void add_irc_command(char * command,
-                            irc_command_callback * callback,
+                            irc_command_callback callback,
                             unsigned short argc_max,
                             char * syntax_msg,
                             char * help_msg);

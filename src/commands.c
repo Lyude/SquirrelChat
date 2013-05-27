@@ -33,7 +33,7 @@ void init_irc_commands() {
 
 // Adds an IRC command
 void add_irc_command(char * command,
-                     irc_command_callback * callback,
+                     irc_command_callback callback,
                      unsigned short argc_max,
                      char * syntax_msg,
                      char * help_msg) {
