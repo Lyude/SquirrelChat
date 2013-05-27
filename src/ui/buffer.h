@@ -19,7 +19,7 @@
 
 #include "../irc_network.h"
 #include "chat_window.h"
-#include "trie.h"
+#include "../trie.h"
 
 #include <gtk/gtk.h>
 
