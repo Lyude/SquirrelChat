@@ -39,6 +39,7 @@ struct buffer_info * new_buffer(char * buffer_name,
     if (type == CHANNEL) {
         buffer->user_list_store =
             gtk_list_store_new(3, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_POINTER);
+        buffer->users = trie_new(trie_strtolower);
     }
     return buffer;
 }

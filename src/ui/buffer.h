@@ -19,6 +19,7 @@
 
 #include "../irc_network.h"
 #include "chat_window.h"
+#include "trie.h"
 
 #include <gtk/gtk.h>
 
@@ -44,7 +45,9 @@ struct buffer_info {
     double buffer_scroll_pos;
     GtkEntryBuffer * command_box_buffer;
 
+    // Only used for channels
     GtkListStore * user_list_store;
+    trie * users;
 };
 
 extern struct buffer_info * new_buffer(char * buffer_name,
