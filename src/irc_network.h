@@ -51,6 +51,7 @@ struct irc_network {
 
     struct buffer_info * buffer;
     trie * buffers;
+    struct irc_response_queue * response_queue;
 };
 
 extern struct irc_network * new_irc_network();

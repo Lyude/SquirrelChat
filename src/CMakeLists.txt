@@ -29,6 +29,7 @@ add_executable(squirrelchat
                chat.c
                message_parser.c
                message_types.c
+               cmd_responses.c
                ui/chat_window.c
                ui/network_tree.c
                ui/buffer.c

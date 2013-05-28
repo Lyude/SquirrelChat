@@ -45,6 +45,7 @@ struct irc_network * new_irc_network() {
     network->buffer = new_buffer(NULL, NETWORK, network);
 
     network->buffers = trie_new(trie_strtolower);
+    network->response_queue = NULL;
 
     return network;
 }
