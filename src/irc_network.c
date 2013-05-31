@@ -56,7 +56,15 @@ struct irc_network * new_irc_network() {
 void free_irc_network(struct irc_network * network,
                       GtkTreeStore * network_tree_store) {
     destroy_buffer(network->buffer);
-    // TODO: Add in code to free all of the strings in the structure
+    
+    free(network->chantypes);
+    free(network->chanmodes_a);
+    free(network->chanmodes_b);
+    free(network->chanmodes_c);
+    free(network->chanmodes_d);
+    free(network->prefix_chars);
+    free(network->prefix_symbols);
+
     free(network);
 }
 
@@ -145,6 +153,14 @@ void disconnect_irc_network(struct irc_network * network,
                             char * msg) {
     send_to_network(network, "QUIT :%s\r\n", msg ? msg : "");
     network->connected = false;
+
+    free(network->chantypes);
+    free(network->chanmodes_a);
+    free(network->chanmodes_b);
+    free(network->chanmodes_c);
+    free(network->chanmodes_d);
+    free(network->prefix_chars);
+    free(network->prefix_symbols);
 }
 
 void free_chat_buffer(void * this_does_nothing) {
