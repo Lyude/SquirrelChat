@@ -18,16 +18,16 @@
 
 #include "irc_network.h"
 
-void init_numerics();
-void echo_numeric(struct irc_network * network,
-                  char * hostmask,
-                  short argc,
-                  char * argv[],
-                  char * trailing);
-void rpl_isupport(struct irc_network * network,
-                  char * hostmask,          
-                  short argc,
-                  char * argv[],
-                  char * trailing);
+extern void init_numerics();
+extern void echo_numeric(struct irc_network * network,
+                         char * hostmask,
+                         short argc,
+                         char * argv[],
+                         char * trailing);
+extern void rpl_isupport(struct irc_network * network,
+                         char * hostmask,          
+                         short argc,
+                         char * argv[],
+                         char * trailing);
 #endif
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
