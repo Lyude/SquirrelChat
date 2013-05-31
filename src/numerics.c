@@ -46,6 +46,15 @@ void init_numerics() {
     trie_set(isupport_tokens, "CASEMAPPING",(void*)ISUPPORT_CASEMAPPING);
 }
 
+// Used for numerics that just give us a message requiring no special handling
+void echo_numeric(struct irc_network * network,
+                  char * hostmask,
+                  short argc,
+                  char * argv[],
+                  char * trailing) {
+    print_to_buffer(network->buffer, "%s\n", trailing);
+}
+
 void rpl_isupport(struct irc_network * network,
                   char * hostmask,          
                   short argc,

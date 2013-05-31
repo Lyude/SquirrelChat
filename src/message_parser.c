@@ -63,6 +63,9 @@ void init_message_parser() {
     trie_set(message_types, "PRIVMSG", privmsg_msg_callback);
     trie_set(message_types, "PING", ping_msg_callback);
 
+    numerics[IRC_RPL_WELCOME] = echo_numeric;
+    numerics[IRC_RPL_YOURHOST] = echo_numeric;
+    numerics[IRC_RPL_CREATED] = echo_numeric;
     numerics[IRC_RPL_ISUPPORT] = rpl_isupport;
 }
 

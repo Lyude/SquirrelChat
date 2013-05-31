@@ -19,6 +19,11 @@
 #include "irc_network.h"
 
 void init_numerics();
+void echo_numeric(struct irc_network * network,
+                  char * hostmask,
+                  short argc,
+                  char * argv[],
+                  char * trailing);
 void rpl_isupport(struct irc_network * network,
                   char * hostmask,          
                   short argc,
