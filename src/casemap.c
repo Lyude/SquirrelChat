@@ -1,4 +1,4 @@
-/*
+/* Provides case comparison and conversion functions for rfc1459 casemapping
  * Copyright (C) 2013 Stephen Chandler Paul
  *
  * This file is free software: you may copy it, redistribute it and/or modify it
@@ -13,30 +13,28 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
+#include "casemap.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gtk/gtk.h>
-#include <errno.h>
-#include <string.h>
+char rfc1459_tolower(const char c) {
+    return c >= 'A' && c <= '^' ? c + 32 : c;
+}
 
-#include "commands.h"
-#include "message_parser.h"
-#include "ui/chat_window.h"
-#include "numerics.h"
+char rfc1459_toupper(const char c) {
+    return c >= 'a' && c <= '~' ? c - 32 : c;
+}
 
-int main(int argc, char *argv[]) {
+int rfc1459_strcasecmp(const char * s1, const char * s2) {
+    const char * c1 = s1;
+    const char * c2 = s2;
+    int result;
 
-    init_irc_commands();
-    init_message_parser();
-    init_numerics();
+    if (c1 == c2)
+        return 0;
 
-    gtk_init(&argc, &argv);
+    while ((result = rfc1459_tolower(*c1) - rfc1459_tolower(*c2++)) == 0)
+        if (*c1++ == '\0')
+            break;
 
-    struct chat_window * window = create_new_chat_window(NULL);
-
-    gtk_main();
-
-    return 0;
+    return result;
 }
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

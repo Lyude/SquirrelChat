@@ -37,6 +37,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "trie.h"
+#include "casemap.h"
 
 static void __null_canonize(char * s) { }
 
@@ -180,4 +181,14 @@ void trie_strtolower(char * s) {
 void trie_strtoupper(char * s) {
     for (int i = 0; s[i] != '\0'; i++)
         s[i] = toupper(s[i]);
+}
+
+void trie_rfc1459_strtoupper(char * s) {
+    for (int i = 0; s[i] != '\0'; i++)
+        s[i] = rfc1459_toupper(s[i]);
+}
+
+void trie_rfc1459_strtolower(char * s) {
+    for (int i = 0; s[i] != '\0'; i++)
+        s[i] = rfc1459_tolower(s[i]);
 }

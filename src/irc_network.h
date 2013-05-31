@@ -38,6 +38,26 @@ struct irc_network {
     char * username;
     char * real_name;
 
+    // ISUPPORT info
+    char * chantypes;
+    bool excepts                        : 1;
+    bool invex                          : 1;
+    bool callerid                       : 1;
+    bool elist_mask_supported           : 1;
+    bool elist_negate_mask_supported    : 1;
+    bool elist_usercount_supported      : 1;
+    bool elist_creation_time_supported  : 1;
+    bool elist_topic_search_supported   : 1;
+    bool                                : 0;
+    char * chanmodes_a; // See http://www.irc.org/tech_docs/005.html for info
+    char * chanmodes_b;
+    char * chanmodes_c;
+    char * chanmodes_d;
+    char * prefix_chars;
+    char * prefix_symbols;
+    void (*casemap_lower)(char *);
+    void (*casemap_upper)(char *);
+
     int socket;
     
     bool connected;

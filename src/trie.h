@@ -66,4 +66,7 @@ extern void *trie_del(trie * trie, char * key);
 extern void trie_strtolower(char * s);
 extern void trie_strtoupper(char * s);
 
+extern void trie_rfc1459_strtoupper(char * s);
+extern void trie_rfc1459_strtolower(char * s);
+
 #endif

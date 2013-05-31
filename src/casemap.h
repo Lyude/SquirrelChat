@@ -1,4 +1,4 @@
-/*
+/* Provides case comparison and conversion functions for rfc1459 casemapping
  * Copyright (C) 2013 Stephen Chandler Paul
  *
  * This file is free software: you may copy it, redistribute it and/or modify it
@@ -14,29 +14,11 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gtk/gtk.h>
-#include <errno.h>
-#include <string.h>
+#ifndef __CASEMAP_H__
+#define __CASEMAP_H__
 
-#include "commands.h"
-#include "message_parser.h"
-#include "ui/chat_window.h"
-#include "numerics.h"
+extern char rfc1459_tolower(const char c);
+extern char rfc1459_toupper(const char c);
+extern int rfc1459_strcasecmp(const char * s1, const char * s2);
 
-int main(int argc, char *argv[]) {
-
-    init_irc_commands();
-    init_message_parser();
-    init_numerics();
-
-    gtk_init(&argc, &argv);
-
-    struct chat_window * window = create_new_chat_window(NULL);
-
-    gtk_main();
-
-    return 0;
-}
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
+#endif // __CASEMAP_H__

@@ -20,6 +20,7 @@
 #include "trie.h"
 #include "irc_network.h"
 #include "irc_numerics.h"
+#include "numerics.h"
 #include "ui/buffer.h"
 #include "chat.h"
 
@@ -61,6 +62,8 @@ void init_message_parser() {
     trie_set(message_types, "PART", part_msg_callback);
     trie_set(message_types, "PRIVMSG", privmsg_msg_callback);
     trie_set(message_types, "PING", ping_msg_callback);
+
+    numerics[IRC_RPL_ISUPPORT] = rpl_isupport;
 }
 
 void process_irc_message(struct irc_network * network, char * msg) {
