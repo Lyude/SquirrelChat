@@ -32,6 +32,7 @@ add_executable(squirrelchat
                cmd_responses.c
                numerics.c
                casemap.c
+               errors.c
                ui/chat_window.c
                ui/network_tree.c
                ui/buffer.c

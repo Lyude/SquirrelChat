@@ -23,6 +23,7 @@
 #include "numerics.h"
 #include "ui/buffer.h"
 #include "chat.h"
+#include "errors.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -123,14 +124,9 @@ void process_irc_message(struct irc_network * network, char * msg) {
             numerics[numeric](network, hostmask, argc, argv, trailing);
         else {
             print_to_buffer(network->buffer,
-                            "Error parsing message: unknown numeric: %i\n"
-                            "Received from: \"%s\"\n"
-                            "Trailing: \"%s\"\n"
-                            "Args: [ ",
-                            numeric, hostmask, trailing ? trailing : "(N/A)");
-            for (short i = 0; i < argc; i++)
-                print_to_buffer(network->buffer, "\"%s\", ", argv[i]);
-            print_to_buffer(network->buffer, " ]\n");
+                            "Error parsing message: unknown numeric %i\n",
+                            numeric);
+            dump_msg_to_buffer(network->buffer, hostmask, argc, argv, trailing);
         }
     }
     // Attempt to look up the command
@@ -138,15 +134,9 @@ void process_irc_message(struct irc_network * network, char * msg) {
         callback(network, hostmask, argc, argv, trailing);
     else {
         print_to_buffer(network->buffer,
-                        "Error parsing message: unknown message type: \"%s\"\n"
-                        "Received from: \"%s\"\n"
-                        "Trailing: \"%s\"\n"
-                        "Args: [ ", 
-                        command, hostmask ? hostmask : "(N/A)",
-                        trailing ? trailing : "(N/A)");
-        for (short i = 0; i < argc; i++)
-            print_to_buffer(network->buffer, "\"%s\", ", argv[i]);
-        print_to_buffer(network->buffer, " ]\n");
+                        "Error parsing message: unknown message type: \"%s\"\n",
+                        command);
+        dump_msg_to_buffer(network->buffer, hostmask, argc, argv, trailing); 
     }
 }
 
