@@ -40,6 +40,9 @@ struct irc_network {
 
     // ISUPPORT info
     char * chantypes;
+    char * version;
+    char * chanmodes;
+    char * usermodes;
     bool excepts                        : 1;
     bool invex                          : 1;
     bool callerid                       : 1;

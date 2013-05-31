@@ -148,6 +148,9 @@ void disconnect_irc_network(struct irc_network * network,
     send_to_network(network, "QUIT :%s\r\n", msg ? msg : "");
     network->connected = false;
 
+    free(network->version);
+    free(network->chanmodes);
+    free(network->usermodes);
     free(network->chantypes);
     free(network->chanmodes_a);
     free(network->chanmodes_b);
@@ -156,6 +159,9 @@ void disconnect_irc_network(struct irc_network * network,
     free(network->prefix_chars);
     free(network->prefix_symbols);
 
+    network->version = NULL;
+    network->chanmodes = NULL;
+    network->usermodes = NULL;
     network->chantypes = NULL;
     network->chanmodes_a = NULL;
     network->chanmodes_b = NULL;

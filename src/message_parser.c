@@ -67,6 +67,7 @@ void init_message_parser() {
     numerics[IRC_RPL_WELCOME] = echo_numeric;
     numerics[IRC_RPL_YOURHOST] = echo_numeric;
     numerics[IRC_RPL_CREATED] = echo_numeric;
+    numerics[IRC_RPL_MYINFO] = rpl_myinfo;
     numerics[IRC_RPL_ISUPPORT] = rpl_isupport;
 }
 

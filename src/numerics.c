@@ -55,6 +55,25 @@ void echo_numeric(struct irc_network * network,
     print_to_buffer(network->buffer, "%s\n", trailing);
 }
 
+void rpl_myinfo(struct irc_network * network,
+                char * hostmask,
+                short argc,
+                char * argv[],
+                char * trailing) {
+    if (argc < 5) {
+        print_to_buffer(network->buffer, 
+                        "Error parsing message: Received invalid RPL_MYINFO: "
+                        "not enough arguments provided (only given %i)\n",
+                        argc);
+        dump_msg_to_buffer(network->buffer, hostmask, argc, argv, trailing);
+    }
+    else {
+        network->version = strdup(argv[2]);
+        network->usermodes = strdup(argv[3]);
+        network->chanmodes = strdup(argv[4]);
+    }
+}
+
 void rpl_isupport(struct irc_network * network,
                   char * hostmask,          
                   short argc,
