@@ -56,14 +56,8 @@ struct irc_network * new_irc_network() {
 void free_irc_network(struct irc_network * network,
                       GtkTreeStore * network_tree_store) {
     destroy_buffer(network->buffer);
-    
-    free(network->chantypes);
-    free(network->chanmodes_a);
-    free(network->chanmodes_b);
-    free(network->chanmodes_c);
-    free(network->chanmodes_d);
-    free(network->prefix_chars);
-    free(network->prefix_symbols);
+    free(network->name);
+    free(network->nickname);
 
     free(network);
 }
