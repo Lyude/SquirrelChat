@@ -155,6 +155,14 @@ void disconnect_irc_network(struct irc_network * network,
     free(network->chanmodes_d);
     free(network->prefix_chars);
     free(network->prefix_symbols);
+
+    network->chantypes = NULL;
+    network->chanmodes_a = NULL;
+    network->chanmodes_b = NULL;
+    network->chanmodes_c = NULL;
+    network->chanmodes_d = NULL;
+    network->prefix_chars = NULL;
+    network->prefix_symbols = NULL;
 }
 
 void free_chat_buffer(void * this_does_nothing) {
