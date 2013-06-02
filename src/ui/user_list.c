@@ -11,7 +11,7 @@ void create_user_list(struct chat_window * window) {
                                                  "text", 0, NULL);
     GtkTreeViewColumn * name_column =
         gtk_tree_view_column_new_with_attributes("Name", renderer,
-                                                 "text", 0, NULL);
+                                                 "text", 1, NULL);
     GtkTreeViewColumn * data_column = gtk_tree_view_column_new();
 
     window->user_list = gtk_tree_view_new();
