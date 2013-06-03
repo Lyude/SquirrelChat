@@ -157,7 +157,8 @@ void part_msg_callback(struct irc_network * network,
         trie_del(buffer->users, nickname);
 
         print_to_buffer(buffer, 
-                        "* %s (%s) has left the channel\n", nickname, address);
+                        "* %s (%s) has left %s\n",
+                        nickname, address, channel_name);
     }
 }
 
