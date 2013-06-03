@@ -189,7 +189,7 @@ void privmsg_msg_callback(struct irc_network * network,
         gtk_tree_store_set(GTK_TREE_STORE(network_tree_model), &buffer_iter,
                            0, nickname, 1, buffer, -1);
 
-        network->row = gtk_tree_row_reference_new(network_tree_model,
+        buffer->row = gtk_tree_row_reference_new(network_tree_model,
                 gtk_tree_model_get_path(network_tree_model, &buffer_iter));
     }
     
