@@ -21,6 +21,9 @@
 
 #include "irc_network.h"
 
+// Response types that have varying numerics
+#define IRC_NICK_RESPONSE -1
+
 typedef struct irc_response_queue irc_response_queue;
 
 struct irc_response_queue {

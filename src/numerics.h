@@ -59,5 +59,10 @@ extern void rpl_endofmotd(struct irc_network * network,
                          short argc,
                          char * argv[],
                          char * trailing);
+extern void nick_change_error(struct irc_network * network,
+                              char * hostmask,
+                              short argc,
+                              char * argv[],
+                              char * trailing);
 #endif
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

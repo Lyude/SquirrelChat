@@ -262,4 +262,19 @@ void rpl_endofmotd(struct irc_network * network,
     }
 }
 
+void nick_change_error(struct irc_network * network,
+                       char * hostmask,
+                       short argc,
+                       char * argv[],
+                       char * trailing) {
+    irc_response_queue ** request;
+    if ((request = find_cmd_response_request(network, IRC_NICK_RESPONSE)) ==
+        NULL)
+        return;
+
+    print_to_buffer((*request)->buffer, "Could not change nickname to %s: %s\n",
+                    (*request)->data, trailing);
+    remove_cmd_response_request(request);
+}
+
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

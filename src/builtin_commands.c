@@ -93,8 +93,11 @@ short cmd_nick(struct buffer_info * buffer,
         return IRC_CMD_SYNTAX_ERR;
 
     //TODO: Add code to check the length of the nickname
-    if (buffer->parent_network->connected)
+    if (buffer->parent_network->connected) {
         send_to_network(buffer->parent_network, "NICK %s\r\n", argv[0]);
+        request_cmd_response(buffer->parent_network, buffer, IRC_NICK_RESPONSE,
+                             strdup(argv[0]));
+    }
     else {
         free(buffer->parent_network->nickname);
         buffer->parent_network->nickname = strdup(argv[0]);
