@@ -168,30 +168,34 @@ void privmsg_msg_callback(struct irc_network * network,
     char * address;
     split_irc_hostmask(hostmask, &nickname, &address);
     struct buffer_info * buffer;
-        
-    /* Since a channel buffer is always created whenever we join a channel, and
-     * we cannot receive messages from channels we're not in, then the only time
-     * we won't be able to find a buffer is when a new user messages us, so we
-     * can just go ahead and make a new query buffer.
-     */
-    if ((buffer = trie_get(network->buffers, argv[0])) == NULL) {
-        buffer = new_buffer(nickname, QUERY, network);
-        GtkTreeModel * network_tree_model;
-        GtkTreeIter network_iter;
-        GtkTreeIter buffer_iter;
+    
+    // Check whether or not the message was meant to be sent to a channel
+    if (strcmp(argv[0], network->nickname) == 0) {
+        if ((buffer = trie_get(network->buffers, nickname)) == NULL) {
+            buffer = new_buffer(nickname, QUERY, network);
+            GtkTreeModel * network_tree_model;
+            GtkTreeIter network_iter;
+            GtkTreeIter buffer_iter;
 
-        network_tree_model = gtk_tree_row_reference_get_model(network->row);
-        gtk_tree_model_get_iter(network_tree_model, &network_iter,
-                                gtk_tree_row_reference_get_path(network->row));
+            network_tree_model = gtk_tree_row_reference_get_model(network->row);
+            gtk_tree_model_get_iter(network_tree_model, &network_iter,
+                                    gtk_tree_row_reference_get_path(
+                                        network->row
+                                    ));
 
-        gtk_tree_store_append(GTK_TREE_STORE(network_tree_model),
-                              &buffer_iter, &network_iter);
-        gtk_tree_store_set(GTK_TREE_STORE(network_tree_model), &buffer_iter,
-                           0, nickname, 1, buffer, -1);
+            gtk_tree_store_append(GTK_TREE_STORE(network_tree_model),
+                                  &buffer_iter, &network_iter);
+            gtk_tree_store_set(GTK_TREE_STORE(network_tree_model), &buffer_iter,
+                               0, nickname, 1, buffer, -1);
 
-        buffer->row = gtk_tree_row_reference_new(network_tree_model,
-                gtk_tree_model_get_path(network_tree_model, &buffer_iter));
+            buffer->row = gtk_tree_row_reference_new(network_tree_model,
+                    gtk_tree_model_get_path(network_tree_model, &buffer_iter));
+
+            trie_set(network->buffers, nickname, buffer);
+        }
     }
+    else
+        buffer = trie_get(network->buffers, argv[0]);
     
     print_to_buffer(buffer, "<%s> %s\n", nickname, trailing);
 }
