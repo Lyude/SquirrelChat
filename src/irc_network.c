@@ -76,7 +76,7 @@ int connect_irc_network(struct irc_network * network) {
 
     // Set a default nickname when the user does not set one
     if (network->nickname == NULL)
-        network->nickname = getlogin();
+        network->nickname = strdup(getlogin());
 
     print_to_buffer(network->buffer, "Attempting to connect to %s:%s...\n",
                     network->address, network->port);
