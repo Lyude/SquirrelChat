@@ -32,11 +32,11 @@ extern void privmsg_msg_callback(struct irc_network * network,
                                  short argc,
                                  char * argv[],
                                  char * trailing);
-void ping_msg_callback(struct irc_network * network,
-                       char * hostmask,
-                       short argc,
-                       char * argv[],
-                       char * trailing);
+extern void ping_msg_callback(struct irc_network * network,
+                              char * hostmask,
+                              short argc,
+                              char * argv[],
+                              char * trailing);
 
 #endif // __MESSAGE_TYPES_H__
 
