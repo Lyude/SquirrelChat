@@ -53,6 +53,7 @@ struct chat_window {
     GtkWidget * scrolled_window_for_chat_viewer;
     GtkWidget * command_box;
 
+    GtkWidget * scrolled_window_for_user_list;
     GtkWidget * user_list;
 
     struct buffer_info * current_buffer;

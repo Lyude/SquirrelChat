@@ -84,8 +84,15 @@ struct chat_window * create_new_chat_window(struct irc_network * network) {
                    chat_and_command_box_container);
 
     create_user_list(new_window);
+    new_window->scrolled_window_for_user_list =
+        gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_kinetic_scrolling(
+            GTK_SCROLLED_WINDOW(new_window->scrolled_window_for_user_list),
+            TRUE);
+    gtk_container_add(GTK_CONTAINER(new_window->scrolled_window_for_user_list),
+                      new_window->user_list);
     gtk_paned_add2(GTK_PANED(new_window->chat_viewer_and_user_list_pane),
-                   new_window->user_list);
+                   new_window->scrolled_window_for_user_list);
 
     /* Create a new network to act as a place holder if a network wasn't
      * provided
@@ -127,10 +134,10 @@ void change_active_buffer(struct chat_window * window,
     if (new_buffer->type == CHANNEL) {
         gtk_tree_view_set_model(GTK_TREE_VIEW(window->user_list),
                                 GTK_TREE_MODEL(new_buffer->user_list_store));
-        gtk_widget_show(window->user_list);
+        gtk_widget_show(window->scrolled_window_for_user_list);
     }
     else
-        gtk_widget_hide(window->user_list);
+        gtk_widget_hide(window->scrolled_window_for_user_list);
 
     window->current_buffer = new_buffer;
 }
