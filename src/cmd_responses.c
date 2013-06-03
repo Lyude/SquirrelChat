@@ -35,6 +35,8 @@ irc_response_queue ** find_cmd_response_request(struct irc_network * network,
                                                 unsigned short irc_numeric) {
     irc_response_queue ** request;
     // Find the location of the pointer to the response
+    if (network->response_queue == NULL)
+        return NULL;
     for (request = &network->response_queue;
          (*request)->irc_numeric != irc_numeric;
          request = &(*request)->next)
