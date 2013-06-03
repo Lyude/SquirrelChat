@@ -25,15 +25,15 @@ typedef struct irc_response_queue irc_response_queue;
 
 struct irc_response_queue {
     struct buffer_info * buffer;
-    unsigned short irc_numeric;
+    short type;
     irc_response_queue * next;
 };
 
 extern void request_cmd_response(struct irc_network * network,
-                                     struct buffer_info * buffer,
-                                     unsigned short irc_numeric);
+                                 struct buffer_info * buffer,
+                                 short type);
 extern irc_response_queue ** find_cmd_response_request(struct irc_network * network,
-                                                       unsigned short irc_numeric);
+                                                       short type);
 extern void remove_cmd_response_request(irc_response_queue ** response);
 
 #endif // __CMD_RESPONSES_H__
