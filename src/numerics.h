@@ -34,5 +34,15 @@ extern void rpl_isupport(struct irc_network * network,
                          short argc,
                          char * argv[],
                          char * trailing);
+extern void rpl_namreply(struct irc_network * network,
+                         char * hostmask,
+                         short argc,
+                         char * argv[],
+                         char * trailing);
+extern void rpl_endofnames(struct irc_network * network,
+                           char * hostmask,
+                           short argc,
+                           char * argv[],
+                           char * trailing);
 #endif
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

@@ -158,4 +158,62 @@ void rpl_isupport(struct irc_network * network,
     }
 }
 
+void rpl_namreply(struct irc_network * network,
+                  char * hostmask,
+                  short argc,
+                  char * argv[],
+                  char * trailing) {
+    struct buffer_info * channel;
+    // The first and second parameter aren't important
+    
+    // Check if we're in the channel
+    if ((channel = trie_get(network->buffers, argv[2])) != NULL) {
+        // Add every single person in the reply to the list
+        char * saveptr;
+        for (char * nick = strtok_r(trailing, " ", &saveptr);
+             nick != NULL;
+             nick = strtok_r(NULL, " ", &saveptr)) {
+            char * prefix;
+            GtkTreeIter new_user;
+
+            // Check if the user has a user prefix
+            if ((prefix = strchr(network->prefix_symbols, nick[0])) != NULL)
+                nick++;
+
+            // Check to see if we already have the user in the list
+            if (trie_get(channel->users, nick) != NULL)
+                continue;
+
+            gtk_list_store_append(channel->user_list_store, &new_user);
+
+            if (prefix != NULL) {
+                char prefix_str[2];
+                prefix_str[0] = *prefix;
+                prefix_str[1] = '\0';
+                gtk_list_store_set(channel->user_list_store,
+                                   &new_user, 0, &prefix_str[0], -1);
+            }
+
+            gtk_list_store_set(channel->user_list_store,
+                               &new_user, 1, nick, -1);
+
+            trie_set(channel->users, nick,
+                     gtk_tree_row_reference_new(
+                         GTK_TREE_MODEL(channel->user_list_store),
+                         gtk_tree_model_get_path(
+                             GTK_TREE_MODEL(channel->user_list_store), &new_user)
+                     ));
+        }
+    }
+    // TODO: Print results to current buffer if we're not in the channel
+}
+
+void rpl_endofnames(struct irc_network * network,
+                    char * hostmask,
+                    short argc,
+                    char * argv[],
+                    char * trailing) {
+    // TODO: Do something here
+}
+
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
