@@ -23,6 +23,8 @@
 #include "net_io.h"
 #include "commands.h"
 #include "ui/buffer.h"
+#include "irc_numerics.h"
+#include "cmd_responses.h"
 
 void add_builtin_commands() {
     add_irc_command("help", cmd_help, 1,
@@ -66,6 +68,10 @@ void add_builtin_commands() {
     add_irc_command("quote", cmd_quote, 0,
                     "/quote <message>",
                     "Sends a raw message to the server.\n");
+    add_irc_command("motd", cmd_motd, 0,
+                    "/motd [server]",
+                    "Prints the MOTD for server, or the current server if "
+                    "server is omitted.\n");
 }
 
 short cmd_help(struct buffer_info * buffer,
@@ -203,6 +209,16 @@ short cmd_quote(struct buffer_info * buffer,
         send_to_network(buffer->parent_network, "%s\r\n", trailing);
     else
         return IRC_CMD_SYNTAX_ERR;
+    return 0;
+}
+
+short cmd_motd(struct buffer_info * buffer,
+               unsigned short argc,
+               char * argv[],
+               char * trailing) {
+    request_cmd_response(buffer->parent_network, buffer, IRC_RPL_MOTD);
+    send_to_network(buffer->parent_network, "MOTD %s\r\n",
+                    (argc >= 1) ? argv[0] : "");
     return 0;
 }
 

@@ -71,6 +71,9 @@ void init_message_parser() {
     numerics[IRC_RPL_ISUPPORT] = rpl_isupport;
     numerics[IRC_RPL_NAMREPLY] = rpl_namreply;
     numerics[IRC_RPL_ENDOFNAMES] = rpl_endofnames;
+    numerics[IRC_RPL_MOTDSTART] = rpl_motdstart;
+    numerics[IRC_RPL_MOTD] = rpl_motd;
+    numerics[IRC_RPL_ENDOFMOTD] = rpl_endofmotd;
 }
 
 void process_irc_message(struct irc_network * network, char * msg) {

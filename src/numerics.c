@@ -17,6 +17,8 @@
 #include "trie.h"
 #include "commands.h"
 #include "casemap.h"
+#include "cmd_responses.h"
+#include "irc_numerics.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -214,6 +216,50 @@ void rpl_endofnames(struct irc_network * network,
                     char * argv[],
                     char * trailing) {
     // TODO: Do something here
+}
+
+void rpl_motdstart(struct irc_network * network,
+                   char * hostmask,
+                   short argc,
+                   char * argv[],
+                   char * trailing) {
+    irc_response_queue ** request;
+    struct buffer_info * output_buffer;
+    // Check if the motd was requested in a different window
+    request = find_cmd_response_request(network, IRC_RPL_MOTD);
+    output_buffer = (request == NULL) ? network->buffer : (*request)->buffer;
+
+    print_to_buffer(output_buffer, "---Start of MOTD---\n");
+}
+
+void rpl_motd(struct irc_network * network,
+              char * hostmask,
+              short argc,
+              char * argv[],
+              char * trailing) {
+    irc_response_queue ** request;
+    struct buffer_info * output_buffer;
+    // Check if the motd was requested in a different window
+    request = find_cmd_response_request(network, IRC_RPL_MOTD);
+    output_buffer = (request == NULL) ? network->buffer : (*request)->buffer;
+
+    print_to_buffer(output_buffer, "%s\n", trailing);
+}
+
+void rpl_endofmotd(struct irc_network * network,
+                  char * hostmask,
+                  short argc,
+                  char * argv[],
+                  char * trailing) {
+    irc_response_queue ** request;
+    // Check if the motd was requested in a different window
+    request = find_cmd_response_request(network, IRC_RPL_MOTD);
+    if (request == NULL)
+        print_to_buffer(network->buffer, "---End of MOTD---\n");
+    else {
+        print_to_buffer((*request)->buffer, "---End of MOTD---\n");
+        remove_cmd_response_request(request);
+    }
 }
 
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
