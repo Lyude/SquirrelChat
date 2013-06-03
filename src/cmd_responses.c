@@ -20,7 +20,8 @@
 
 void request_cmd_response(struct irc_network * network,
                           struct buffer_info * buffer,
-                          short type) {
+                          short type,
+                          void * data) {
     irc_response_queue ** end;
     // Find the location of the end of the queue
     for (end = &network->response_queue; *end != NULL; end = &(*end)->next);
@@ -29,6 +30,7 @@ void request_cmd_response(struct irc_network * network,
     *end = malloc(sizeof(struct irc_response_queue));
     (*end)->buffer = buffer;
     (*end)->type = type;
+    (*end)->data = data;
     (*end)->next = NULL;
 }
 irc_response_queue ** find_cmd_response_request(struct irc_network * network,
@@ -47,6 +49,7 @@ irc_response_queue ** find_cmd_response_request(struct irc_network * network,
 
 void remove_cmd_response_request(irc_response_queue ** response) {
     irc_response_queue * next_node = (*response)->next;
+    free((*response)->data);
     free(*response);
     *response = next_node;
 }

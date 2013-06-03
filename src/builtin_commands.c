@@ -216,7 +216,7 @@ short cmd_motd(struct buffer_info * buffer,
                unsigned short argc,
                char * argv[],
                char * trailing) {
-    request_cmd_response(buffer->parent_network, buffer, IRC_RPL_MOTD);
+    request_cmd_response(buffer->parent_network, buffer, IRC_RPL_MOTD, NULL);
     send_to_network(buffer->parent_network, "MOTD %s\r\n",
                     (argc >= 1) ? argv[0] : "");
     return 0;

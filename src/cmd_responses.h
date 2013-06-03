@@ -26,12 +26,14 @@ typedef struct irc_response_queue irc_response_queue;
 struct irc_response_queue {
     struct buffer_info * buffer;
     short type;
+    void * data;
     irc_response_queue * next;
 };
 
 extern void request_cmd_response(struct irc_network * network,
                                  struct buffer_info * buffer,
-                                 short type);
+                                 short type,
+                                 void * data);
 extern irc_response_queue ** find_cmd_response_request(struct irc_network * network,
                                                        short type);
 extern void remove_cmd_response_request(irc_response_queue ** response);
