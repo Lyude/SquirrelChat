@@ -56,7 +56,8 @@ extern struct buffer_info * new_buffer(char * buffer_name,
 extern void destroy_buffer(struct buffer_info * buffer);
 
 extern void print_to_buffer(struct buffer_info * buffer,
-                            char * message, ...);
+                            char * message, ...)
+    __attribute__((format(printf, 2, 3)));
 
 #endif /* __BUFFER_H__ */    
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
