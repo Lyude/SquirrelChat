@@ -296,6 +296,8 @@ void nick_msg_callback(struct irc_network * network,
         irc_response_queue ** request;
         free(network->nickname);
         network->nickname = strdup(new_nickname);
+        print_to_buffer(network->buffer, "* You are now known as %s\n",
+                        new_nickname);
         trie_each(network->buffers, announce_our_nick_change, &params);
 
         // If the user initiated the nick change, remove their response request
