@@ -248,10 +248,10 @@ void rpl_motd(struct irc_network * network,
 }
 
 void rpl_endofmotd(struct irc_network * network,
-                  char * hostmask,
-                  short argc,
-                  char * argv[],
-                  char * trailing) {
+                   char * hostmask,
+                   short argc,
+                   char * argv[],
+                   char * trailing) {
     irc_response_queue ** request;
     // Check if the motd was requested in a different window
     request = find_cmd_response_request(network, IRC_RPL_MOTD);
