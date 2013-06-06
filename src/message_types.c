@@ -19,6 +19,7 @@
 #include "net_io.h"
 #include "irc_macros.h"
 #include "cmd_responses.h"
+#include "errors.h"
 
 #include <string.h>
 #include <stdlib.h>

@@ -19,6 +19,7 @@
 #include "casemap.h"
 #include "cmd_responses.h"
 #include "irc_numerics.h"
+#include "errors.h"
 
 #include <string.h>
 #include <stdlib.h>
