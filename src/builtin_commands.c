@@ -72,6 +72,10 @@ void add_builtin_commands() {
                     "/motd [server]",
                     "Prints the MOTD for server, or the current server if "
                     "server is omitted.\n");
+    add_irc_command("topic", cmd_topic, 0,
+                    "/topic [channel] [new topic]",
+                    "Displays/sets the topic of the current channel, or "
+                    "displays/sets the topic of another channel.\n");
 }
 
 short cmd_help(struct buffer_info * buffer,
@@ -179,6 +183,55 @@ short cmd_part(struct buffer_info * buffer,
     else
         send_to_network(buffer->parent_network, "PART %s :%s\r\n",
                         argv[0], trailing ? trailing : "");
+    return 0;
+}
+
+// Max argc: 0
+short cmd_topic(struct buffer_info * buffer,
+                unsigned short argc,
+                char * argv[],
+                char * trailing) {
+    if (!buffer->parent_network->connected) {
+        print_to_buffer(buffer, "Not connected!\n");
+        return 0;
+    }
+
+    // Check if the user specified any parameters
+    if (trailing == NULL) {
+        if (buffer->type == CHANNEL) {
+            send_to_network(buffer->parent_network, "TOPIC %s\r\n",
+                            buffer->buffer_name);
+            request_cmd_response(buffer->parent_network, buffer, IRC_RPL_TOPIC,
+                                 NULL);
+            request_cmd_response(buffer->parent_network, buffer,
+                                 IRC_RPL_TOPICWHOTIME, NULL);
+        }
+        else
+            print_to_buffer(buffer, "You're not in a channel!\n");
+    }
+    else {
+        char * channel;
+        if (strchr(buffer->parent_network->chantypes, trailing[0]) != NULL)
+            channel = strtok_r(trailing, " ", &trailing);
+        else {
+            if (buffer->type != CHANNEL) {
+                print_to_buffer(buffer, "You're not in a channel!\n");
+                return 0;
+            }
+            channel = buffer->buffer_name;
+        }
+        if (*trailing == '\0') {
+            send_to_network(buffer->parent_network, "TOPIC %s\n",
+                            channel);
+            request_cmd_response(buffer->parent_network, buffer, IRC_RPL_TOPIC,
+                                 NULL);
+            request_cmd_response(buffer->parent_network, buffer,
+                                 IRC_RPL_TOPICWHOTIME, NULL);
+        }
+        else
+            send_to_network(buffer->parent_network, "TOPIC %s :%s\r\n", channel,
+                            trailing);
+    }
     return 0;
 }
 

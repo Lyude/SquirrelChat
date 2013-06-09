@@ -60,6 +60,10 @@ extern short cmd_motd(struct buffer_info * buffer,
                       unsigned short argc,
                       char * argv[],
                       char * trailing);
+extern short cmd_topic(struct buffer_info * buffer,
+                       unsigned short argc,
+                       char * argv[],
+                       char * trailing);
 
 #endif // __BUILTIN_COMMANDS_H__
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

@@ -64,6 +64,7 @@ void init_message_parser() {
     trie_set(message_types, "PRIVMSG", privmsg_msg_callback);
     trie_set(message_types, "PING", ping_msg_callback);
     trie_set(message_types, "NICK", nick_msg_callback);
+    trie_set(message_types, "TOPIC", topic_msg_callback);
 
     numerics[IRC_RPL_WELCOME] = echo_numeric;
     numerics[IRC_RPL_YOURHOST] = echo_numeric;
@@ -77,6 +78,9 @@ void init_message_parser() {
     numerics[IRC_RPL_ENDOFMOTD] = rpl_endofmotd;
     numerics[IRC_ERR_NICKNAMEINUSE] = nick_change_error;
     numerics[IRC_ERR_ERRORNEUSNICKNAME] = nick_change_error;
+    numerics[IRC_RPL_TOPIC] = rpl_topic;
+    numerics[IRC_RPL_NOTOPIC] = rpl_notopic;
+    numerics[IRC_RPL_TOPICWHOTIME] = rpl_topicwhotime;
 }
 
 void process_irc_message(struct irc_network * network, char * msg) {

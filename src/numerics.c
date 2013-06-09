@@ -20,6 +20,7 @@
 #include "cmd_responses.h"
 #include "irc_numerics.h"
 #include "errors.h"
+#include "message_parser.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -261,6 +262,93 @@ void rpl_endofmotd(struct irc_network * network,
         print_to_buffer((*request)->buffer, "---End of MOTD---\n");
         remove_cmd_response_request(request);
     }
+}
+
+void rpl_topic(struct irc_network * network,
+               char * hostmask,
+               short argc,
+               char * argv[],
+               char * trailing) {
+    if (argc < 2 || trailing == NULL) {
+        print_to_buffer(network->buffer,
+                        "Error parsing message: missing parameters for "
+                        "RPL_TOPIC.\n");
+        dump_msg_to_buffer(network->buffer, hostmask, argc, argv, trailing);
+        return;
+    }
+
+    struct buffer_info * output;
+    irc_response_queue ** request;
+
+    // Check if the topic was requested in a different window
+    if ((request = find_cmd_response_request(network, IRC_RPL_TOPIC)) != NULL) {
+        output = (*request)->buffer;
+        remove_cmd_response_request(request);
+    }
+    else if ((output = trie_get(network->buffers, argv[1])) == NULL)
+        output = network->buffer;
+
+    print_to_buffer(output, "* Topic for %s is \"%s\"\n", argv[1], trailing);
+}
+
+void rpl_notopic(struct irc_network * network,
+                 char * hostmask,
+                 short argc,
+                 char * argv[],
+                 char * trailing) {
+    if (argc < 2) {
+        print_to_buffer(network->buffer,
+                        "Error parsing message: Missing parameters for "
+                        "RPL_NOTOPIC.\n");
+        dump_msg_to_buffer(network->buffer, hostmask, argc, argv, trailing);
+        return;
+    }
+
+    struct buffer_info * output;
+    irc_response_queue ** request;
+    if ((request = find_cmd_response_request(network, IRC_RPL_TOPIC)) != NULL) {
+        output = (*request)->buffer;
+        remove_cmd_response_request(request);
+        remove_cmd_response_request(
+                find_cmd_response_request(network, IRC_RPL_TOPICWHOTIME));
+    }
+    else if ((output = trie_get(network->buffers, argv[1])) == NULL)
+        output = network->buffer;
+
+    print_to_buffer(output, "* No topic set for %s\n", argv[1]);
+}
+
+void rpl_topicwhotime(struct irc_network * network,
+                      char * hostmask,
+                      short argc,
+                      char * argv[],
+                      char * trailing) {
+    if (argc < 3) {
+        print_to_buffer(network->buffer,
+                        "Error parsing message: Received RPL_TOPICWHOTIME but "
+                        "not enough arguments were provided with the "
+                        "message.\n");
+        dump_msg_to_buffer(network->buffer, hostmask, argc, argv, trailing);
+        return;
+    }
+
+    struct buffer_info * output;
+    irc_response_queue ** request;
+    char * nickname;
+    char * address;
+
+    // Check if the response was requested in another buffer
+    if ((request = find_cmd_response_request(network, IRC_RPL_TOPICWHOTIME)) !=
+        NULL) {
+        output = (*request)->buffer;
+        remove_cmd_response_request(request);
+    }
+    else if ((output = trie_get(network->buffers, argv[1])) == NULL)
+        output = network->buffer;
+
+    split_irc_hostmask(argv[2], &nickname, &address);
+
+    print_to_buffer(output, "* Set by %s (%s)\n", nickname, address);
 }
 
 void nick_change_error(struct irc_network * network,

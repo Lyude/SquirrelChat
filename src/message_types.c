@@ -344,4 +344,34 @@ void ping_msg_callback(struct irc_network * network,
     send_to_network(network, "PONG %s\r\n", trailing);
 }
 
+void topic_msg_callback(struct irc_network * network,
+                        char * hostmask,
+                        short argc,
+                        char * argv[],
+                        char * trailing) {
+    if (argc < 1) {
+        print_to_buffer(network->buffer,
+                        "Error parsing message: Received TOPIC message, but "
+                        "the message did not specify a channel.\n");
+        dump_msg_to_buffer(network->buffer, hostmask, argc, argv, trailing);
+        return;
+    }
+    
+    struct buffer_info * channel;
+    char * nickname;
+    char * address;
+    split_irc_hostmask(hostmask, &nickname, &address);
+
+    if ((channel = trie_get(network->buffers, argv[0])) == NULL) {
+        print_to_buffer(network->buffer,
+                        "Error parsing message: Received TOPIC message for %s, "
+                        "but we're not in that channel.",
+                        argv[0]);
+        return;
+    }
+
+    print_to_buffer(channel, "* %s changed the topic to \"%s\"\n",
+                    nickname, trailing);
+}
+
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

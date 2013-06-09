@@ -59,6 +59,21 @@ extern void rpl_endofmotd(struct irc_network * network,
                          short argc,
                          char * argv[],
                          char * trailing);
+extern void rpl_topic(struct irc_network * network,
+                      char * hostmask,
+                      short argc,
+                      char * argv[],
+                      char * trailing);
+extern void rpl_notopic(struct irc_network * network,
+                        char * hostmask,
+                        short argc,
+                        char * argv[],
+                        char * trailing);
+extern void rpl_topicwhotime(struct irc_network * network,
+                             char * hostmask,
+                             short argc,
+                             char * argv[],
+                             char * trailing);
 extern void nick_change_error(struct irc_network * network,
                               char * hostmask,
                               short argc,
