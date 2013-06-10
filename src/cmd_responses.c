@@ -18,40 +18,32 @@
 
 #include <stdlib.h>
 
-void request_cmd_response(struct irc_network * network,
-                          struct buffer_info * buffer,
-                          short type,
-                          void * data) {
-    irc_response_queue ** end;
-    // Find the location of the end of the queue
-    for (end = &network->response_queue; *end != NULL; end = &(*end)->next);
+void claim_response(struct irc_network * network,
+                        struct buffer_info * buffer,
+                        void * data,
+                        void (*data_free_func)(void *)) {
+    cmd_response_claim ** end;
+    // Find the last response claim
+    for (end = &network->claimed_responses; *end != NULL; end = &(*end)->next);
 
-    // Create the new request
-    *end = malloc(sizeof(struct irc_response_queue));
+    *end = malloc(sizeof(cmd_response_claim));
     (*end)->buffer = buffer;
-    (*end)->type = type;
     (*end)->data = data;
+    (*end)->data_free_func = data_free_func;
     (*end)->next = NULL;
 }
-irc_response_queue ** find_cmd_response_request(struct irc_network * network,
-                                                short type) {
-    irc_response_queue ** request;
-    // Find the location of the pointer to the response
-    if (network->response_queue == NULL)
-        return NULL;
-    for (request = &network->response_queue;
-         (*request)->type != type;
-         request = &(*request)->next)
-        if ((*request)->next == NULL)
-            return NULL;
-    return request;
-}
 
-void remove_cmd_response_request(irc_response_queue ** response) {
-    irc_response_queue * next_node = (*response)->next;
-    free((*response)->data);
-    free(*response);
-    *response = next_node;
+void remove_last_response_claim(struct irc_network * network) {
+    cmd_response_claim * next;
+
+    next = network->claimed_responses->next;
+
+    if (network->claimed_responses->data != NULL)
+        network->claimed_responses->data_free_func(
+                network->claimed_responses->data);
+
+    free(network->claimed_responses);
+    network->claimed_responses = next;
 }
 
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

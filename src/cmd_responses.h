@@ -21,25 +21,20 @@
 
 #include "irc_network.h"
 
-// Response types that have varying numerics
-#define IRC_NICK_RESPONSE -1
+typedef struct cmd_response_claim cmd_response_claim;
 
-typedef struct irc_response_queue irc_response_queue;
-
-struct irc_response_queue {
+struct cmd_response_claim {
     struct buffer_info * buffer;
-    short type;
     void * data;
-    irc_response_queue * next;
+    void (*data_free_func)(void *);
+    cmd_response_claim * next;
 };
 
-extern void request_cmd_response(struct irc_network * network,
-                                 struct buffer_info * buffer,
-                                 short type,
-                                 void * data);
-extern irc_response_queue ** find_cmd_response_request(struct irc_network * network,
-                                                       short type);
-extern void remove_cmd_response_request(irc_response_queue ** response);
+extern void claim_response(struct irc_network * network,
+                           struct buffer_info * buffer,
+                           void * data,
+                           void (*data_free_func)(void *));
+extern void remove_last_response_claim(struct irc_network * network);
 
 #endif // __CMD_RESPONSES_H__
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

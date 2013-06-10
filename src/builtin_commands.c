@@ -99,8 +99,7 @@ short cmd_nick(struct buffer_info * buffer,
     //TODO: Add code to check the length of the nickname
     if (buffer->parent_network->connected) {
         send_to_network(buffer->parent_network, "NICK %s\r\n", argv[0]);
-        request_cmd_response(buffer->parent_network, buffer, IRC_NICK_RESPONSE,
-                             strdup(argv[0]));
+        claim_response(buffer->parent_network, buffer, strdup(argv[0]), free);
     }
     else {
         free(buffer->parent_network->nickname);
@@ -201,10 +200,7 @@ short cmd_topic(struct buffer_info * buffer,
         if (buffer->type == CHANNEL) {
             send_to_network(buffer->parent_network, "TOPIC %s\r\n",
                             buffer->buffer_name);
-            request_cmd_response(buffer->parent_network, buffer, IRC_RPL_TOPIC,
-                                 NULL);
-            request_cmd_response(buffer->parent_network, buffer,
-                                 IRC_RPL_TOPICWHOTIME, NULL);
+            claim_response(buffer->parent_network, buffer, NULL, NULL);
         }
         else
             print_to_buffer(buffer, "You're not in a channel!\n");
@@ -223,10 +219,7 @@ short cmd_topic(struct buffer_info * buffer,
         if (*trailing == '\0') {
             send_to_network(buffer->parent_network, "TOPIC %s\n",
                             channel);
-            request_cmd_response(buffer->parent_network, buffer, IRC_RPL_TOPIC,
-                                 NULL);
-            request_cmd_response(buffer->parent_network, buffer,
-                                 IRC_RPL_TOPICWHOTIME, NULL);
+            claim_response(buffer->parent_network, buffer, NULL, NULL);
         }
         else
             send_to_network(buffer->parent_network, "TOPIC %s :%s\r\n", channel,
@@ -272,7 +265,7 @@ short cmd_motd(struct buffer_info * buffer,
                unsigned short argc,
                char * argv[],
                char * trailing) {
-    request_cmd_response(buffer->parent_network, buffer, IRC_RPL_MOTD, NULL);
+    claim_response(buffer->parent_network, buffer, NULL, NULL);
     send_to_network(buffer->parent_network, "MOTD %s\r\n",
                     (argc >= 1) ? argv[0] : "");
     return 0;

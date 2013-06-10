@@ -74,7 +74,7 @@ struct irc_network {
 
     struct buffer_info * buffer;
     trie * buffers;
-    struct irc_response_queue * response_queue;
+    struct cmd_response_claim * claimed_responses;
 };
 
 extern struct irc_network * new_irc_network();

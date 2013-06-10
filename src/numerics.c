@@ -225,13 +225,13 @@ void rpl_motdstart(struct irc_network * network,
                    short argc,
                    char * argv[],
                    char * trailing) {
-    irc_response_queue ** request;
     struct buffer_info * output_buffer;
     // Check if the motd was requested in a different window
-    request = find_cmd_response_request(network, IRC_RPL_MOTD);
-    output_buffer = (request == NULL) ? network->buffer : (*request)->buffer;
 
-    print_to_buffer(output_buffer, "---Start of MOTD---\n");
+    print_to_buffer((network->claimed_responses) ?
+                        network->claimed_responses->buffer :
+                        network->buffer,
+                    "---Start of MOTD---\n");
 }
 
 void rpl_motd(struct irc_network * network,
@@ -239,13 +239,10 @@ void rpl_motd(struct irc_network * network,
               short argc,
               char * argv[],
               char * trailing) {
-    irc_response_queue ** request;
-    struct buffer_info * output_buffer;
-    // Check if the motd was requested in a different window
-    request = find_cmd_response_request(network, IRC_RPL_MOTD);
-    output_buffer = (request == NULL) ? network->buffer : (*request)->buffer;
-
-    print_to_buffer(output_buffer, "%s\n", trailing);
+    print_to_buffer((network->claimed_responses) ?
+                        network->claimed_responses->buffer :
+                        network->buffer,
+                    "%s\n", trailing);
 }
 
 void rpl_endofmotd(struct irc_network * network,
@@ -253,14 +250,12 @@ void rpl_endofmotd(struct irc_network * network,
                    short argc,
                    char * argv[],
                    char * trailing) {
-    irc_response_queue ** request;
-    // Check if the motd was requested in a different window
-    request = find_cmd_response_request(network, IRC_RPL_MOTD);
-    if (request == NULL)
+    if (network->claimed_responses == NULL)
         print_to_buffer(network->buffer, "---End of MOTD---\n");
     else {
-        print_to_buffer((*request)->buffer, "---End of MOTD---\n");
-        remove_cmd_response_request(request);
+        print_to_buffer(network->claimed_responses->buffer,
+                        "---End of MOTD---\n");
+        remove_last_response_claim(network);
     }
 }
 
@@ -278,13 +273,10 @@ void rpl_topic(struct irc_network * network,
     }
 
     struct buffer_info * output;
-    irc_response_queue ** request;
 
     // Check if the topic was requested in a different window
-    if ((request = find_cmd_response_request(network, IRC_RPL_TOPIC)) != NULL) {
-        output = (*request)->buffer;
-        remove_cmd_response_request(request);
-    }
+    if (network->claimed_responses != NULL)
+        output = network->claimed_responses->buffer;
     else if ((output = trie_get(network->buffers, argv[1])) == NULL)
         output = network->buffer;
 
@@ -305,12 +297,9 @@ void rpl_notopic(struct irc_network * network,
     }
 
     struct buffer_info * output;
-    irc_response_queue ** request;
-    if ((request = find_cmd_response_request(network, IRC_RPL_TOPIC)) != NULL) {
-        output = (*request)->buffer;
-        remove_cmd_response_request(request);
-        remove_cmd_response_request(
-                find_cmd_response_request(network, IRC_RPL_TOPICWHOTIME));
+    if (network->claimed_responses != NULL) {
+        output = network->claimed_responses->buffer;
+        remove_last_response_claim(network);
     }
     else if ((output = trie_get(network->buffers, argv[1])) == NULL)
         output = network->buffer;
@@ -333,15 +322,14 @@ void rpl_topicwhotime(struct irc_network * network,
     }
 
     struct buffer_info * output;
-    irc_response_queue ** request;
     char * nickname;
     char * address;
 
     // Check if the response was requested in another buffer
-    if ((request = find_cmd_response_request(network, IRC_RPL_TOPICWHOTIME)) !=
-        NULL) {
-        output = (*request)->buffer;
-        remove_cmd_response_request(request);
+    if (network->claimed_responses != NULL) {
+        // RPL_TOPICWHOTIME is the last response for /topic
+        output = network->claimed_responses->buffer;
+        remove_last_response_claim(network);
     }
     else if ((output = trie_get(network->buffers, argv[1])) == NULL)
         output = network->buffer;
@@ -356,14 +344,13 @@ void nick_change_error(struct irc_network * network,
                        short argc,
                        char * argv[],
                        char * trailing) {
-    irc_response_queue ** request;
-    if ((request = find_cmd_response_request(network, IRC_NICK_RESPONSE)) ==
-        NULL)
+    if (network->claimed_responses == NULL)
         return;
 
-    print_to_buffer((*request)->buffer, "Could not change nickname to %s: %s\n",
-                    (*request)->data, trailing);
-    remove_cmd_response_request(request);
+    print_to_buffer(network->claimed_responses->buffer,
+                    "Could not change nickname to %s: %s\n",
+                    network->claimed_responses->data, trailing);
+    remove_last_response_claim(network);
 }
 
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
