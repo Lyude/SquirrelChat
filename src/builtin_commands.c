@@ -95,6 +95,8 @@ short cmd_nick(struct buffer_info * buffer,
                char * trailing) {
     if (argc < 1)
         return IRC_CMD_SYNTAX_ERR;
+    else if (strcmp(buffer->parent_network->nickname, argv[0]) == 0)
+        return 0;
 
     //TODO: Add code to check the length of the nickname
     if (buffer->parent_network->connected) {
