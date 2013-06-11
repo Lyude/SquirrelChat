@@ -71,6 +71,7 @@ struct irc_network {
     GIOChannel * input_channel;
 
     GtkTreeRowReference * row;
+    struct chat_window * window;
 
     struct buffer_info * buffer;
     trie * buffers;
