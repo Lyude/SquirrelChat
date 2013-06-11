@@ -62,6 +62,8 @@ void print_to_buffer(struct buffer_info * buffer,
     char * parsed_message;
     size_t parsed_message_len;
     GtkTextIter end_of_buffer;
+    GtkAdjustment * scroll_adjustment =
+        gtk_scrollable_get_vadjustment(GTK_SCROLLABLE(buffer->window->chat_viewer));
 
     // Parse the message passed to this function
     va_start(args, message);
@@ -79,9 +81,23 @@ void print_to_buffer(struct buffer_info * buffer,
      * anything is printed to the buffer
      */
 
-    // Print the message
-    gtk_text_buffer_insert(buffer->buffer, &end_of_buffer, parsed_message,
-                           parsed_message_len);
+    /* If the user has manually scrolled, don't adjust the scroll position,
+     * otherwise scroll to the bottom when printing the message
+     */
+    if (gtk_adjustment_get_value(scroll_adjustment) >=
+        gtk_adjustment_get_upper(scroll_adjustment) -
+        gtk_adjustment_get_page_size(scroll_adjustment) - 1e-12 &&
+        buffer == buffer->window->current_buffer) {
+        gtk_text_buffer_insert(buffer->buffer, &end_of_buffer, parsed_message,
+                       parsed_message_len);
+        gtk_text_view_scroll_to_mark(GTK_TEXT_VIEW(buffer->window->chat_viewer),
+                                     gtk_text_buffer_get_mark(buffer->buffer,
+                                                              "insert"),
+                                     0.0, false, 0.0, 0.0);
+    }
+    else
+        gtk_text_buffer_insert(buffer->buffer, &end_of_buffer, parsed_message,
+                               parsed_message_len);
 }
 
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

@@ -127,6 +127,10 @@ void change_active_buffer(struct chat_window * window,
 
     gtk_entry_set_buffer(GTK_ENTRY(window->command_box), new_buffer->command_box_buffer);
     gtk_text_view_set_buffer(GTK_TEXT_VIEW(window->chat_viewer), new_buffer->buffer);
+    gtk_text_view_scroll_to_mark(GTK_TEXT_VIEW(window->chat_viewer),
+                                 gtk_text_buffer_get_mark(new_buffer->buffer,
+                                                          "insert"),
+                                 0.0, false, 0.0, 0.0);
 //    gtk_adjustment_set_value(gtk_scrolled_window_get_vadjustment(
 //        GTK_SCROLLED_WINDOW(window->scrolled_window_for_chat_viewer)),
 //            new_buffer->buffer_scroll_pos);
