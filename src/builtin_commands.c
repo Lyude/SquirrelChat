@@ -76,6 +76,9 @@ void add_builtin_commands() {
                     "/topic [channel] [new topic]",
                     "Displays/sets the topic of the current channel, or "
                     "displays/sets the topic of another channel.\n");
+    add_irc_command("notice", cmd_notice, 1,
+                    "/notice <target> <notice>",
+                    "Sends a notice to target.\n");
 }
 
 short cmd_help(struct buffer_info * buffer,
@@ -148,6 +151,23 @@ short cmd_msg(struct buffer_info * buffer,
         print_to_buffer(buffer, "Message too long!\n");
     else
         send_privmsg(buffer->parent_network, argv[0], trailing);
+    return 0;
+}
+
+short cmd_notice(struct buffer_info * buffer,
+                 unsigned short argc,
+                 char * argv[],
+                 char * trailing) {
+    if (argc < 1)
+        return IRC_CMD_SYNTAX_ERR;
+    // TODO: add support for sending notices > 512 chars
+    if (strlen(trailing) > IRC_MSG_LEN -
+                           (strlen(buffer->parent_network->nickname) +
+                            sizeof(" :")))
+        print_to_buffer(buffer, "Notice too long!\n");
+    else
+        send_to_network(buffer->parent_network, "NOTICE %s :%s\r\n",
+                        argv[0], trailing);
     return 0;
 }
 
