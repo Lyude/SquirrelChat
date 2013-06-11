@@ -65,6 +65,7 @@ void init_message_parser() {
     trie_set(message_types, "PING", ping_msg_callback);
     trie_set(message_types, "NICK", nick_msg_callback);
     trie_set(message_types, "TOPIC", topic_msg_callback);
+    trie_set(message_types, "NOTICE", notice_msg_callback);
 
     numerics[IRC_RPL_WELCOME] = echo_numeric;
     numerics[IRC_RPL_YOURHOST] = echo_numeric;

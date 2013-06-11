@@ -204,6 +204,35 @@ void privmsg_msg_callback(struct irc_network * network,
     print_to_buffer(buffer, "<%s> %s\n", nickname, trailing);
 }
 
+void notice_msg_callback(struct irc_network * network,
+                         char * hostmask,
+                         short argc,
+                         char * argv[],
+                         char * trailing) {
+    if (argc < 1 || trailing == NULL) {
+        print_to_buffer(network->buffer,
+                        "Received NOTICE with missing params\n");
+        dump_msg_to_buffer(network->buffer, hostmask, argc, argv, trailing);
+        return;
+    }
+
+    char * nickname;
+    char * address;
+    split_irc_hostmask(hostmask, &nickname, &address);
+
+    if (strcmp(argv[0], "*") == 0)
+        print_to_buffer(network->buffer, "* %s: %s\n", nickname, trailing);
+    else if (strcmp(argv[0], network->nickname) == 0)
+        print_to_buffer(network->window->current_buffer,
+                        "-%s- %s\n", nickname, trailing);
+    else {
+        struct buffer_info * output;
+        if ((output = trie_get(network->buffers, argv[0])) != NULL)
+            print_to_buffer(network->window->current_buffer,
+                            "-%s:%s- %s\n", nickname, argv[0], trailing);
+    }
+}
+
 struct announce_nick_change_param {
     char * old_nick;
     char * new_nick;

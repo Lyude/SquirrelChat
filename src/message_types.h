@@ -32,6 +32,11 @@ extern void privmsg_msg_callback(struct irc_network * network,
                                  short argc,
                                  char * argv[],
                                  char * trailing);
+extern void notice_msg_callback(struct irc_network * network,
+                                char * hostmask,
+                                short argc,
+                                char * argv[],
+                                char * trailing);
 extern void ping_msg_callback(struct irc_network * network,
                               char * hostmask,
                               short argc,
