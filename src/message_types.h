@@ -51,6 +51,10 @@ extern void topic_msg_callback(struct irc_network * network,
                                char * hostmask,
                                short argc,
                                char * argv[]);
+extern void mode_msg_callback(struct irc_network * network,
+                              char * hostmask,
+                              short argc,
+                              char * argv[]);
 
 #endif // __MESSAGE_TYPES_H__
 

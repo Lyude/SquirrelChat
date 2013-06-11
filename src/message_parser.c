@@ -67,6 +67,7 @@ void init_message_parser() {
     trie_set(message_types, "NICK", nick_msg_callback);
     trie_set(message_types, "TOPIC", topic_msg_callback);
     trie_set(message_types, "NOTICE", notice_msg_callback);
+    trie_set(message_types, "MODE", mode_msg_callback);
 
     init_message_types();
 
@@ -127,8 +128,7 @@ void process_irc_message(struct irc_network * network, char * msg) {
 
         else if ((param_end = strchr(cursor, ' ')) == NULL) {
             argv[argc] = cursor;
-            if (argc == 0)
-                argc++;
+            argc++;
             break;
         }
         *param_end = '\0';

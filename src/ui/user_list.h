@@ -27,12 +27,29 @@ extern void add_user_to_list(struct buffer_info * buffer,
                              size_t prefix_len);
 extern int remove_user_from_list(struct buffer_info * buffer,
                                  const char * nickname);
+extern void _set_user_prefix(struct buffer_info * buffer,
+                             GtkTreeIter * user_row,
+                             char prefix);
+extern int _set_user_prefix_by_nick(struct buffer_info * buffer,
+                                    const char * nickname,
+                                    char prefix);
+extern int add_prefix_to_user(struct buffer_info * buffer,
+                              const char * nickname,
+                              const char * prefix);
+extern int remove_prefix_from_user(struct buffer_info * buffer,
+                                   const char * nickname,
+                                   char prefix);
 
 extern int get_user_row(const struct buffer_info * buffer,
                         const char * nickname,
                         GtkTreeIter * user_row);
 extern char * get_user_prefixes(const struct buffer_info * buffer,
                                 GtkTreeIter * user);
+
+#define set_user_prefix(_buffer, _user, _prefix)            \
+        _Generic((_user), GtkTreeIter*: _set_user_prefix,   \
+                          default: _set_user_prefix_by_nick \
+                )(_buffer, _user, _prefix)
 
 #endif // __USER_LIST_H__
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

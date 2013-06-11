@@ -46,6 +46,12 @@ char * get_user_prefixes(const struct buffer_info * buffer,
     return prefixes;
 }
 
+static inline void set_user_prefixes(const struct buffer_info * buffer,
+                                     GtkTreeIter * user,
+                                     const char * prefixes) {
+    gtk_list_store_set(buffer->user_list_store, user, 2, prefixes, -1);
+}
+
 void create_user_list(struct chat_window * window) {
     GtkCellRenderer * renderer = gtk_cell_renderer_text_new();
 
@@ -123,6 +129,112 @@ int remove_user_from_list(struct buffer_info * buffer,
     trie_del(buffer->users, nickname);
     free(get_user_prefixes(buffer, &user_row));
     gtk_list_store_remove(buffer->user_list_store, &user_row);
+    return 0;
+}
+
+int _set_user_prefix_by_nick(struct buffer_info * buffer,
+                             const char * nickname,
+                             char prefix) {
+    GtkTreeIter user;
+
+    if (get_user_row(buffer, nickname, &user) == -1)
+        return -1;
+    _set_user_prefix(buffer, &user, prefix);
+    return 0;
+}
+
+void _set_user_prefix(struct buffer_info * buffer,
+                      GtkTreeIter * user,
+                      char prefix) {
+    char new_prefix[2];
+    new_prefix[0] = prefix;
+    new_prefix[1] = '\0';
+    gtk_list_store_set(buffer->user_list_store, user, 0, &new_prefix, -1);
+}
+
+int add_prefix_to_user(struct buffer_info * buffer,
+                       const char * nickname,
+                       const char * prefix) {
+    GtkTreeIter user_row;
+    char * current_prefixes;
+    size_t current_prefixes_size;
+    short insert_pos;
+
+    if (get_user_row(buffer, nickname, &user_row) == -1)
+        return -1;
+
+    current_prefixes = get_user_prefixes(buffer, &user_row);
+    if (current_prefixes == NULL) {
+        current_prefixes = malloc(sizeof(char[2]));
+        current_prefixes[0] = *prefix;
+        current_prefixes[1] = '\0';
+        set_user_prefixes(buffer, &user_row, current_prefixes);
+        set_user_prefix(buffer, nickname, *prefix);
+        return 0;
+    }
+
+    current_prefixes_size = strlen(current_prefixes);
+
+    // If the user already has the prefix applied, skip it
+    if (strchr(current_prefixes, *prefix) != NULL)
+        return 0;
+
+    /* Figure out where to put the new prefix symbol (the list of prefixes a
+     * user has is always sorted from greatest to least in terms of
+     * privileges)
+     */
+    for (insert_pos = 0; current_prefixes[insert_pos] != '\0'; insert_pos++)
+        if (prefix < strchr(buffer->parent_network->prefix_symbols,
+                            current_prefixes[insert_pos]))
+            break;
+
+    current_prefixes = realloc(current_prefixes, current_prefixes_size + 2);
+    memmove(&current_prefixes[insert_pos + 1],
+            &current_prefixes[insert_pos],
+            current_prefixes_size - insert_pos + 1);
+    current_prefixes[insert_pos] = *prefix;
+
+    set_user_prefix(buffer, nickname, current_prefixes[0]);
+
+    gtk_list_store_set(buffer->user_list_store, &user_row, 2, current_prefixes,
+                       -1);
+    return 0;
+}
+
+int remove_prefix_from_user(struct buffer_info * buffer,
+                            const char * nickname,
+                            char prefix) {
+    GtkTreeIter user_row;
+    char * current_prefixes;
+    size_t current_prefixes_size;
+    char * pos;
+
+    if (get_user_row(buffer, nickname, &user_row) == -1)
+        return -1;
+
+    current_prefixes = get_user_prefixes(buffer, &user_row);
+    current_prefixes_size = strlen(current_prefixes) + 1;
+
+    // Find the position of the prefix that needs to be removed
+    if ((pos = strchr(current_prefixes, prefix)) == NULL)
+        return 0;
+    else if (current_prefixes_size == 2) { // The user only has one prefix
+        free(current_prefixes);
+        set_user_prefixes(buffer, &user_row, NULL);
+        set_user_prefix(buffer, nickname, '\0');
+    }
+    // Remove the prefix from the string
+    memmove(pos, pos + 1,
+            current_prefixes_size - (pos - current_prefixes));
+    
+    // Trim the string
+    current_prefixes = realloc(current_prefixes, current_prefixes_size - 1);
+
+    // Update the user's row
+    set_user_prefixes(buffer, &user_row, current_prefixes);
+    set_user_prefix(buffer, nickname, current_prefixes[0]);
+    gtk_list_store_set(buffer->user_list_store, &user_row, 2, current_prefixes,
+                       -1);
     return 0;
 }
 

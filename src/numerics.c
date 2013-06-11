@@ -176,7 +176,7 @@ void rpl_namreply(struct irc_network * network,
              nick != NULL;
              nick = strtok_r(NULL, " ", &saveptr)) {
             char * prefix;
-            GtkTreeIter new_user;
+            GtkTreeIter user;
 
             // Check if the user has a user prefix
             if (strchr(network->prefix_symbols, nick[0]) != NULL) {
@@ -190,10 +190,15 @@ void rpl_namreply(struct irc_network * network,
             }
 
             // Check to see if we already have the user in the list
-            if (trie_get(channel->users, nick) != NULL)
-                continue;
-
-            add_user_to_list(channel, nick, prefix, (size_t)(nick - prefix));
+            if (get_user_row(channel, nick, &user) != -1)
+                /* Since this will really only happen on non-multi-prefix
+                 * networks, we don't need to worry about updating the user's
+                 * full prefix string
+                 */
+                set_user_prefix(channel, &user, prefix ? *prefix : '\0');
+            else
+                add_user_to_list(channel, nick, prefix,
+                                 (size_t)(nick - prefix));
         }
     }
     // TODO: Print results to current buffer if we're not in the channel
