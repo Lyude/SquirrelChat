@@ -72,6 +72,7 @@ void add_network(struct chat_window * window,
             GTK_TREE_MODEL(window->network_tree_store),
             toplevel_path);
     network->window = window;
+    network->buffer->window = window;
 }
 
 // Get's the currently selected network in the network tree
