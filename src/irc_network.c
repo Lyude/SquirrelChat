@@ -124,10 +124,9 @@ int connect_irc_network(struct irc_network * network) {
         return -1;
     }
 
-    print_to_buffer(network->buffer, "Connected! Sending info...\n");
-    send_to_network(network, "NICK %s\r\n", network->nickname);
-    send_to_network(network, "USER %s X X :%s\r\n",
-                    network->username, network->real_name);
+    print_to_buffer(network->buffer,
+                    "Connected! Beginning CAP negotiation...\n");
+    send_to_network(network, "CAP LS\r\n");
 
     network->connected = true;
     network->input_channel = g_io_channel_unix_new(network->socket);

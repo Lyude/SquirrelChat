@@ -20,9 +20,89 @@
 #include "irc_macros.h"
 #include "cmd_responses.h"
 #include "errors.h"
+#include "trie.h"
 
 #include <string.h>
 #include <stdlib.h>
+
+trie * cap_features;
+
+#define IRC_CAP_MULTI_PREFIX    1
+#define IRC_CAP_SASL            2
+
+void init_message_types() {
+    cap_features = trie_new(trie_strtolower);
+    trie_set(cap_features, "multi-prefix",  (void*)IRC_CAP_MULTI_PREFIX);
+    trie_set(cap_features, "sasl",          (void*)IRC_CAP_SASL);
+}
+
+void cap_msg_callback(struct irc_network * network,
+                      char * hostmask,
+                      short argc,
+                      char * argv[],
+                      char * trailing) {
+    if (argc < 2) {
+        print_to_buffer(network->buffer, "Fatal error: Invalid CAP received\n");
+        dump_msg_to_buffer(network->buffer, hostmask, argc, argv, trailing);
+        disconnect_irc_network(network, NULL);
+        return;
+    }
+    
+    if (strcmp(argv[1], "LS") == 0) {
+        char cap_str[IRC_MSG_BUF_LEN];
+        char * saveptr;
+        bool features_found = false;
+
+        memset(&cap_str, 0, IRC_MSG_LEN);
+
+        // Build the CAP REQ string
+        strcat(&cap_str[0], "CAP REQ ");
+        for (char * feature = strtok_r(trailing, " ", &saveptr);
+             feature != NULL;
+             feature = strtok_r(NULL, " ", &saveptr)) {
+            switch ((int)trie_get(cap_features, feature)) {
+                case IRC_CAP_MULTI_PREFIX:
+                case IRC_CAP_SASL:
+                    features_found = true;
+                    strncat(&cap_str[0], " ", IRC_MSG_LEN);
+                    strncat(&cap_str[0], feature, IRC_MSG_LEN);
+                    break;
+            }
+        }
+        // If we found features that we're compatible with
+        if (features_found)
+            send_to_network(network, "%s\r\n", (char*)&cap_str);
+        else
+            send_to_network(network, "CAP END\r\n");
+    }
+
+    else if (strcmp(argv[1], "ACK") == 0) {
+        char * saveptr;
+        for (char * feature = strtok_r(trailing, " ", &saveptr);
+             feature != NULL;
+             feature = strtok_r(NULL, " ", &saveptr)) {
+            switch ((int)trie_get(cap_features, feature)) {
+                case IRC_CAP_MULTI_PREFIX:
+                    network->multi_prefix = true;
+                    break;
+                case IRC_CAP_SASL:
+                    network->sasl = true;
+                    break;
+            }
+        }
+
+        // Finish the capability negotiation and begin registration
+        print_to_buffer(network->buffer,
+                        "Finished CAP negotiation.\n"
+                        "Sending registration information.\n");
+        send_to_network(network,
+                        "CAP END\r\n"
+                        "NICK %s\r\n"
+                        "USER %s X X %s\r\n",
+                        network->nickname, network->username,
+                        network->real_name);
+    }
+}
 
 void join_msg_callback(struct irc_network * network,
                        char * hostmask,
