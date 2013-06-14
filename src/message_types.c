@@ -16,6 +16,7 @@
 #include "message_parser.h"
 #include "irc_network.h"
 #include "ui/buffer.h"
+#include "ui/user_list.h"
 #include "net_io.h"
 #include "irc_macros.h"
 #include "cmd_responses.h"
@@ -153,18 +154,7 @@ void join_msg_callback(struct irc_network * network,
             return;
         }
 
-        // Add the user to the user list in the channel
-        gtk_list_store_append(buffer->user_list_store, &new_user_row);
-        gtk_list_store_set(buffer->user_list_store, &new_user_row, 1,
-                           nickname, -1);
-        trie_set(buffer->users, nickname,
-                 gtk_tree_row_reference_new(
-                     GTK_TREE_MODEL(buffer->user_list_store),
-                     gtk_tree_model_get_path(
-                         GTK_TREE_MODEL(buffer->user_list_store), &new_user_row
-                         )
-                     )
-                 );
+        add_user_to_list(buffer, nickname, NULL);
 
         print_to_buffer(buffer, "* %s (%s) has joined %s\n",
                         nickname, address, channel_name);
@@ -215,10 +205,7 @@ void part_msg_callback(struct irc_network * network,
         destroy_buffer(buffer);
     }
     else {
-        GtkTreeRowReference * user;
-        GtkTreeIter user_row;
-
-        if ((user = trie_get(buffer->users, nickname)) == NULL) {
+        if (remove_user_from_list(buffer, nickname) == -1) {
             print_to_buffer(buffer->parent_network->buffer,
                             "Error parsing message: Received a PART message "
                             "from %s (%s) in %s, but the user wasn't in the "
@@ -226,16 +213,6 @@ void part_msg_callback(struct irc_network * network,
                             nickname, address, channel_name);
             return;
         }
-
-        // Find the user's row in the user list and remove it and it's reference
-        gtk_tree_model_get_iter(GTK_TREE_MODEL(buffer->user_list_store),
-                                &user_row,
-                                gtk_tree_row_reference_get_path(user));
-
-        // Remove the user's row and remove them from the users trie
-        gtk_tree_row_reference_free(user);
-        gtk_list_store_remove(buffer->user_list_store, &user_row);
-        trie_del(buffer->users, nickname);
 
         print_to_buffer(buffer, 
                         "* %s (%s) has left %s\n",

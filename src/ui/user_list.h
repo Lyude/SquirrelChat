@@ -21,5 +21,11 @@
 
 extern void create_user_list(struct chat_window * window);
 
+extern void add_user_to_list(struct buffer_info * buffer,
+                             char * nickname,
+                             char * prefix_str);
+extern int remove_user_from_list(struct buffer_info * buffer,
+                                 char * nickname);
+
 #endif // __USER_LIST_H__
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

@@ -21,6 +21,7 @@
 #include "irc_numerics.h"
 #include "errors.h"
 #include "message_parser.h"
+#include "ui/user_list.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -181,32 +182,20 @@ void rpl_namreply(struct irc_network * network,
             GtkTreeIter new_user;
 
             // Check if the user has a user prefix
-            if ((prefix = strchr(network->prefix_symbols, nick[0])) != NULL)
-                nick++;
+            if ((prefix = strchr(network->prefix_symbols, nick[0])) != NULL) {
+                if (network->multi_prefix)
+                    for (nick++;
+                         strchr(network->prefix_symbols, nick[0]) != NULL;
+                         nick++);
+                else
+                    nick++;
+            }
 
             // Check to see if we already have the user in the list
             if (trie_get(channel->users, nick) != NULL)
                 continue;
 
-            gtk_list_store_append(channel->user_list_store, &new_user);
-
-            if (prefix != NULL) {
-                char prefix_str[2];
-                prefix_str[0] = *prefix;
-                prefix_str[1] = '\0';
-                gtk_list_store_set(channel->user_list_store,
-                                   &new_user, 0, &prefix_str[0], -1);
-            }
-
-            gtk_list_store_set(channel->user_list_store,
-                               &new_user, 1, nick, -1);
-
-            trie_set(channel->users, nick,
-                     gtk_tree_row_reference_new(
-                         GTK_TREE_MODEL(channel->user_list_store),
-                         gtk_tree_model_get_path(
-                             GTK_TREE_MODEL(channel->user_list_store), &new_user)
-                     ));
+            add_user_to_list(channel, nick, prefix);
         }
     }
     // TODO: Print results to current buffer if we're not in the channel
