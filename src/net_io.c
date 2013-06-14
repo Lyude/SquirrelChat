@@ -31,7 +31,7 @@
 
 // Sends a message to a currently connected IRC network
 void send_to_network(struct irc_network * buffer,
-                     char * msg, ...) {
+                     const char * msg, ...) {
     va_list args;
     size_t msg_len;
     char send_buffer[IRC_MSG_BUF_LEN];

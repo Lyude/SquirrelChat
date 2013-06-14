@@ -21,8 +21,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-static inline int get_user_row(struct buffer_info * buffer,
-                               char * nickname,
+static inline int get_user_row(const struct buffer_info * buffer,
+                               const char * nickname,
                                GtkTreeIter * user_row) {
     GtkTreeRowReference * user_ref;
 
@@ -35,7 +35,7 @@ static inline int get_user_row(struct buffer_info * buffer,
     return 0;
 }
 
-static inline char * get_user_prefixes(struct buffer_info * buffer,
+static inline char * get_user_prefixes(const struct buffer_info * buffer,
                                        GtkTreeIter * user) {
     GValue value;
     char * prefixes;
@@ -70,8 +70,8 @@ void create_user_list(struct chat_window * window) {
 }
 
 void add_user_to_list(struct buffer_info * buffer,
-                      char * nickname,
-                      char * prefix_str) {
+                      const char * nickname,
+                      const char * prefix_str) {
     GtkTreeIter new_user_row;
 
     // Add the user to the user list in the channel
@@ -106,7 +106,7 @@ void add_user_to_list(struct buffer_info * buffer,
 }
 
 int remove_user_from_list(struct buffer_info * buffer,
-                          char * nickname) {
+                          const char * nickname) {
     GtkTreeRowReference * user_ref;
     GtkTreeIter user_row;
 

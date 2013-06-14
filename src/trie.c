@@ -81,7 +81,7 @@ static char nibble(char * s, int i)
     return (i%2==0) ? s[i/2]>>4 : s[i/2]&0xf;
 }
 
-static trie_e *retrieval(trie * trie, char * tkey, int create)
+static trie_e *retrieval(trie * trie, const char * tkey, int create)
 {
     trie_e *n;
     char key[U_TRIE_KEY_MAX];
@@ -110,13 +110,13 @@ static trie_e *retrieval(trie * trie, char * tkey, int create)
     return n;
 }
 
-void trie_set(trie * trie, char * key, void * val)
+void trie_set(trie * trie, const char * key, void * val)
 {
     trie_e *n = retrieval(trie, key, 1);
     n->val = val;
 }
 
-void *trie_get(trie * trie, char * key)
+void *trie_get(trie * trie, const char * key)
 {
     trie_e *n = retrieval(trie, key, 0);
     return n ? n->val : NULL;
@@ -140,7 +140,7 @@ void trie_each(trie *trie, void(*cb)(), void * priv)
     each(&trie->n, cb, priv);
 }
 
-void *trie_del(trie * trie, char * key)
+void *trie_del(trie * trie, const char * key)
 {
     trie_e *prev, *cur;
     void *val;

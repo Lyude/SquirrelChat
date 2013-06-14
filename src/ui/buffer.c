@@ -23,7 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct buffer_info * new_buffer(char * buffer_name,
+struct buffer_info * new_buffer(const char * buffer_name,
                                 enum buffer_type type,
                                 struct irc_network * network) {
     struct buffer_info * buffer = malloc(sizeof(struct buffer_info));
@@ -57,7 +57,7 @@ void destroy_buffer(struct buffer_info * buffer) {
 }
 
 void print_to_buffer(struct buffer_info * buffer,
-                     char * message, ...) {
+                     const char * message, ...) {
     va_list args;
     char * parsed_message;
     size_t parsed_message_len;

@@ -20,7 +20,7 @@
 #include "irc_network.h"
 
 void send_privmsg(struct irc_network * network,
-                  char * recepient,
-                  char * message);
+                  const char * recepient,
+                  const char * message);
 
 #endif /* CHAT_H */

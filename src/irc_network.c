@@ -142,7 +142,7 @@ int connect_irc_network(struct irc_network * network) {
 
 // 
 void disconnect_irc_network(struct irc_network * network,
-                            char * msg) {
+                            const char * msg) {
     send_to_network(network, "QUIT :%s\r\n", msg ? msg : "");
     network->status = DISCONNECTED;
 

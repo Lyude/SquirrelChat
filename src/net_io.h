@@ -21,7 +21,7 @@
 #include <stdbool.h>
 
 extern void send_to_network(struct irc_network * buffer,
-                            char * msg, ...)
+                            const char * msg, ...)
     __attribute__((format (printf, 2, 3)));
 extern bool receive_from_network(struct irc_network * buffer, char ** output);
 

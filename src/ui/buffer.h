@@ -51,13 +51,13 @@ struct buffer_info {
     trie * users;
 };
 
-extern struct buffer_info * new_buffer(char * buffer_name,
+extern struct buffer_info * new_buffer(const char * buffer_name,
                                        enum buffer_type type,
                                        struct irc_network * network);
 extern void destroy_buffer(struct buffer_info * buffer);
 
 extern void print_to_buffer(struct buffer_info * buffer,
-                            char * message, ...)
+                            const char * message, ...)
     __attribute__((format(printf, 2, 3)));
 
 #endif /* __BUFFER_H__ */    

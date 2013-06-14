@@ -19,8 +19,8 @@
 
 // TODO: Add support for splitting messages over 512 chars
 void send_privmsg(struct irc_network * network,
-                  char * recepient,
-                  char * msg) {
+                  const char * recepient,
+                  const char * msg) {
     send_to_network(network, "PRIVMSG %s :%s\r\n",
                     recepient, msg);
 }
