@@ -92,16 +92,19 @@ void cap_msg_callback(struct irc_network * network,
             }
         }
 
-        // Finish the capability negotiation and begin registration
-        print_to_buffer(network->buffer,
-                        "Finished CAP negotiation.\n"
-                        "Sending registration information.\n");
-        send_to_network(network,
-                        "CAP END\r\n"
-                        "NICK %s\r\n"
-                        "USER %s X X %s\r\n",
-                        network->nickname, network->username,
-                        network->real_name);
+        if (network->status == CAP) {
+            // Finish the capability negotiation and begin registration
+            print_to_buffer(network->buffer,
+                            "Finished CAP negotiation.\n"
+                            "Sending registration information.\n");
+            send_to_network(network,
+                            "CAP END\r\n"
+                            "NICK %s\r\n"
+                            "USER %s X X %s\r\n",
+                            network->nickname, network->username,
+                            network->real_name);
+            network->status = CONNECTED;
+        }
     }
 }
 

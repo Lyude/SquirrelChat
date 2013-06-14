@@ -21,6 +21,7 @@
 #include "irc_numerics.h"
 #include "errors.h"
 #include "message_parser.h"
+#include "net_io.h"
 #include "ui/user_list.h"
 
 #include <string.h>
@@ -342,4 +343,22 @@ void nick_change_error(struct irc_network * network,
     remove_last_response_claim(network);
 }
 
+void err_notregistered(struct irc_network * network,
+                       char * hostmask,
+                       short argc,
+                       char * argv[],
+                       char * trailing) {
+    /* The only time our client could ever get this is during the CAP
+     * negotiation, which means that the server does not support IRCv3 and
+     * inherently does not support CAP
+     */
+    print_to_buffer(network->buffer,
+                    "CAP negotiation failed: Server does not support CAP.\n"
+                    "Sending registration information.\n");
+    send_to_network(network,
+                    "NICK %s\r\n"
+                    "USER %s X X %s\r\n",
+                    network->nickname, network->username, network->real_name);
+    network->status = CONNECTED;
+}
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

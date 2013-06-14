@@ -71,7 +71,7 @@ void command_box_activated_handler(GtkEntry * entry,
         if (window->current_buffer->type == NETWORK)
             print_to_buffer(window->current_buffer,
                             "You can't say stuff in this buffer!\n");
-        else if (!window->current_buffer->parent_network->connected)
+        else if (window->current_buffer->parent_network->status != CONNECTED)
             print_to_buffer(window->current_buffer,
                             "Not connected!\n");
         else {

@@ -65,7 +65,11 @@ struct irc_network {
 
     int socket;
     
-    bool connected;
+    enum {
+        DISCONNECTED,
+        CAP,
+        CONNECTED
+    } status;
 
     char recv_buffer[IRC_MSG_BUF_LEN];
     int buffer_cursor;

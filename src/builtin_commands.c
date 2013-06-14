@@ -102,7 +102,7 @@ short cmd_nick(struct buffer_info * buffer,
         return 0;
 
     //TODO: Add code to check the length of the nickname
-    if (buffer->parent_network->connected) {
+    if (buffer->parent_network->status != DISCONNECTED) {
         send_to_network(buffer->parent_network, "NICK %s\r\n", argv[0]);
         claim_response(buffer->parent_network, buffer, strdup(argv[0]), free);
     }
@@ -181,7 +181,7 @@ short cmd_join(struct buffer_info * buffer,
                char * trailing) {
     if (argc < 1)
         return IRC_CMD_SYNTAX_ERR;
-    if (buffer->parent_network->connected)
+    if (buffer->parent_network->status == CONNECTED)
         send_to_network(buffer->parent_network, "JOIN %s\r\n",
                         argv[0]);
     else
@@ -212,7 +212,7 @@ short cmd_topic(struct buffer_info * buffer,
                 unsigned short argc,
                 char * argv[],
                 char * trailing) {
-    if (!buffer->parent_network->connected) {
+    if (buffer->parent_network->status != CONNECTED) {
         print_to_buffer(buffer, "Not connected!\n");
         return 0;
     }
@@ -255,7 +255,7 @@ short cmd_connect(struct buffer_info * buffer,
                   unsigned short argc,
                   char * argv[],
                   char * trailing) {
-    if (!buffer->parent_network->connected)
+    if (buffer->parent_network->status == DISCONNECTED)
         connect_irc_network(buffer->parent_network);
     return 0;
 }
@@ -265,7 +265,7 @@ short cmd_quit(struct buffer_info * buffer,
                unsigned short argc,
                char * argv[],
                char * trailing) {
-    if (!buffer->parent_network->connected)
+    if (buffer->parent_network->status == CONNECTED)
         print_to_buffer(buffer, "Not connected!\n");
     else
         disconnect_irc_network(buffer->parent_network, trailing);

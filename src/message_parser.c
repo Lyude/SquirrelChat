@@ -85,6 +85,7 @@ void init_message_parser() {
     numerics[IRC_RPL_TOPIC] = rpl_topic;
     numerics[IRC_RPL_NOTOPIC] = rpl_notopic;
     numerics[IRC_RPL_TOPICWHOTIME] = rpl_topicwhotime;
+    numerics[IRC_ERR_NOTREGISTERED] = err_notregistered;
 }
 
 void process_irc_message(struct irc_network * network, char * msg) {

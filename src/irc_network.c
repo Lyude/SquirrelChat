@@ -128,7 +128,7 @@ int connect_irc_network(struct irc_network * network) {
                     "Connected! Beginning CAP negotiation...\n");
     send_to_network(network, "CAP LS\r\n");
 
-    network->connected = true;
+    network->status = CAP;
     network->input_channel = g_io_channel_unix_new(network->socket);
     g_io_channel_set_encoding(network->input_channel, NULL, NULL);
     g_io_channel_set_buffered(network->input_channel, FALSE);
@@ -144,7 +144,7 @@ int connect_irc_network(struct irc_network * network) {
 void disconnect_irc_network(struct irc_network * network,
                             char * msg) {
     send_to_network(network, "QUIT :%s\r\n", msg ? msg : "");
-    network->connected = false;
+    network->status = DISCONNECTED;
 
     free(network->version);
     free(network->chanmodes);
