@@ -61,7 +61,6 @@ void free_irc_network(struct irc_network * network,
     free(network);
 }
 
-// Connects an IRC network
 int connect_irc_network(struct irc_network * network) {
     struct addrinfo hints; // For specifying the type of host we want
     struct addrinfo * results; // Stores the result list from getaddrinfo
@@ -140,7 +139,6 @@ int connect_irc_network(struct irc_network * network) {
     return 0;
 }
 
-// 
 void disconnect_irc_network(struct irc_network * network,
                             const char * msg) {
     send_to_network(network, "QUIT :%s\r\n", msg ? msg : "");
@@ -167,10 +165,6 @@ void disconnect_irc_network(struct irc_network * network,
     network->chanmodes_d = NULL;
     network->prefix_chars = NULL;
     network->prefix_symbols = NULL;
-}
-
-void free_chat_buffer(void * this_does_nothing) {
-    // TODO: Add stuff
 }
 
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

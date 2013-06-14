@@ -92,8 +92,6 @@ extern int connect_irc_network(struct irc_network * network);
 extern void disconnect_irc_network(struct irc_network * network,
                                    const char * msg);
 
-extern void free_chat_buffer(void * this_does_nothing);
-
 extern void network_tree_cursor_changed_handler(GtkTreeSelection *treeselection,
                                                 GtkTextView *chat_viewer);
 #endif /* BUFFERS_H */

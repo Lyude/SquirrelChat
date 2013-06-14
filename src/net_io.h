@@ -23,7 +23,6 @@
 extern void send_to_network(struct irc_network * buffer,
                             const char * msg, ...)
     __attribute__((format (printf, 2, 3)));
-extern bool receive_from_network(struct irc_network * buffer, char ** output);
 
 #endif /* NET_IO_H */
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
