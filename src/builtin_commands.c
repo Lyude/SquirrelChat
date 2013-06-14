@@ -143,9 +143,10 @@ short cmd_msg(struct buffer_info * buffer,
               char * trailing) {
     if (argc < 1)
         return IRC_CMD_SYNTAX_ERR;
-
+    else if (buffer->parent_network->status != CONNECTED)
+        print_to_buffer(buffer, "Not connected!\n");
     // TODO: Add support for sending messages > 512 chars
-    if (strlen(trailing) > IRC_MSG_LEN - 
+    else if (strlen(trailing) > IRC_MSG_LEN - 
                            (strlen(buffer->parent_network->nickname) + 
                             sizeof(" :")))
         print_to_buffer(buffer, "Message too long!\n");
@@ -160,10 +161,12 @@ short cmd_notice(struct buffer_info * buffer,
                  char * trailing) {
     if (argc < 1)
         return IRC_CMD_SYNTAX_ERR;
+    else if (buffer->parent_network->status != CONNECTED)
+        print_to_buffer(buffer, "Not connected!\n");
     // TODO: add support for sending notices > 512 chars
-    if (strlen(trailing) > IRC_MSG_LEN -
-                           (strlen(buffer->parent_network->nickname) +
-                            sizeof(" :")))
+    else if (strlen(trailing) > IRC_MSG_LEN -
+                                (strlen(buffer->parent_network->nickname) +
+                                sizeof(" :")))
         print_to_buffer(buffer, "Notice too long!\n");
     else
         send_to_network(buffer->parent_network, "NOTICE %s :%s\r\n",
@@ -181,7 +184,7 @@ short cmd_join(struct buffer_info * buffer,
                char * trailing) {
     if (argc < 1)
         return IRC_CMD_SYNTAX_ERR;
-    if (buffer->parent_network->status == CONNECTED)
+    else if (buffer->parent_network->status == CONNECTED)
         send_to_network(buffer->parent_network, "JOIN %s\r\n",
                         argv[0]);
     else
@@ -201,6 +204,8 @@ short cmd_part(struct buffer_info * buffer,
         else
             print_to_buffer(buffer, "You're not in a channel!\n");
     }
+    else if (buffer->parent_network->status != CONNECTED)
+        print_to_buffer(buffer, "Not connected!\n");
     else
         send_to_network(buffer->parent_network, "PART %s :%s\r\n",
                         argv[0], trailing ? trailing : "");
@@ -265,7 +270,7 @@ short cmd_quit(struct buffer_info * buffer,
                unsigned short argc,
                char * argv[],
                char * trailing) {
-    if (buffer->parent_network->status == CONNECTED)
+    if (buffer->parent_network->status == DISCONNECTED)
         print_to_buffer(buffer, "Not connected!\n");
     else
         disconnect_irc_network(buffer->parent_network, trailing);
@@ -276,7 +281,9 @@ short cmd_quote(struct buffer_info * buffer,
                 unsigned short argc,
                 char * argv[],
                 char * trailing) {
-    if (trailing != NULL)
+    if (buffer->parent_network->status == DISCONNECTED)
+        print_to_buffer(buffer, "Not connected!\n");
+    else if (trailing != NULL)
         send_to_network(buffer->parent_network, "%s\r\n", trailing);
     else
         return IRC_CMD_SYNTAX_ERR;
@@ -287,6 +294,11 @@ short cmd_motd(struct buffer_info * buffer,
                unsigned short argc,
                char * argv[],
                char * trailing) {
+    if (buffer->parent_network->status != CONNECTED) {
+        print_to_buffer(buffer, "Not connected!\n");
+        return 0;
+    }
+
     claim_response(buffer->parent_network, buffer, NULL, NULL);
     send_to_network(buffer->parent_network, "MOTD %s\r\n",
                     (argc >= 1) ? argv[0] : "");
