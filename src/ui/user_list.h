@@ -28,5 +28,8 @@ extern void add_user_to_list(struct buffer_info * buffer,
 extern int remove_user_from_list(struct buffer_info * buffer,
                                  const char * nickname);
 
+extern char * get_user_prefixes(const struct buffer_info * buffer,
+                                GtkTreeIter * user);
+
 #endif // __USER_LIST_H__
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

@@ -35,8 +35,8 @@ static inline int get_user_row(const struct buffer_info * buffer,
     return 0;
 }
 
-static inline char * get_user_prefixes(const struct buffer_info * buffer,
-                                       GtkTreeIter * user) {
+char * get_user_prefixes(const struct buffer_info * buffer,
+                         GtkTreeIter * user) {
     GValue value = G_VALUE_INIT;
     char * prefixes;
     gtk_tree_model_get_value(GTK_TREE_MODEL(buffer->user_list_store),
