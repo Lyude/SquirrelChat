@@ -20,13 +20,11 @@
 void dump_msg_to_buffer(struct buffer_info * buffer,
                         char * hostmask,
                         short argc,
-                        char * argv[],
-                        char * trailing) {
+                        char * argv[]) {
     print_to_buffer(buffer,
                     "Received from: \"%s\"\n"
-                    "Trailing: \"%s\"\n"
                     "Args: [ ",
-                    hostmask, trailing ? trailing : "(N/A)");
+                    hostmask);
     for (short i = 0; i < argc; i++)
         print_to_buffer(buffer, "\"%s\", ", argv[i]);
     print_to_buffer(buffer, " ]\n");

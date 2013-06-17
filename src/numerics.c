@@ -53,25 +53,23 @@ void init_numerics() {
 }
 
 // Used for numerics that just give us a message requiring no special handling
-void echo_numeric(struct irc_network * network,
-                  char * hostmask,
-                  short argc,
-                  char * argv[],
-                  char * trailing) {
-    print_to_buffer(network->buffer, "%s\n", trailing);
+void echo_argv_1(struct irc_network * network,
+                 char * hostmask,
+                 short argc,
+                 char * argv[]) {
+    print_to_buffer(network->buffer, "%s\n", argv[1]);
 }
 
 void rpl_myinfo(struct irc_network * network,
                 char * hostmask,
                 short argc,
-                char * argv[],
-                char * trailing) {
+                char * argv[]) {
     if (argc < 5) {
         print_to_buffer(network->buffer, 
                         "Error parsing message: Received invalid RPL_MYINFO: "
                         "not enough arguments provided (only given %i)\n",
                         argc);
-        dump_msg_to_buffer(network->buffer, hostmask, argc, argv, trailing);
+        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
     }
     else {
         network->version = strdup(argv[2]);
@@ -83,8 +81,7 @@ void rpl_myinfo(struct irc_network * network,
 void rpl_isupport(struct irc_network * network,
                   char * hostmask,          
                   short argc,
-                  char * argv[],
-                  char * trailing) {
+                  char * argv[]) {
     for (short i = 1; i < argc; i++) {
         char * saveptr;
         char * saveptr2;
@@ -167,8 +164,7 @@ void rpl_isupport(struct irc_network * network,
 void rpl_namreply(struct irc_network * network,
                   char * hostmask,
                   short argc,
-                  char * argv[],
-                  char * trailing) {
+                  char * argv[]) {
     struct buffer_info * channel;
     // The first and second parameter aren't important
     
@@ -176,7 +172,7 @@ void rpl_namreply(struct irc_network * network,
     if ((channel = trie_get(network->buffers, argv[2])) != NULL) {
         // Add every single person in the reply to the list
         char * saveptr;
-        for (char * nick = strtok_r(trailing, " ", &saveptr);
+        for (char * nick = strtok_r(argv[3], " ", &saveptr);
              nick != NULL;
              nick = strtok_r(NULL, " ", &saveptr)) {
             char * prefix;
@@ -206,16 +202,14 @@ void rpl_namreply(struct irc_network * network,
 void rpl_endofnames(struct irc_network * network,
                     char * hostmask,
                     short argc,
-                    char * argv[],
-                    char * trailing) {
+                    char * argv[]) {
     // TODO: Do something here
 }
 
 void rpl_motdstart(struct irc_network * network,
                    char * hostmask,
                    short argc,
-                   char * argv[],
-                   char * trailing) {
+                   char * argv[]) {
     struct buffer_info * output_buffer;
     // Check if the motd was requested in a different window
 
@@ -228,19 +222,17 @@ void rpl_motdstart(struct irc_network * network,
 void rpl_motd(struct irc_network * network,
               char * hostmask,
               short argc,
-              char * argv[],
-              char * trailing) {
+              char * argv[]) {
     print_to_buffer((network->claimed_responses) ?
                         network->claimed_responses->buffer :
                         network->buffer,
-                    "%s\n", trailing);
+                    "%s\n", argv[1]);
 }
 
 void rpl_endofmotd(struct irc_network * network,
                    char * hostmask,
                    short argc,
-                   char * argv[],
-                   char * trailing) {
+                   char * argv[]) {
     if (network->claimed_responses == NULL)
         print_to_buffer(network->buffer, "---End of MOTD---\n");
     else {
@@ -253,13 +245,12 @@ void rpl_endofmotd(struct irc_network * network,
 void rpl_topic(struct irc_network * network,
                char * hostmask,
                short argc,
-               char * argv[],
-               char * trailing) {
-    if (argc < 2 || trailing == NULL) {
+               char * argv[]) {
+    if (argc < 3) {
         print_to_buffer(network->buffer,
                         "Error parsing message: missing parameters for "
                         "RPL_TOPIC.\n");
-        dump_msg_to_buffer(network->buffer, hostmask, argc, argv, trailing);
+        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
         return;
     }
 
@@ -271,19 +262,18 @@ void rpl_topic(struct irc_network * network,
     else if ((output = trie_get(network->buffers, argv[1])) == NULL)
         output = network->buffer;
 
-    print_to_buffer(output, "* Topic for %s is \"%s\"\n", argv[1], trailing);
+    print_to_buffer(output, "* Topic for %s is \"%s\"\n", argv[1], argv[2]);
 }
 
 void rpl_notopic(struct irc_network * network,
                  char * hostmask,
                  short argc,
-                 char * argv[],
-                 char * trailing) {
+                 char * argv[]) {
     if (argc < 2) {
         print_to_buffer(network->buffer,
                         "Error parsing message: Missing parameters for "
                         "RPL_NOTOPIC.\n");
-        dump_msg_to_buffer(network->buffer, hostmask, argc, argv, trailing);
+        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
         return;
     }
 
@@ -301,14 +291,13 @@ void rpl_notopic(struct irc_network * network,
 void rpl_topicwhotime(struct irc_network * network,
                       char * hostmask,
                       short argc,
-                      char * argv[],
-                      char * trailing) {
+                      char * argv[]) {
     if (argc < 3) {
         print_to_buffer(network->buffer,
                         "Error parsing message: Received RPL_TOPICWHOTIME but "
                         "not enough arguments were provided with the "
                         "message.\n");
-        dump_msg_to_buffer(network->buffer, hostmask, argc, argv, trailing);
+        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
         return;
     }
 
@@ -333,22 +322,20 @@ void rpl_topicwhotime(struct irc_network * network,
 void nick_change_error(struct irc_network * network,
                        char * hostmask,
                        short argc,
-                       char * argv[],
-                       char * trailing) {
+                       char * argv[]) {
     if (network->claimed_responses == NULL)
         return;
 
     print_to_buffer(network->claimed_responses->buffer,
                     "Could not change nickname to %s: %s\n",
-                    network->claimed_responses->data, trailing);
+                    network->claimed_responses->data, argv[2]);
     remove_last_response_claim(network);
 }
 
 void err_notregistered(struct irc_network * network,
                        char * hostmask,
                        short argc,
-                       char * argv[],
-                       char * trailing) {
+                       char * argv[]) {
     /* The only time our client could ever get this is during the CAP
      * negotiation, which means that the server does not support IRCv3 and
      * inherently does not support CAP

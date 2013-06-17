@@ -20,8 +20,7 @@
 typedef void (*irc_message_callback)(struct irc_network *,
                                      char *,     // hostmask
                                      short,      // argc
-                                     char*[],    // argv
-                                     char*);     // last parameter
+                                     char*[]);   // argv
 
 extern void init_message_parser();
 extern void process_irc_message(struct irc_network * network, char * msg);

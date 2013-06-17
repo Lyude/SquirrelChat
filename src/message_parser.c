@@ -70,9 +70,9 @@ void init_message_parser() {
 
     init_message_types();
 
-    numerics[IRC_RPL_WELCOME] = echo_numeric;
-    numerics[IRC_RPL_YOURHOST] = echo_numeric;
-    numerics[IRC_RPL_CREATED] = echo_numeric;
+    numerics[IRC_RPL_WELCOME] = echo_argv_1;
+    numerics[IRC_RPL_YOURHOST] = echo_argv_1;
+    numerics[IRC_RPL_CREATED] = echo_argv_1;
     numerics[IRC_RPL_MYINFO] = rpl_myinfo;
     numerics[IRC_RPL_ISUPPORT] = rpl_isupport;
     numerics[IRC_RPL_NAMREPLY] = rpl_namreply;
@@ -114,7 +114,6 @@ void process_irc_message(struct irc_network * network, char * msg) {
 
     char * argv[MAX_POSSIBLE_PARAMS];
     short argc;
-    char * trailing = NULL;
     for (argc = 0; ; argc++) {
         char * param_end;
         
@@ -122,7 +121,7 @@ void process_irc_message(struct irc_network * network, char * msg) {
          * processing spaces
          */
         if (*cursor == ':') {
-            trailing = cursor + 1;
+            argv[argc++] = cursor + 1;
             break;
         }
 
@@ -139,22 +138,22 @@ void process_irc_message(struct irc_network * network, char * msg) {
 
     if ((numeric = numeric_to_short(command)) != -1) {
         if (numeric > 0 && numeric <= IRC_NUMERIC_MAX && numerics[numeric] != NULL)
-            numerics[numeric](network, hostmask, argc, argv, trailing);
+            numerics[numeric](network, hostmask, argc, argv);
         else {
             print_to_buffer(network->buffer,
                             "Error parsing message: unknown numeric %i\n",
                             numeric);
-            dump_msg_to_buffer(network->buffer, hostmask, argc, argv, trailing);
+            dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
         }
     }
     // Attempt to look up the command
     else if ((callback = trie_get(message_types, command)) != NULL)
-        callback(network, hostmask, argc, argv, trailing);
+        callback(network, hostmask, argc, argv);
     else {
         print_to_buffer(network->buffer,
                         "Error parsing message: unknown message type: \"%s\"\n",
                         command);
-        dump_msg_to_buffer(network->buffer, hostmask, argc, argv, trailing); 
+        dump_msg_to_buffer(network->buffer, hostmask, argc, argv); 
     }
 }
 

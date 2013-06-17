@@ -40,11 +40,10 @@ void init_message_types() {
 void cap_msg_callback(struct irc_network * network,
                       char * hostmask,
                       short argc,
-                      char * argv[],
-                      char * trailing) {
+                      char * argv[]) {
     if (argc < 2) {
         print_to_buffer(network->buffer, "Fatal error: Invalid CAP received\n");
-        dump_msg_to_buffer(network->buffer, hostmask, argc, argv, trailing);
+        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
         disconnect_irc_network(network, NULL);
         return;
     }
@@ -58,7 +57,7 @@ void cap_msg_callback(struct irc_network * network,
 
         // Build the CAP REQ string
         strcat(&cap_str[0], "CAP REQ ");
-        for (char * feature = strtok_r(trailing, " ", &saveptr);
+        for (char * feature = strtok_r(argv[2], " ", &saveptr);
              feature != NULL;
              feature = strtok_r(NULL, " ", &saveptr)) {
             switch ((int)trie_get(cap_features, feature)) {
@@ -79,7 +78,7 @@ void cap_msg_callback(struct irc_network * network,
 
     else if (strcmp(argv[1], "ACK") == 0) {
         char * saveptr;
-        for (char * feature = strtok_r(trailing, " ", &saveptr);
+        for (char * feature = strtok_r(argv[2], " ", &saveptr);
              feature != NULL;
              feature = strtok_r(NULL, " ", &saveptr)) {
             switch ((int)trie_get(cap_features, feature)) {
@@ -111,15 +110,12 @@ void cap_msg_callback(struct irc_network * network,
 void join_msg_callback(struct irc_network * network,
                        char * hostmask,
                        short argc,
-                       char * argv[],
-                       char * trailing) {
+                       char * argv[]) {
     char * nickname;
     char * address;
     split_irc_hostmask(hostmask, &nickname, &address);
 
-    char * channel_name;
-
-    if ((channel_name = trailing) == NULL && (channel_name = argv[0]) == NULL)
+    if (argc < 1)
         print_to_buffer(network->buffer,
                         "Error parsing message: Received a JOIN from %s, but "
                         "no channel was specified\n", nickname);
@@ -128,10 +124,10 @@ void join_msg_callback(struct irc_network * network,
         GtkTreeModel * network_tree_model;
         GtkTreeIter network_iter;
         GtkTreeIter channel_iter;
-        struct buffer_info * new_channel = new_buffer(channel_name,
+        struct buffer_info * new_channel = new_buffer(argv[0],
                                                       CHANNEL, network);
 
-        trie_set(network->buffers, channel_name, new_channel);
+        trie_set(network->buffers, argv[0], new_channel);
         // Add a new row as a child of the network
         network_tree_model = gtk_tree_row_reference_get_model(network->row);
         gtk_tree_model_get_iter(network_tree_model, &network_iter,
@@ -140,7 +136,7 @@ void join_msg_callback(struct irc_network * network,
         gtk_tree_store_append(GTK_TREE_STORE(network_tree_model),
                                &channel_iter, &network_iter);
         gtk_tree_store_set(GTK_TREE_STORE(network_tree_model), &channel_iter,
-                           0, channel_name, 1, new_channel, -1);
+                           0, argv[0], 1, new_channel, -1);
         
         // Store a reference to the row in the buffer
         new_channel->row = gtk_tree_row_reference_new(network_tree_model,
@@ -149,47 +145,41 @@ void join_msg_callback(struct irc_network * network,
     else {
         struct buffer_info * buffer;
         GtkTreeIter new_user_row;
-        if ((buffer = trie_get(network->buffers, channel_name)) == NULL) {
+        if ((buffer = trie_get(network->buffers, argv[0])) == NULL) {
             print_to_buffer(network->buffer,
                             "Error parsing message: received JOIN from %s for "
                             "%s, but we're not in that channel!\n",
-                            nickname, channel_name);
+                            nickname, argv[0]);
             return;
         }
 
         add_user_to_list(buffer, nickname, NULL, 0);
 
         print_to_buffer(buffer, "* %s (%s) has joined %s\n",
-                        nickname, address, channel_name);
+                        nickname, address, argv[0]);
     }
 }
 
 void part_msg_callback(struct irc_network * network,
                        char * hostmask,
                        short argc,
-                       char * argv[],
-                       char * trailing) {
+                       char * argv[]) {
     struct buffer_info * buffer;
-    char * channel_name;
     char * nickname;
     char * address;
     split_irc_hostmask(hostmask, &nickname, &address);
 
-    if (argc < 1) {
-        if ((channel_name = trailing) == NULL) {
-            print_to_buffer(network->buffer,
-                            "Error parsing message: Received PART from %s "
-                            "without a channel!\n", nickname);
-            return;
-        }
+    if (argc < 2) {
+        print_to_buffer(network->buffer,
+                        "Error parsing message: Received PART from %s "
+                        "without a channel!\n", nickname);
+        return;
     }
-    else
-        channel_name = argv[0];
 
-    if ((buffer = trie_get(network->buffers, channel_name)) == NULL) {
+    if ((buffer = trie_get(network->buffers, argv[0])) == NULL) {
         print_to_buffer(network->buffer,
                         "Received a PART message for %s, but we're not in that "
-                        "channel!\n", channel_name);
+                        "channel!\n", argv[0]);
         return;
     }
 
@@ -213,28 +203,27 @@ void part_msg_callback(struct irc_network * network,
                             "Error parsing message: Received a PART message "
                             "from %s (%s) in %s, but the user wasn't in the "
                             "channel.\n",
-                            nickname, address, channel_name);
+                            nickname, address, argv[0]);
             return;
         }
 
         print_to_buffer(buffer, 
                         "* %s (%s) has left %s\n",
-                        nickname, address, channel_name);
+                        nickname, address, argv[0]);
     }
 }
 
 void privmsg_msg_callback(struct irc_network * network,
                           char * hostmask,
                           short argc,
-                          char * argv[],
-                          char * trailing) {
+                          char * argv[]) {
     char * nickname;
     char * address;
     split_irc_hostmask(hostmask, &nickname, &address);
-    struct buffer_info * buffer;
     
     // Check whether or not the message was meant to be sent to a channel
-    if (strcmp(argv[0], network->nickname) == 0) {
+    if (argc < 3) {
+        struct buffer_info * buffer;
         if ((buffer = trie_get(network->buffers, nickname)) == NULL) {
             buffer = new_buffer(nickname, QUERY, network);
             GtkTreeModel * network_tree_model;
@@ -257,22 +246,21 @@ void privmsg_msg_callback(struct irc_network * network,
 
             trie_set(network->buffers, nickname, buffer);
         }
+        print_to_buffer(buffer, "<%s> %s\n", nickname, argv[1]);
     }
     else
-        buffer = trie_get(network->buffers, argv[0]);
-    
-    print_to_buffer(buffer, "<%s> %s\n", nickname, trailing);
+        print_to_buffer(trie_get(network->buffers, argv[0]),
+                        "<%s> %s\n", nickname, argv[1]);
 }
 
 void notice_msg_callback(struct irc_network * network,
                          char * hostmask,
                          short argc,
-                         char * argv[],
-                         char * trailing) {
-    if (argc < 1 || trailing == NULL) {
+                         char * argv[]) {
+    if (argc < 2) {
         print_to_buffer(network->buffer,
                         "Received NOTICE with missing params\n");
-        dump_msg_to_buffer(network->buffer, hostmask, argc, argv, trailing);
+        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
         return;
     }
 
@@ -281,15 +269,15 @@ void notice_msg_callback(struct irc_network * network,
     split_irc_hostmask(hostmask, &nickname, &address);
 
     if (strcmp(argv[0], "*") == 0)
-        print_to_buffer(network->buffer, "* %s: %s\n", nickname, trailing);
+        print_to_buffer(network->buffer, "* %s: %s\n", nickname, argv[1]);
     else if (strcmp(argv[0], network->nickname) == 0)
         print_to_buffer(network->window->current_buffer,
-                        "-%s- %s\n", nickname, trailing);
+                        "-%s- %s\n", nickname, argv[1]);
     else {
         struct buffer_info * output;
         if ((output = trie_get(network->buffers, argv[0])) != NULL)
             print_to_buffer(network->window->current_buffer,
-                            "-%s:%s- %s\n", nickname, argv[0], trailing);
+                            "-%s:%s- %s\n", nickname, argv[0], argv[1]);
     }
 }
 
@@ -356,21 +344,15 @@ void announce_our_nick_change(struct buffer_info * buffer,
 void nick_msg_callback(struct irc_network * network,
                        char * hostmask,
                        short argc,
-                       char * argv[],
-                       char * trailing) {
-    char * new_nickname;
+                       char * argv[]) {
     char * nickname;
     char * address;
 
-    if (trailing != NULL)
-        new_nickname = trailing;
-    else if (argc >= 1)
-        new_nickname = argv[0];
-    else {
+    if (argc < 1) {
         print_to_buffer(network->buffer,
                         "Received NICK message, but did not receive a "
                         "nickname?\n");
-        dump_msg_to_buffer(network->buffer, hostmask, argc, argv, trailing);
+        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
         return;
     }
 
@@ -378,14 +360,14 @@ void nick_msg_callback(struct irc_network * network,
 
     struct announce_nick_change_param params;
     params.old_nick = nickname;
-    params.new_nick = new_nickname;
+    params.new_nick = argv[0];
 
     // Check if we're the one whose nickname is being changed
     if (strcmp(network->nickname, nickname) == 0) {
         free(network->nickname);
-        network->nickname = strdup(new_nickname);
+        network->nickname = strdup(argv[0]);
         print_to_buffer(network->buffer, "* You are now known as %s\n",
-                        new_nickname);
+                        argv[0]);
         trie_each(network->buffers, announce_our_nick_change, &params);
 
         // If the user initiated the nick change, remove their response request
@@ -403,11 +385,11 @@ void nick_msg_callback(struct irc_network * network,
             GtkTreeModel * network_tree_model;
 
             print_to_buffer(query, "* %s is now known as %s\n",
-                            nickname, new_nickname);
+                            nickname, argv[0]);
 
             // Change the name of the buffer
             free(query->buffer_name);
-            query->buffer_name = strdup(new_nickname);
+            query->buffer_name = strdup(argv[0]);
 
             // Change the name of the buffer on the network tree
             network_tree_model = gtk_tree_row_reference_get_model(query->row);
@@ -415,10 +397,10 @@ void nick_msg_callback(struct irc_network * network,
                                     &query_row,
                                     gtk_tree_row_reference_get_path(query->row));
             gtk_tree_store_set(GTK_TREE_STORE(network_tree_model), &query_row,
-                               0, new_nickname, -1);
+                               0, argv[0], -1);
 
             trie_del(network->buffers, nickname);
-            trie_set(network->buffers, new_nickname, query);
+            trie_set(network->buffers, argv[0], query);
         }
     }
 }
@@ -426,21 +408,19 @@ void nick_msg_callback(struct irc_network * network,
 void ping_msg_callback(struct irc_network * network,
                        char * hostmask,
                        short argc,
-                       char * argv[],
-                       char * trailing) {
-    send_to_network(network, "PONG %s\r\n", trailing);
+                       char * argv[]) {
+    send_to_network(network, "PONG %s\r\n", argv[0]);
 }
 
 void topic_msg_callback(struct irc_network * network,
                         char * hostmask,
                         short argc,
-                        char * argv[],
-                        char * trailing) {
+                        char * argv[]) {
     if (argc < 1) {
         print_to_buffer(network->buffer,
                         "Error parsing message: Received TOPIC message, but "
                         "the message did not specify a channel.\n");
-        dump_msg_to_buffer(network->buffer, hostmask, argc, argv, trailing);
+        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
         return;
     }
     
@@ -458,7 +438,7 @@ void topic_msg_callback(struct irc_network * network,
     }
 
     print_to_buffer(channel, "* %s changed the topic to \"%s\"\n",
-                    nickname, trailing);
+                    nickname, argv[0]);
 }
 
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

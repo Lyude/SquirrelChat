@@ -19,70 +19,57 @@
 #include "irc_network.h"
 
 extern void init_numerics();
-extern void echo_numeric(struct irc_network * network,
-                         char * hostmask,
-                         short argc,
-                         char * argv[],
-                         char * trailing);
+extern void echo_argv_1(struct irc_network * network,
+                        char * hostmask,
+                        short argc,
+                        char * argv[]);
 extern void rpl_myinfo(struct irc_network * network,
                        char * hostmask,
                        short argc,
-                       char * argv[],
-                       char * trailing);
+                       char * argv[]);
 extern void rpl_isupport(struct irc_network * network,
                          char * hostmask,          
                          short argc,
-                         char * argv[],
-                         char * trailing);
+                         char * argv[]);
 extern void rpl_namreply(struct irc_network * network,
                          char * hostmask,
                          short argc,
-                         char * argv[],
-                         char * trailing);
+                         char * argv[]);
 extern void rpl_endofnames(struct irc_network * network,
                            char * hostmask,
                            short argc,
-                           char * argv[],
-                           char * trailing);
+                           char * argv[]);
 extern void rpl_motdstart(struct irc_network * network,
                           char * hostmask,
                           short argc,
-                          char * argv[],
-                          char * trailing);
+                          char * argv[]);
 extern void rpl_motd(struct irc_network * network,
                      char * hostmask,
                      short argc,
-                     char * argv[],
-                     char * trailing);
+                     char * argv[]);
 extern void rpl_endofmotd(struct irc_network * network,
                          char * hostmask,
                          short argc,
-                         char * argv[],
-                         char * trailing);
+                         char * argv[]);
 extern void rpl_topic(struct irc_network * network,
                       char * hostmask,
                       short argc,
-                      char * argv[],
-                      char * trailing);
+                      char * argv[]);
 extern void rpl_notopic(struct irc_network * network,
                         char * hostmask,
                         short argc,
-                        char * argv[],
-                        char * trailing);
+                        char * argv[]);
 extern void rpl_topicwhotime(struct irc_network * network,
                              char * hostmask,
                              short argc,
-                             char * argv[],
-                             char * trailing);
+                             char * argv[]);
 extern void nick_change_error(struct irc_network * network,
                               char * hostmask,
                               short argc,
-                              char * argv[],
-                              char * trailing);
+                              char * argv[]);
 extern void err_notregistered(struct irc_network * network,
                               char * hostmask,
                               short argc,
-                              char * argv[],
-                              char * trailing);
+                              char * argv[]);
 #endif
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
