@@ -183,7 +183,8 @@ void rpl_namreply(struct irc_network * network,
             GtkTreeIter new_user;
 
             // Check if the user has a user prefix
-            if ((prefix = strchr(network->prefix_symbols, nick[0])) != NULL) {
+            if (strchr(network->prefix_symbols, nick[0]) != NULL) {
+                prefix = nick;
                 if (network->multi_prefix)
                     for (nick++;
                          strchr(network->prefix_symbols, nick[0]) != NULL;
@@ -196,7 +197,7 @@ void rpl_namreply(struct irc_network * network,
             if (trie_get(channel->users, nick) != NULL)
                 continue;
 
-            add_user_to_list(channel, nick, prefix);
+            add_user_to_list(channel, nick, prefix, (size_t)(nick - prefix));
         }
     }
     // TODO: Print results to current buffer if we're not in the channel

@@ -157,7 +157,7 @@ void join_msg_callback(struct irc_network * network,
             return;
         }
 
-        add_user_to_list(buffer, nickname, NULL);
+        add_user_to_list(buffer, nickname, NULL, 0);
 
         print_to_buffer(buffer, "* %s (%s) has joined %s\n",
                         nickname, address, channel_name);

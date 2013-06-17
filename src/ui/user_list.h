@@ -23,7 +23,8 @@ extern void create_user_list(struct chat_window * window);
 
 extern void add_user_to_list(struct buffer_info * buffer,
                              const char * nickname,
-                             const char * prefix_str);
+                             const char * prefix_str,
+                             size_t prefix_len);
 extern int remove_user_from_list(struct buffer_info * buffer,
                                  const char * nickname);
 

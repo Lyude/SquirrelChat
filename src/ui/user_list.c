@@ -71,7 +71,8 @@ void create_user_list(struct chat_window * window) {
 
 void add_user_to_list(struct buffer_info * buffer,
                       const char * nickname,
-                      const char * prefix_str) {
+                      const char * prefix_str,
+                      size_t prefix_len) {
     GtkTreeIter new_user_row;
 
     // Add the user to the user list in the channel
@@ -89,7 +90,8 @@ void add_user_to_list(struct buffer_info * buffer,
 
     if (buffer->parent_network->multi_prefix)
         gtk_list_store_set(buffer->user_list_store, &new_user_row, 1,
-                           nickname, 2, prefix_str ? strdup(prefix_str) : NULL,
+                           nickname, 2,
+                           prefix_str ? strndup(prefix_str, prefix_len) : NULL,
                            -1);
     else
         gtk_list_store_set(buffer->user_list_store, &new_user_row, 1,
