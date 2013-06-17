@@ -28,6 +28,9 @@ extern void add_user_to_list(struct buffer_info * buffer,
 extern int remove_user_from_list(struct buffer_info * buffer,
                                  const char * nickname);
 
+extern int get_user_row(const struct buffer_info * buffer,
+                        const char * nickname,
+                        GtkTreeIter * user_row);
 extern char * get_user_prefixes(const struct buffer_info * buffer,
                                 GtkTreeIter * user);
 

@@ -21,9 +21,9 @@
 #include <string.h>
 #include <stdlib.h>
 
-static inline int get_user_row(const struct buffer_info * buffer,
-                               const char * nickname,
-                               GtkTreeIter * user_row) {
+int get_user_row(const struct buffer_info * buffer,
+                 const char * nickname,
+                 GtkTreeIter * user_row) {
     GtkTreeRowReference * user_ref;
 
     if ((user_ref = trie_get(buffer->users, nickname)) == NULL)
