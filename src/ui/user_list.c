@@ -121,6 +121,7 @@ int remove_user_from_list(struct buffer_info * buffer,
 
     gtk_tree_row_reference_free(user_ref);
     trie_del(buffer->users, nickname);
+    free(get_user_prefixes(buffer, &user_row));
     gtk_list_store_remove(buffer->user_list_store, &user_row);
     return 0;
 }
