@@ -24,8 +24,11 @@
 #include "net_io.h"
 #include "ui/user_list.h"
 
+#include <errno.h>
 #include <string.h>
+#include <strings.h>
 #include <stdlib.h>
+#include <time.h>
 
 trie * isupport_tokens;
 #define ISUPPORT_CHANTYPES      1
@@ -143,10 +146,12 @@ void rpl_isupport(struct irc_network * network,
                 if (strcmp(value, "rfc1459") == 0) {
                     network->casemap_upper = trie_rfc1459_strtoupper;
                     network->casemap_lower = trie_rfc1459_strtolower;
+                    network->casecmp = rfc1459_strcasecmp;
                 }
                 else if (strcmp(value, "ascii") == 0) {
                     network->casemap_upper = trie_strtoupper;
                     network->casemap_lower = trie_strtolower;
+                    network->casecmp = strcasecmp;
                 }
                 else {
                     print_to_buffer(network->buffer,
@@ -322,6 +327,95 @@ void rpl_topicwhotime(struct irc_network * network,
     split_irc_hostmask(argv[2], &nickname, &address);
 
     print_to_buffer(output, "* Set by %s (%s)\n", nickname, address);
+}
+
+void rpl_channelmodeis(struct irc_network * network,
+                       char * hostmask,
+                       short argc,
+                       char * argv[]) {
+    if (argc < 3) {
+        print_to_buffer(network->buffer,
+                        "Error parsing message: Received invalid "
+                        "RPL_CHANNELMODEIS.");
+        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
+        return;
+    }
+
+    struct buffer_info * output;
+    /* Check if the response was requested in another channel
+     * We don't remove the claimed response since most networks will follow up
+     * with a RPL_CREATIONTIME response
+     */
+    if (network->claimed_responses)
+        output = network->claimed_responses->buffer;
+    else if ((output = trie_get(network->buffers, argv[1])) == NULL)
+        output = network->buffer;
+
+    print_to_buffer(output, "The modes for %s are: %s\r\n",
+                    argv[1], argv[2]);
+}
+
+void rpl_creationtime(struct irc_network * network,
+                      char * hostmask,
+                      short argc,
+                      char * argv[]) {
+    if (argc < 3) {
+        print_to_buffer(network->buffer,
+                        "Error parsing message: Received invalid "
+                        "RPL_CREATIONTIME.\n");
+        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
+        remove_last_response_claim(network);
+        return;
+    }
+
+    struct buffer_info * output;
+    unsigned long epoch_time;
+
+    if (network->claimed_responses) {
+        output = network->claimed_responses->buffer;
+        remove_last_response_claim(network);
+    }
+    else if ((output = trie_get(network->buffers, argv[1])) == NULL)
+        output = network->buffer;
+
+    errno = 0;
+    if ((epoch_time = strtoul(argv[2], NULL, 10)) == 0 &&
+        errno != 0) {
+        print_to_buffer(network->buffer,
+                        "Error parsing message: Received invalid EPOCH time in "
+                        "RPL_CREATIONTIME.\n"
+                        "strtoul() returned the following error: %s\n",
+                        strerror(errno));
+        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
+        return;
+    }
+
+    print_to_buffer(output, "* Channel created on %s",
+                    ctime((const long *)&epoch_time));
+}
+
+// Used for generic errors that come with a channel argument
+void generic_channel_error(struct irc_network * network,
+                           char * hostmask,
+                           short argc,
+                           char * argv[]) {
+    if (argc < 3) {
+        print_to_buffer(network->buffer,
+                        "Error parsing message: Received invalid generic error "
+                        "with a channel argument.\n");
+        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
+        return;
+    }
+
+    struct buffer_info * output;
+    if (network->claimed_responses) {
+        output = network->claimed_responses->buffer;
+        remove_last_response_claim(network);
+    }
+    else if ((output = trie_get(network->buffers, argv[1])) == NULL)
+        output = network->buffer;
+
+    print_to_buffer(output, "Error: %s: %s\n", argv[1], argv[2]);
 }
 
 void nick_change_error(struct irc_network * network,

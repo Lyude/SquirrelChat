@@ -63,6 +63,18 @@ extern void rpl_topicwhotime(struct irc_network * network,
                              char * hostmask,
                              short argc,
                              char * argv[]);
+extern void rpl_channelmodeis(struct irc_network * network,
+                              char * hostmask,
+                              short argc,
+                              char * argv[]);
+extern void rpl_creationtime(struct irc_network * network,
+                             char * hostmask,
+                             short argc,
+                             char * argv[]);
+extern void generic_channel_error(struct irc_network * network,
+                                  char * hostmask,
+                                  short argc,
+                                  char * argv[]);
 extern void nick_change_error(struct irc_network * network,
                               char * hostmask,
                               short argc,

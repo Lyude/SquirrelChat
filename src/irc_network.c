@@ -165,6 +165,7 @@ void disconnect_irc_network(struct irc_network * network,
     network->chanmodes_d = NULL;
     network->prefix_chars = NULL;
     network->prefix_symbols = NULL;
+    network->casecmp = NULL;
 }
 
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

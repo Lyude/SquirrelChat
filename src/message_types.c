@@ -526,8 +526,16 @@ escape_user_mode_check:
         if (network->claimed_responses)
             remove_last_response_claim(network);
     }
-    else
-        print_to_buffer(network->buffer, "Your mode is now %s\n", argv[1]);
+    else {
+        struct buffer_info * output;
+        if (network->claimed_responses) {
+            output = network->claimed_responses->buffer;
+            remove_last_response_claim(network);
+        }
+        else
+            output = network->buffer;
+        print_to_buffer(output, "Your mode is %s\n", argv[1]);
+    }
 }
 
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

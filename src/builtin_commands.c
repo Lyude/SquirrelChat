@@ -79,6 +79,9 @@ void add_builtin_commands() {
     add_irc_command("notice", cmd_notice, 1,
                     "/notice <target> <notice>",
                     "Sends a notice to target.\n");
+    add_irc_command("mode", cmd_mode, 1,
+                    "/mode [target] [modes] [mode arguments]",
+                    "Changes or displays the mode of a user or a channel.\n");
 }
 
 short cmd_help(struct buffer_info * buffer,
@@ -302,6 +305,49 @@ short cmd_motd(struct buffer_info * buffer,
     claim_response(buffer->parent_network, buffer, NULL, NULL);
     send_to_network(buffer->parent_network, "MOTD %s\r\n",
                     (argc >= 1) ? argv[0] : "");
+    return 0;
+}
+
+short cmd_mode(struct buffer_info * buffer,
+               unsigned short argc,
+               char * argv[],
+               char * trailing) {
+    if (buffer->parent_network->status != CONNECTED) {
+        print_to_buffer(buffer, "Not connected!\n");
+        return 0;
+    }
+
+    if (argc == 0) {
+        if (buffer->type == NETWORK)
+            send_to_network(buffer->parent_network,
+                            "MODE %s\r\n", buffer->parent_network->nickname);
+        else if (buffer->type == CHANNEL)
+            send_to_network(buffer->parent_network,
+                        "MODE %s\r\n", buffer->buffer_name);
+        else
+            return IRC_CMD_SYNTAX_ERR;
+    }
+
+    // Check if the user explicitly specified a target
+    else if (strchr(buffer->parent_network->chantypes, *(argv[0])) ||
+             buffer->parent_network->casecmp(buffer->parent_network->nickname,
+                                             argv[0]) == 0)
+        send_to_network(buffer->parent_network,
+                        "MODE %s %s\r\n", argv[0], trailing ? trailing : "");
+    else {
+        if (buffer->type == NETWORK)
+            send_to_network(buffer->parent_network,
+                            "MODE %s %s %s\r\n",
+                            buffer->parent_network->nickname, argv[0],
+                            trailing ? trailing : "");
+        else if (buffer->type == CHANNEL)
+            send_to_network(buffer->parent_network,
+                            "MODE %s %s %s\r\n", buffer->buffer_name, argv[0],
+                            trailing ? trailing : "");
+        else
+            return IRC_CMD_SYNTAX_ERR;
+    }
+    claim_response(buffer->parent_network, buffer, NULL, NULL);
     return 0;
 }
 

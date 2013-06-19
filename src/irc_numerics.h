@@ -51,6 +51,7 @@
 #define IRC_RPL_NOTOPIC             331
 #define IRC_RPL_TOPIC               332
 #define IRC_RPL_TOPICWHOTIME        333
+#define IRC_RPL_CREATIONTIME        329
 
 #define IRC_RPL_INVITING            341
 

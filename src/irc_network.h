@@ -62,6 +62,7 @@ struct irc_network {
     char * prefix_symbols;
     void (*casemap_lower)(char *);
     void (*casemap_upper)(char *);
+    int (*casecmp)(const char *, const char *);
 
     int socket;
     
