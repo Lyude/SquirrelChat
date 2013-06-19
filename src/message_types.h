@@ -17,42 +17,24 @@
 #define __MESSAGE_TYPES_H__
 #include "irc_network.h"
 
-extern void cap_msg_callback(struct irc_network * network,
-                             char * hostmask,
-                             short argc,
-                             char * argv[]);
-extern void join_msg_callback(struct irc_network * network,
-                              char * hostmask,
-                              short argc,
-                              char * argv[]);
-extern void part_msg_callback(struct irc_network * network,
-                              char * hostmask,
-                              short argc,
-                              char * argv[]);
-extern void privmsg_msg_callback(struct irc_network * network,
-                                 char * hostmask,
-                                 short argc,
-                                 char * argv[]);
-extern void notice_msg_callback(struct irc_network * network,
-                                char * hostmask,
-                                short argc,
-                                char * argv[]);
-extern void ping_msg_callback(struct irc_network * network,
-                              char * hostmask,
-                              short argc,
-                              char * argv[]);
-extern void nick_msg_callback(struct irc_network * network,
-                              char * hostmask,
-                              short argc,
-                              char * argv[]);
-extern void topic_msg_callback(struct irc_network * network,
-                               char * hostmask,
-                               short argc,
-                               char * argv[]);
-extern void mode_msg_callback(struct irc_network * network,
-                              char * hostmask,
-                              short argc,
-                              char * argv[]);
+#define MSG_CB(func_name)                               \
+    extern void func_name(struct irc_network * network, \
+                          char * hostmask,              \
+                          short argc,                   \
+                          char * argv[])                \
+    __attribute__((nonnull(1)))
+
+MSG_CB(cap_msg_callback);
+MSG_CB(join_msg_callback);
+MSG_CB(part_msg_callback);
+MSG_CB(privmsg_msg_callback);
+MSG_CB(notice_msg_callback);
+MSG_CB(ping_msg_callback);
+MSG_CB(nick_msg_callback);
+MSG_CB(topic_msg_callback);
+MSG_CB(mode_msg_callback);
+
+#undef MSG_CB
 
 #endif // __MESSAGE_TYPES_H__
 

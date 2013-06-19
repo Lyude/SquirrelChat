@@ -56,18 +56,18 @@ static void init_numerics() {
     trie_set(isupport_tokens, "CASEMAPPING",(void*)ISUPPORT_CASEMAPPING);
 }
 
+#define NUMERIC_CB(func_name)                   \
+    void func_name(struct irc_network * network,\
+                   char * hostmask,             \
+                   short argc,                  \
+                   char * argv[])
+
 // Used for numerics that just give us a message requiring no special handling
-void echo_argv_1(struct irc_network * network,
-                 char * hostmask,
-                 short argc,
-                 char * argv[]) {
+NUMERIC_CB(echo_argv_1) {
     print_to_buffer(network->buffer, "%s\n", argv[1]);
 }
 
-void rpl_myinfo(struct irc_network * network,
-                char * hostmask,
-                short argc,
-                char * argv[]) {
+NUMERIC_CB(rpl_myinfo) {
     if (argc < 5) {
         print_to_buffer(network->buffer, 
                         "Error parsing message: Received invalid RPL_MYINFO: "
@@ -82,10 +82,7 @@ void rpl_myinfo(struct irc_network * network,
     }
 }
 
-void rpl_isupport(struct irc_network * network,
-                  char * hostmask,          
-                  short argc,
-                  char * argv[]) {
+NUMERIC_CB(rpl_isupport) {
     for (short i = 1; i < argc; i++) {
         char * saveptr;
         char * saveptr2;
@@ -167,10 +164,7 @@ void rpl_isupport(struct irc_network * network,
     }
 }
 
-void rpl_namreply(struct irc_network * network,
-                  char * hostmask,
-                  short argc,
-                  char * argv[]) {
+NUMERIC_CB(rpl_namreply) {
     struct buffer_info * channel;
     // The first and second parameter aren't important
     
@@ -210,17 +204,11 @@ void rpl_namreply(struct irc_network * network,
     // TODO: Print results to current buffer if we're not in the channel
 }
 
-void rpl_endofnames(struct irc_network * network,
-                    char * hostmask,
-                    short argc,
-                    char * argv[]) {
+NUMERIC_CB(rpl_endofnames) {
     // TODO: Do something here
 }
 
-void rpl_motdstart(struct irc_network * network,
-                   char * hostmask,
-                   short argc,
-                   char * argv[]) {
+NUMERIC_CB(rpl_motdstart) {
     struct buffer_info * output_buffer;
     // Check if the motd was requested in a different window
 
@@ -230,20 +218,14 @@ void rpl_motdstart(struct irc_network * network,
                     "---Start of MOTD---\n");
 }
 
-void rpl_motd(struct irc_network * network,
-              char * hostmask,
-              short argc,
-              char * argv[]) {
+NUMERIC_CB(rpl_motd) {
     print_to_buffer((network->claimed_responses) ?
                         network->claimed_responses->buffer :
                         network->buffer,
                     "%s\n", argv[1]);
 }
 
-void rpl_endofmotd(struct irc_network * network,
-                   char * hostmask,
-                   short argc,
-                   char * argv[]) {
+NUMERIC_CB(rpl_endofmotd) {
     if (network->claimed_responses == NULL)
         print_to_buffer(network->buffer, "---End of MOTD---\n");
     else {
@@ -253,10 +235,7 @@ void rpl_endofmotd(struct irc_network * network,
     }
 }
 
-void rpl_topic(struct irc_network * network,
-               char * hostmask,
-               short argc,
-               char * argv[]) {
+NUMERIC_CB(rpl_topic) {
     if (argc < 3) {
         print_to_buffer(network->buffer,
                         "Error parsing message: missing parameters for "
@@ -276,10 +255,7 @@ void rpl_topic(struct irc_network * network,
     print_to_buffer(output, "* Topic for %s is \"%s\"\n", argv[1], argv[2]);
 }
 
-void rpl_notopic(struct irc_network * network,
-                 char * hostmask,
-                 short argc,
-                 char * argv[]) {
+NUMERIC_CB(rpl_notopic) {
     if (argc < 2) {
         print_to_buffer(network->buffer,
                         "Error parsing message: Missing parameters for "
@@ -299,10 +275,7 @@ void rpl_notopic(struct irc_network * network,
     print_to_buffer(output, "* No topic set for %s\n", argv[1]);
 }
 
-void rpl_topicwhotime(struct irc_network * network,
-                      char * hostmask,
-                      short argc,
-                      char * argv[]) {
+NUMERIC_CB(rpl_topicwhotime) {
     if (argc < 3) {
         print_to_buffer(network->buffer,
                         "Error parsing message: Received RPL_TOPICWHOTIME but "
@@ -330,10 +303,7 @@ void rpl_topicwhotime(struct irc_network * network,
     print_to_buffer(output, "* Set by %s (%s)\n", nickname, address);
 }
 
-void rpl_channelmodeis(struct irc_network * network,
-                       char * hostmask,
-                       short argc,
-                       char * argv[]) {
+NUMERIC_CB(rpl_channelmodeis) {
     if (argc < 3) {
         print_to_buffer(network->buffer,
                         "Error parsing message: Received invalid "
@@ -356,10 +326,7 @@ void rpl_channelmodeis(struct irc_network * network,
                     argv[1], argv[2]);
 }
 
-void rpl_creationtime(struct irc_network * network,
-                      char * hostmask,
-                      short argc,
-                      char * argv[]) {
+NUMERIC_CB(rpl_creationtime) {
     if (argc < 3) {
         print_to_buffer(network->buffer,
                         "Error parsing message: Received invalid "
@@ -396,10 +363,7 @@ void rpl_creationtime(struct irc_network * network,
 }
 
 // Used for generic errors that come with a channel argument
-void generic_channel_error(struct irc_network * network,
-                           char * hostmask,
-                           short argc,
-                           char * argv[]) {
+NUMERIC_CB(generic_channel_error) {
     if (argc < 3) {
         print_to_buffer(network->buffer,
                         "Error parsing message: Received invalid generic error "
@@ -419,10 +383,7 @@ void generic_channel_error(struct irc_network * network,
     print_to_buffer(output, "Error: %s: %s\n", argv[1], argv[2]);
 }
 
-void nick_change_error(struct irc_network * network,
-                       char * hostmask,
-                       short argc,
-                       char * argv[]) {
+NUMERIC_CB(nick_change_error) {
     if (network->claimed_responses == NULL)
         return;
 
@@ -432,10 +393,7 @@ void nick_change_error(struct irc_network * network,
     remove_last_response_claim(network);
 }
 
-void err_notregistered(struct irc_network * network,
-                       char * hostmask,
-                       short argc,
-                       char * argv[]) {
+NUMERIC_CB(err_notregistered) {
     /* The only time our client could ever get this is during the CAP
      * negotiation, which means that the server does not support IRCv3 and
      * inherently does not support CAP

@@ -38,10 +38,13 @@ static void init_message_types() {
     trie_set(cap_features, "sasl",          (void*)IRC_CAP_SASL);
 }
 
-void cap_msg_callback(struct irc_network * network,
-                      char * hostmask,
-                      short argc,
-                      char * argv[]) {
+#define MSG_CB(func_name)                       \
+    void func_name(struct irc_network * network,\
+                   char * hostmask,             \
+                   short argc,                  \
+                   char * argv[])
+
+MSG_CB(cap_msg_callback) {
     if (argc < 2) {
         print_to_buffer(network->buffer, "Fatal error: Invalid CAP received\n");
         dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
@@ -108,10 +111,7 @@ void cap_msg_callback(struct irc_network * network,
     }
 }
 
-void join_msg_callback(struct irc_network * network,
-                       char * hostmask,
-                       short argc,
-                       char * argv[]) {
+MSG_CB(join_msg_callback) {
     char * nickname;
     char * address;
     split_irc_hostmask(hostmask, &nickname, &address);
@@ -161,10 +161,7 @@ void join_msg_callback(struct irc_network * network,
     }
 }
 
-void part_msg_callback(struct irc_network * network,
-                       char * hostmask,
-                       short argc,
-                       char * argv[]) {
+MSG_CB(part_msg_callback) {
     struct buffer_info * buffer;
     char * nickname;
     char * address;
@@ -214,10 +211,7 @@ void part_msg_callback(struct irc_network * network,
     }
 }
 
-void privmsg_msg_callback(struct irc_network * network,
-                          char * hostmask,
-                          short argc,
-                          char * argv[]) {
+MSG_CB(privmsg_msg_callback) {
     char * nickname;
     char * address;
     split_irc_hostmask(hostmask, &nickname, &address);
@@ -254,10 +248,7 @@ void privmsg_msg_callback(struct irc_network * network,
                         "<%s> %s\n", nickname, argv[1]);
 }
 
-void notice_msg_callback(struct irc_network * network,
-                         char * hostmask,
-                         short argc,
-                         char * argv[]) {
+MSG_CB(notice_msg_callback) {
     if (argc < 2) {
         print_to_buffer(network->buffer,
                         "Received NOTICE with missing params\n");
@@ -342,10 +333,7 @@ void announce_our_nick_change(struct buffer_info * buffer,
     }
 }
 
-void nick_msg_callback(struct irc_network * network,
-                       char * hostmask,
-                       short argc,
-                       char * argv[]) {
+MSG_CB(nick_msg_callback) {
     char * nickname;
     char * address;
 
@@ -406,17 +394,11 @@ void nick_msg_callback(struct irc_network * network,
     }
 }
 
-void ping_msg_callback(struct irc_network * network,
-                       char * hostmask,
-                       short argc,
-                       char * argv[]) {
+MSG_CB(ping_msg_callback) {
     send_to_network(network, "PONG %s\r\n", argv[0]);
 }
 
-void topic_msg_callback(struct irc_network * network,
-                        char * hostmask,
-                        short argc,
-                        char * argv[]) {
+MSG_CB(topic_msg_callback) {
     if (argc < 1) {
         print_to_buffer(network->buffer,
                         "Error parsing message: Received TOPIC message, but "
@@ -442,10 +424,7 @@ void topic_msg_callback(struct irc_network * network,
                     nickname, argv[0]);
 }
 
-void mode_msg_callback(struct irc_network * network,
-                       char * hostmask,
-                       short argc,
-                       char * argv[]) {
+MSG_CB(mode_msg_callback) {
     // Check if the target is a channel
     if (strchr(network->chantypes, *(argv[0]))) {
         struct buffer_info * channel;

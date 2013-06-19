@@ -18,69 +18,30 @@
 
 #include "irc_network.h"
 
-extern void echo_argv_1(struct irc_network * network,
-                        char * hostmask,
-                        short argc,
-                        char * argv[]);
-extern void rpl_myinfo(struct irc_network * network,
-                       char * hostmask,
-                       short argc,
-                       char * argv[]);
-extern void rpl_isupport(struct irc_network * network,
-                         char * hostmask,          
-                         short argc,
-                         char * argv[]);
-extern void rpl_namreply(struct irc_network * network,
-                         char * hostmask,
-                         short argc,
-                         char * argv[]);
-extern void rpl_endofnames(struct irc_network * network,
-                           char * hostmask,
-                           short argc,
-                           char * argv[]);
-extern void rpl_motdstart(struct irc_network * network,
-                          char * hostmask,
-                          short argc,
-                          char * argv[]);
-extern void rpl_motd(struct irc_network * network,
-                     char * hostmask,
-                     short argc,
-                     char * argv[]);
-extern void rpl_endofmotd(struct irc_network * network,
-                         char * hostmask,
-                         short argc,
-                         char * argv[]);
-extern void rpl_topic(struct irc_network * network,
-                      char * hostmask,
-                      short argc,
-                      char * argv[]);
-extern void rpl_notopic(struct irc_network * network,
-                        char * hostmask,
-                        short argc,
-                        char * argv[]);
-extern void rpl_topicwhotime(struct irc_network * network,
-                             char * hostmask,
-                             short argc,
-                             char * argv[]);
-extern void rpl_channelmodeis(struct irc_network * network,
-                              char * hostmask,
-                              short argc,
-                              char * argv[]);
-extern void rpl_creationtime(struct irc_network * network,
-                             char * hostmask,
-                             short argc,
-                             char * argv[]);
-extern void generic_channel_error(struct irc_network * network,
-                                  char * hostmask,
-                                  short argc,
-                                  char * argv[]);
-extern void nick_change_error(struct irc_network * network,
-                              char * hostmask,
-                              short argc,
-                              char * argv[]);
-extern void err_notregistered(struct irc_network * network,
-                              char * hostmask,
-                              short argc,
-                              char * argv[]);
+#define NUMERIC_CB(name)                            \
+    extern void name(struct irc_network * network,  \
+                     char * hostmask,               \
+                     short argc,                    \
+                     char * argv[])                 \
+    __attribute__((nonnull(1)))
+
+NUMERIC_CB(echo_argv_1);
+NUMERIC_CB(rpl_myinfo);
+NUMERIC_CB(rpl_isupport);
+NUMERIC_CB(rpl_namreply);
+NUMERIC_CB(rpl_endofnames);
+NUMERIC_CB(rpl_motdstart);
+NUMERIC_CB(rpl_motd);
+NUMERIC_CB(rpl_endofmotd);
+NUMERIC_CB(rpl_topic);
+NUMERIC_CB(rpl_notopic);
+NUMERIC_CB(rpl_topicwhotime);
+NUMERIC_CB(rpl_channelmodeis);
+NUMERIC_CB(rpl_creationtime);
+NUMERIC_CB(generic_channel_error);
+NUMERIC_CB(nick_change_error);
+NUMERIC_CB(err_notregistered);
+
+#undef NUMERIC_CB
 #endif
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

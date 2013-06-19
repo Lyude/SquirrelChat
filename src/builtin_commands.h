@@ -18,58 +18,28 @@
 
 #include "ui/buffer.h"
 
-extern short cmd_help(struct buffer_info * buffer,
-                      unsigned short argc,
-                      char * argv[],
-                      char * trailing);
-extern short cmd_nick(struct buffer_info * buffer,
-                      unsigned short argc,
-                      char * argv[],
-                      char * trailing);
-extern short cmd_server(struct buffer_info * buffer,
-                        unsigned short argc,
-                        char * argv[],
-                        char * trailing);
-extern short cmd_msg(struct buffer_info * buffer,
-                     unsigned short argc,
-                     char * argv[],
-                     char * trailing);
-extern short cmd_join(struct buffer_info * buffer,
-                      unsigned short argc,
-                      char * argv[],
-                      char * trailing);
-extern short cmd_part(struct buffer_info * buffer,
-                      unsigned short argc,
-                      char * argv[],
-                      char * trailing);
-extern short cmd_connect(struct buffer_info * buffer,
-                         unsigned short argc,
-                         char * argv[],
-                         char * trailing);
-extern short cmd_quit(struct buffer_info * buffer,
-                      unsigned short argc,
-                      char * argv[],
-                      char * trailing);
-extern short cmd_quote(struct buffer_info * buffer,
-                       unsigned short argc,
-                       char * argv[],
-                       char * trailing);
-extern short cmd_motd(struct buffer_info * buffer,
-                      unsigned short argc,
-                      char * argv[],
-                      char * trailing);
-extern short cmd_topic(struct buffer_info * buffer,
-                       unsigned short argc,
-                       char * argv[],
-                       char * trailing);
-extern short cmd_notice(struct buffer_info * buffer,
-                        unsigned short argc,
-                        char * argv[],
-                        char * trailing);
-extern short cmd_mode(struct buffer_info * buffer,
-                      unsigned short argc,
-                      char * argv[],
-                      char * trailing);
+#define BI_CMD(func_name)                               \
+    extern short func_name(struct buffer_info * buffer, \
+                           unsigned short argc,         \
+                           char * argv[],               \
+                           char * trailing)             \
+    __attribute__((nonnull(1)))
+
+BI_CMD(cmd_help);
+BI_CMD(cmd_nick);
+BI_CMD(cmd_server);
+BI_CMD(cmd_msg);
+BI_CMD(cmd_join);
+BI_CMD(cmd_part);
+BI_CMD(cmd_connect);
+BI_CMD(cmd_quit);
+BI_CMD(cmd_quote);
+BI_CMD(cmd_motd);
+BI_CMD(cmd_topic);
+BI_CMD(cmd_notice);
+BI_CMD(cmd_mode);
+
+#undef BI_CMD
 
 #endif // __BUILTIN_COMMANDS_H__
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

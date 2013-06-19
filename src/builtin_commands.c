@@ -85,10 +85,13 @@ static void add_builtin_commands() {
                     "Changes or displays the mode of a user or a channel.\n");
 }
 
-short cmd_help(struct buffer_info * buffer,
-               unsigned short argc,
-               char * argv[],
-               char * trailing) {
+#define BI_CMD(func_name)                       \
+    short func_name(struct buffer_info * buffer,\
+                    unsigned short argc,        \
+                    char * argv[],              \
+                    char * trailing)
+
+BI_CMD(cmd_help) {
     if (argc < 1)
         return 0; // FIXME: printing the syntax for help segfaults
     print_command_help(buffer, argv[0]);
@@ -96,10 +99,7 @@ short cmd_help(struct buffer_info * buffer,
 }
 
 // Max argc: 1
-short cmd_nick(struct buffer_info * buffer,
-               unsigned short argc,
-               char * argv[],
-               char * trailing) {
+BI_CMD(cmd_nick) {
     if (argc < 1)
         return IRC_CMD_SYNTAX_ERR;
     else if (strcmp(buffer->parent_network->nickname, argv[0]) == 0)
@@ -118,10 +118,7 @@ short cmd_nick(struct buffer_info * buffer,
 }
 
 // Max argc: 1
-short cmd_server(struct buffer_info * buffer,
-                 unsigned short argc,
-                 char * argv[],
-                 char * trailing) {
+BI_CMD(cmd_server) {
     if (argc < 1)
         return IRC_CMD_SYNTAX_ERR;
 
@@ -141,10 +138,7 @@ short cmd_server(struct buffer_info * buffer,
 }
 
 // Max argc: 1
-short cmd_msg(struct buffer_info * buffer,
-              unsigned short argc,
-              char * argv[],
-              char * trailing) {
+BI_CMD(cmd_msg) {
     if (argc < 1)
         return IRC_CMD_SYNTAX_ERR;
     else if (buffer->parent_network->status != CONNECTED)
@@ -159,10 +153,7 @@ short cmd_msg(struct buffer_info * buffer,
     return 0;
 }
 
-short cmd_notice(struct buffer_info * buffer,
-                 unsigned short argc,
-                 char * argv[],
-                 char * trailing) {
+BI_CMD(cmd_notice) {
     if (argc < 1)
         return IRC_CMD_SYNTAX_ERR;
     else if (buffer->parent_network->status != CONNECTED)
@@ -182,10 +173,7 @@ short cmd_notice(struct buffer_info * buffer,
 /* TODO: Possibly allow passwords to be specified as the second parameter if
  * only one channel is specified
  */
-short cmd_join(struct buffer_info * buffer,
-               unsigned short argc,
-               char * argv[],
-               char * trailing) {
+BI_CMD(cmd_join) {
     if (argc < 1)
         return IRC_CMD_SYNTAX_ERR;
     else if (buffer->parent_network->status == CONNECTED)
@@ -197,10 +185,7 @@ short cmd_join(struct buffer_info * buffer,
 }
 
 // Max argc: 1
-short cmd_part(struct buffer_info * buffer,
-               unsigned short argc,
-               char * argv[],
-               char * trailing) {
+BI_CMD(cmd_part) {
     if (argc < 1) {
         if (buffer->type == CHANNEL)
             send_to_network(buffer->parent_network, "PART %s\r\n",
@@ -217,10 +202,7 @@ short cmd_part(struct buffer_info * buffer,
 }
 
 // Max argc: 0
-short cmd_topic(struct buffer_info * buffer,
-                unsigned short argc,
-                char * argv[],
-                char * trailing) {
+BI_CMD(cmd_topic) {
     if (buffer->parent_network->status != CONNECTED) {
         print_to_buffer(buffer, "Not connected!\n");
         return 0;
@@ -260,20 +242,14 @@ short cmd_topic(struct buffer_info * buffer,
 }
 
 // Max argc: 0
-short cmd_connect(struct buffer_info * buffer,
-                  unsigned short argc,
-                  char * argv[],
-                  char * trailing) {
+BI_CMD(cmd_connect) {
     if (buffer->parent_network->status == DISCONNECTED)
         connect_irc_network(buffer->parent_network);
     return 0;
 }
 
 // Max argc: 0
-short cmd_quit(struct buffer_info * buffer,
-               unsigned short argc,
-               char * argv[],
-               char * trailing) {
+BI_CMD(cmd_quit) {
     if (buffer->parent_network->status == DISCONNECTED)
         print_to_buffer(buffer, "Not connected!\n");
     else
@@ -281,10 +257,7 @@ short cmd_quit(struct buffer_info * buffer,
     return 0;
 }
 
-short cmd_quote(struct buffer_info * buffer,
-                unsigned short argc,
-                char * argv[],
-                char * trailing) {
+BI_CMD(cmd_quote) {
     if (buffer->parent_network->status == DISCONNECTED)
         print_to_buffer(buffer, "Not connected!\n");
     else if (trailing != NULL)
@@ -294,10 +267,7 @@ short cmd_quote(struct buffer_info * buffer,
     return 0;
 }
 
-short cmd_motd(struct buffer_info * buffer,
-               unsigned short argc,
-               char * argv[],
-               char * trailing) {
+BI_CMD(cmd_motd) {
     if (buffer->parent_network->status != CONNECTED) {
         print_to_buffer(buffer, "Not connected!\n");
         return 0;
@@ -309,10 +279,7 @@ short cmd_motd(struct buffer_info * buffer,
     return 0;
 }
 
-short cmd_mode(struct buffer_info * buffer,
-               unsigned short argc,
-               char * argv[],
-               char * trailing) {
+BI_CMD(cmd_mode) {
     if (buffer->parent_network->status != CONNECTED) {
         print_to_buffer(buffer, "Not connected!\n");
         return 0;
