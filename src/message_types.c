@@ -445,78 +445,89 @@ void mode_msg_callback(struct irc_network * network,
                        char * hostmask,
                        short argc,
                        char * argv[]) {
-    struct buffer_info * channel;
-    if ((channel = trie_get(network->buffers, argv[0])) == NULL) {
-        print_to_buffer(network->buffer,
-                        "Error parsing message: Received MODE message for %s, "
-                        "but we're not in that channel.\n",
-                        argv[0]);
-        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
-        return;
-    }
+    // Check if the target is a channel
+    if (strchr(network->chantypes, *(argv[0]))) {
+        struct buffer_info * channel;
+        if ((channel = trie_get(network->buffers, argv[0])) == NULL) {
+            print_to_buffer(network->buffer,
+                            "Error parsing message: Received MODE message for "
+                            "%s but we're not in that channel.\n",
+                            argv[0]);
+            dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
+            return;
+        }
 
-    char * nickname;
-    char * address;
-    split_irc_hostmask(hostmask, &nickname, &address);
+        char * nickname;
+        char * address;
+        split_irc_hostmask(hostmask, &nickname, &address);
 
-    if (argc > 2) {
-        short arg_pos = 2;
-        if (network->multi_prefix) {
-            for (char * pos = argv[1]; ; pos++) {
-                // Check if the mode or modes are being unset
-                if (*pos == '+') {
-                    for (pos++; *pos != '+' && *pos != '-'; pos++) {
-                        /* If we've reached the end of the string, escape this
-                         * loop
-                         */
-                        if (*pos == '\0')
-                            goto escape_user_mode_check;
+        if (argc > 2) {
+            short arg_pos = 2;
+            if (network->multi_prefix) {
+                for (char * pos = argv[1]; ; pos++) {
+                    // Check if the mode or modes are being unset
+                    if (*pos == '+') {
+                        for (pos++; *pos != '+' && *pos != '-'; pos++) {
+                            /* If we've reached the end of the string, escape
+                             * this loop
+                             */
+                            if (*pos == '\0')
+                                goto escape_user_mode_check;
 
-                        char * mode;
-                        // Check if the mode is a user mode
-                        if ((mode = strchr(network->prefix_chars, *pos)) != NULL) {
-                            add_prefix_to_user(channel, argv[arg_pos++], (char*)(
-                                               (long)network->prefix_symbols +
-                                               ((long)mode - 
-                                                (long)network->prefix_chars)));
+                            char * mode;
+                            // Check if the mode is a user mode
+                            if ((mode = strchr(network->prefix_chars, *pos))) {
+                                add_prefix_to_user(channel,
+                                    argv[arg_pos++], (char*)(
+                                    (long)network->prefix_symbols +
+                                    ((long)mode - 
+                                    (long)network->prefix_chars)));
+                            }
+                        }
+                    }
+                    else {
+                        for (pos++; *pos != '+' && *pos != '-'; pos++) {
+                            /* If we've reached the end of the string, escape
+                             * this loop
+                             */
+                            if (*pos == '\0')
+                                goto escape_user_mode_check;
+
+                            char * mode;
+                            if ((mode = strchr(network->prefix_chars, *pos)))
+                                remove_prefix_from_user(channel,
+                                    argv[arg_pos++], (*(char*)(
+                                    (long)network->prefix_symbols +
+                                    ((long) mode -
+                                    (long)network->prefix_chars))));
                         }
                     }
                 }
-                else {
-                    for (pos++; *pos != '+' && *pos != '-'; pos++) {
-                        /* If we've reached the end of the string, escape this
-                         * loop
-                         */
-                        if (*pos == '\0')
-                            goto escape_user_mode_check;
-
-                        char * mode;
-                        if ((mode = strchr(network->prefix_chars, *pos)) != NULL)
-                            remove_prefix_from_user(channel, argv[arg_pos++], (*(char*)(
-                                                    (long)network->prefix_symbols +
-                                                    ((long) mode -
-                                                     (long)network->prefix_chars))));
+            }
+            else {
+                for (char * pos = argv[1]; *pos != '\0'; pos++) {
+                    if (*pos != '+' && *pos != '-' &&
+                        strchr(network->prefix_chars, *pos) != NULL) {
+                        send_to_network(network, "NAMES %s\r\n", argv[0]);
+                        break;
                     }
                 }
             }
-        }
-        else {
-            for (char * pos = argv[1]; *pos != '\0'; pos++) {
-                if (*pos != '+' && *pos != '-' &&
-                    strchr(network->prefix_chars, *pos) != NULL) {
-                    send_to_network(network, "NAMES %s\r\n", argv[0]);
-                    break;
-                }
-            }
-        }
 escape_user_mode_check:
-        print_to_buffer(channel, "* %s sets mode %s", nickname, argv[1]);
-        for (arg_pos = 2; arg_pos < argc; arg_pos++)
-            print_to_buffer(channel, " %s", argv[arg_pos]);
-        print_to_buffer(channel, "\n");
+            print_to_buffer(channel, "* %s sets mode %s", nickname, argv[1]);
+            for (arg_pos = 2; arg_pos < argc; arg_pos++)
+                print_to_buffer(channel, " %s", argv[arg_pos]);
+            print_to_buffer(channel, "\n");
+        }
+        else
+            print_to_buffer(channel, "* %s sets mode %s\n", nickname, argv[1]);
+
+        // If the mode response was claimed by another command, remove the claim
+        if (network->claimed_responses)
+            remove_last_response_claim(network);
     }
     else
-        print_to_buffer(channel, "* %s sets mode %s\n", nickname, argv[1]);
+        print_to_buffer(network->buffer, "Your mode is now %s\n", argv[1]);
 }
 
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
