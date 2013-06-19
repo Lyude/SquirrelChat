@@ -18,7 +18,6 @@
 
 #include "irc_network.h"
 
-extern void init_numerics();
 extern void echo_argv_1(struct irc_network * network,
                         char * hostmask,
                         short argc,

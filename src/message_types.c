@@ -31,7 +31,8 @@ trie * cap_features;
 #define IRC_CAP_MULTI_PREFIX    1
 #define IRC_CAP_SASL            2
 
-void init_message_types() {
+__attribute__((constructor(2)))
+static void init_message_types() {
     cap_features = trie_new(trie_strtolower);
     trie_set(cap_features, "multi-prefix",  (void*)IRC_CAP_MULTI_PREFIX);
     trie_set(cap_features, "sasl",          (void*)IRC_CAP_SASL);

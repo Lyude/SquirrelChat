@@ -41,7 +41,8 @@ trie * isupport_tokens;
 #define ISUPPORT_CALLERID       8
 #define ISUPPORT_CASEMAPPING    9
 
-void init_numerics() {
+__attribute__((constructor(2)))
+static void init_numerics() {
     isupport_tokens = trie_new(trie_strtoupper);
     trie_set(isupport_tokens, "CHANTYPES",  (void*)ISUPPORT_CHANTYPES);
     trie_set(isupport_tokens, "EXCEPTS",    (void*)ISUPPORT_EXCEPTS);

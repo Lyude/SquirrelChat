@@ -26,9 +26,9 @@
 trie * command_trie;
 
 // Sets up the commands trie and adds the default client commands to said trie
+__attribute__((constructor(1)))
 void init_irc_commands() {
     command_trie = trie_new(trie_strtolower);
-    add_builtin_commands();
 }
 
 // Adds an IRC command

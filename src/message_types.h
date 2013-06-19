@@ -17,8 +17,6 @@
 #define __MESSAGE_TYPES_H__
 #include "irc_network.h"
 
-extern void init_message_types();
-
 extern void cap_msg_callback(struct irc_network * network,
                              char * hostmask,
                              short argc,

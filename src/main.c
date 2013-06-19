@@ -24,13 +24,9 @@
 #include "message_parser.h"
 #include "ui/chat_window.h"
 #include "numerics.h"
+#include "message_types.h"
 
 int main(int argc, char *argv[]) {
-
-    init_irc_commands();
-    init_message_parser();
-    init_numerics();
-
     gtk_init(&argc, &argv);
 
     struct chat_window * window = create_new_chat_window(NULL);

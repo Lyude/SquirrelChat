@@ -54,7 +54,8 @@ short numeric_to_short(char * numeric) {
         return result;
 }
 
-void init_message_parser() {
+__attribute__((constructor(1)))
+static void init_message_parser() {
     message_types = trie_new(trie_strtoupper);
     numerics = calloc(IRC_NUMERIC_MAX, sizeof(irc_message_callback*));
 
@@ -68,8 +69,6 @@ void init_message_parser() {
     trie_set(message_types, "TOPIC", topic_msg_callback);
     trie_set(message_types, "NOTICE", notice_msg_callback);
     trie_set(message_types, "MODE", mode_msg_callback);
-
-    init_message_types();
 
     numerics[IRC_RPL_WELCOME] = echo_argv_1;
     numerics[IRC_RPL_YOURHOST] = echo_argv_1;

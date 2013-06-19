@@ -18,8 +18,6 @@
 
 #include "ui/buffer.h"
 
-extern void add_builtin_commands();
-
 extern short cmd_help(struct buffer_info * buffer,
                       unsigned short argc,
                       char * argv[],
