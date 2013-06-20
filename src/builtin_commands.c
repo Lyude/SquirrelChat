@@ -26,8 +26,7 @@
 #include "irc_numerics.h"
 #include "cmd_responses.h"
 
-__attribute__((constructor(2)))
-static void add_builtin_commands() {
+void add_builtin_commands() {
     add_irc_command("help", cmd_help, 1,
                     "/help <command>",
                     "Prints a description of a command\n");

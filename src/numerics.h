@@ -18,6 +18,8 @@
 
 #include "irc_network.h"
 
+extern void init_numerics();
+
 #define NUMERIC_CB(name)                            \
     extern void name(struct irc_network * network,  \
                      char * hostmask,               \

@@ -34,6 +34,8 @@ struct irc_command_info {
 #define IRC_CMD_ARGC_MAX USHRT_MAX
 #define IRC_CMD_SYNTAX_ERR -1
 
+extern void init_irc_commands();
+
 extern void add_irc_command(char * command,
                             irc_command_callback callback,
                             unsigned short argc_max,

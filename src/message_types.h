@@ -17,6 +17,8 @@
 #define __MESSAGE_TYPES_H__
 #include "irc_network.h"
 
+extern void init_message_types();
+
 #define MSG_CB(func_name)                               \
     extern void func_name(struct irc_network * network, \
                           char * hostmask,              \

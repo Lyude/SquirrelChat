@@ -18,6 +18,8 @@
 
 #include "ui/buffer.h"
 
+extern void add_builtin_commands();
+
 #define BI_CMD(func_name)                               \
     extern short func_name(struct buffer_info * buffer, \
                            unsigned short argc,         \
