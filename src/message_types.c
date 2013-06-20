@@ -216,7 +216,10 @@ MSG_CB(privmsg_msg_callback) {
     split_irc_hostmask(hostmask, &nickname, &address);
     
     // Check whether or not the message was meant to be sent to a channel
-    if (argc < 3) {
+    if (strchr(network->chantypes, *(argv[0])))
+        print_to_buffer(trie_get(network->buffers, argv[0]),
+                        "<%s> %s\n", nickname, argv[1]);
+    else {
         struct buffer_info * buffer;
         if ((buffer = trie_get(network->buffers, nickname)) == NULL) {
             buffer = new_buffer(nickname, QUERY, network);
@@ -242,9 +245,6 @@ MSG_CB(privmsg_msg_callback) {
         }
         print_to_buffer(buffer, "<%s> %s\n", nickname, argv[1]);
     }
-    else
-        print_to_buffer(trie_get(network->buffers, argv[0]),
-                        "<%s> %s\n", nickname, argv[1]);
 }
 
 MSG_CB(notice_msg_callback) {
