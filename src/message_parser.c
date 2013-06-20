@@ -68,6 +68,7 @@ void init_message_parser() {
     trie_set(message_types, "TOPIC", topic_msg_callback);
     trie_set(message_types, "NOTICE", notice_msg_callback);
     trie_set(message_types, "MODE", mode_msg_callback);
+    trie_set(message_types, "QUIT", quit_msg_callback);
 
     init_message_types();
 

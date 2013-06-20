@@ -517,4 +517,45 @@ escape_user_mode_check:
     }
 }
 
+struct announce_quit_params {
+    char * nickname;
+    char * quit_msg;
+};
+
+static void announce_quit(struct buffer_info * buffer,
+                          struct announce_quit_params * params) {
+    if (buffer->type == CHANNEL) {
+        // Check if the user is in the channel
+        if (remove_user_from_list(buffer, params->nickname) != -1) {
+            if (params->quit_msg == NULL)
+                print_to_buffer(buffer, "* %s has quit.\n", params->nickname);
+            else
+                print_to_buffer(buffer, "* %s has quit (%s).\n",
+                                params->nickname, params->quit_msg);
+        }
+    }
+    else {
+        if (buffer->parent_network->casecmp(buffer->parent_network->nickname,
+                                            params->nickname) == 0) {
+            if (params->quit_msg == NULL)
+                print_to_buffer(buffer, "* %s has quit.\n", params->nickname);
+            else
+                print_to_buffer(buffer, "* %s has quit (%s).\n",
+                                params->nickname, params->quit_msg);
+        }
+    }
+} _nonnull(1, 2)
+
+MSG_CB(quit_msg_callback) {
+    char * nickname;
+    char * address;
+    struct announce_quit_params params;
+    split_irc_hostmask(hostmask, &nickname, &address);
+
+    params.nickname = nickname;
+    params.quit_msg = (argc >= 1) ? argv[0] : NULL;
+
+    trie_each(network->buffers, announce_quit, &params);
+}
+
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
