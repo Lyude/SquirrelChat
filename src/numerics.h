@@ -40,6 +40,7 @@ NUMERIC_CB(rpl_notopic);
 NUMERIC_CB(rpl_topicwhotime);
 NUMERIC_CB(rpl_channelmodeis);
 NUMERIC_CB(rpl_creationtime);
+NUMERIC_CB(generic_command_error);
 NUMERIC_CB(generic_channel_error);
 NUMERIC_CB(nick_change_error);
 NUMERIC_CB(err_notregistered);

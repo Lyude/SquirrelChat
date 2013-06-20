@@ -96,6 +96,9 @@ void init_message_parser() {
     numerics[IRC_ERR_BADCHANMASK] = generic_channel_error;
     numerics[IRC_ERR_BANLISTFULL] = generic_channel_error;
     numerics[IRC_ERR_CHANOPRIVSNEEDED] = generic_channel_error;
+    numerics[IRC_ERR_NEEDMOREPARAMS] = generic_command_error;
+    numerics[IRC_ERR_UNKNOWNCOMMAND] = generic_command_error;
+    numerics[IRC_RPL_TRYAGAIN] = generic_command_error;
 }
 
 void process_irc_message(struct irc_network * network, char * msg) {

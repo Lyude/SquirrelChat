@@ -382,6 +382,27 @@ NUMERIC_CB(generic_channel_error) {
     print_to_buffer(output, "Error: %s: %s\n", argv[1], argv[2]);
 }
 
+// Used for generic errors that come with a command argument
+NUMERIC_CB(generic_command_error) {
+    if (argc < 3) {
+        print_to_buffer(network->buffer,
+                        "Error parsing message: Received invalid generic error "
+                        "with a command argument.\n");
+        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
+        return;
+    }
+
+    struct buffer_info * output;
+    if (network->claimed_responses) {
+        output = network->claimed_responses->buffer;
+        remove_last_response_claim(network);
+    }
+    else
+        output = network->buffer;
+
+    print_to_buffer(output, "Error: %s: %s\n", argv[1], argv[2]);
+}
+
 NUMERIC_CB(nick_change_error) {
     if (network->claimed_responses == NULL)
         return;
