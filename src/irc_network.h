@@ -87,13 +87,17 @@ struct irc_network {
 
 extern struct irc_network * new_irc_network();
 extern void free_irc_network(struct irc_network * network,
-                             GtkTreeStore * network_tree_store);
+                             GtkTreeStore * network_tree_store)
+    _nonnull(1, 2);
 
-extern int connect_irc_network(struct irc_network * network);
+extern int connect_irc_network(struct irc_network * network)
+    _nonnull(1);
 extern void disconnect_irc_network(struct irc_network * network,
-                                   const char * msg);
+                                   const char * msg)
+    _nonnull(1);
 
 extern void network_tree_cursor_changed_handler(GtkTreeSelection *treeselection,
-                                                GtkTextView *chat_viewer);
+                                                GtkTextView *chat_viewer)
+    _nonnull(1, 2);
 #endif /* BUFFERS_H */
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

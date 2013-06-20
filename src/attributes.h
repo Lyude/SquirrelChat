@@ -1,4 +1,6 @@
-/* Copyright (C) 2013 Stephen Chandler Paul
+/* Limits use of __attribute__ to supporting compilers
+ * (Included in every file for SquirrelChat by default)
+ * Copyright (C) 2013 Stephen Chandler Paul
  *
  * This file is free software: you may copy it, redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -12,19 +14,14 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
+#ifndef __SQ_ATTRIBUTES_H__
 
-#ifndef MAIN_MENU_H
-#define MAIN_MENU_H
+#ifdef __GNUC__
+#define _nonnull(...)               __attribute__((nonnull(__VA_ARGS__)))
+#define _format(type, str, start)   __attribute__((format(type, str, start)))
+#elif
+#define _nonnull(...)
+#define _format(type, str, start)
+#endif
 
-#include "chat_window.h"
-
-#include <gtk/gtk.h>
-
-extern void create_main_menu_bar(struct chat_window * window)
-    _nonnull(1);
-extern void connect_main_menu_bar_signals(struct chat_window * window)
-    _nonnull(1);
-
-#endif /* MAIN_MENU_H */
-
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
+#endif // __SQ_ATTRIBUTES_H__

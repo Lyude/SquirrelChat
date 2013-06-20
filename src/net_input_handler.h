@@ -23,7 +23,8 @@
 
 extern gboolean net_input_handler(GIOChannel *source,
                                   GIOCondition condition,
-                                  struct irc_network * buffer);
+                                  struct irc_network * buffer)
+    _nonnull(3);
 
 #endif // NET_INPUT_HANDLER_H
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

@@ -63,7 +63,8 @@ struct chat_window {
 extern struct chat_window * create_new_chat_window(struct irc_network * network);
 
 extern void change_active_buffer(struct chat_window * window,
-                                 struct buffer_info * new_buffer);
+                                 struct buffer_info * new_buffer)
+    _nonnull(1, 2);
 
 #endif // CHAT_WINDOW_H
 

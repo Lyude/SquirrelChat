@@ -23,7 +23,7 @@
                            unsigned short argc,         \
                            char * argv[],               \
                            char * trailing)             \
-    __attribute__((nonnull(1)))
+    _nonnull(1)
 
 BI_CMD(cmd_help);
 BI_CMD(cmd_nick);

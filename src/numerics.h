@@ -23,7 +23,7 @@
                      char * hostmask,               \
                      short argc,                    \
                      char * argv[])                 \
-    __attribute__((nonnull(1)))
+    _nonnull(1)
 
 NUMERIC_CB(echo_argv_1);
 NUMERIC_CB(rpl_myinfo);

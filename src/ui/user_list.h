@@ -19,32 +19,41 @@
 
 #include "chat_window.h"
 
-extern void create_user_list(struct chat_window * window);
+extern void create_user_list(struct chat_window * window)
+    _nonnull(1);
 
 extern void add_user_to_list(struct buffer_info * buffer,
                              const char * nickname,
                              const char * prefix_str,
-                             size_t prefix_len);
+                             size_t prefix_len)
+    _nonnull(1, 2);
 extern int remove_user_from_list(struct buffer_info * buffer,
-                                 const char * nickname);
+                                 const char * nickname)
+    _nonnull(1, 2);
 extern void _set_user_prefix(struct buffer_info * buffer,
                              GtkTreeIter * user_row,
-                             char prefix);
+                             char prefix)
+    _nonnull(1, 2);
 extern int _set_user_prefix_by_nick(struct buffer_info * buffer,
                                     const char * nickname,
-                                    char prefix);
+                                    char prefix)
+    _nonnull(1, 2);
 extern int add_prefix_to_user(struct buffer_info * buffer,
                               const char * nickname,
-                              const char * prefix);
+                              const char * prefix)
+    _nonnull(1, 2, 3);
 extern int remove_prefix_from_user(struct buffer_info * buffer,
                                    const char * nickname,
-                                   char prefix);
+                                   char prefix)
+    _nonnull(1, 2);
 
 extern int get_user_row(const struct buffer_info * buffer,
                         const char * nickname,
-                        GtkTreeIter * user_row);
+                        GtkTreeIter * user_row)
+    _nonnull(1, 2, 3);
 extern char * get_user_prefixes(const struct buffer_info * buffer,
-                                GtkTreeIter * user);
+                                GtkTreeIter * user)
+    _nonnull(1, 2);
 
 #define set_user_prefix(_buffer, _user, _prefix)            \
         _Generic((_user), GtkTreeIter*: _set_user_prefix,   \

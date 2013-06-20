@@ -19,7 +19,8 @@
 
 extern char rfc1459_tolower(const char c);
 extern char rfc1459_toupper(const char c);
-extern int rfc1459_strcasecmp(const char * s1, const char * s2);
+extern int rfc1459_strcasecmp(const char * s1, const char * s2)
+    _nonnull(1, 2);
 
 #endif // __CASEMAP_H__
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

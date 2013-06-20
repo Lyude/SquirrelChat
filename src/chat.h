@@ -21,7 +21,8 @@
 
 void send_privmsg(struct irc_network * network,
                   const char * recepient,
-                  const char * message);
+                  const char * message)
+    _nonnull(1, 2, 3);
 
 #endif /* CHAT_H */
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

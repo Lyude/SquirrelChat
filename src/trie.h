@@ -57,17 +57,24 @@ struct trie {
 };
 
 extern trie *trie_new(void (*canonize)());
-extern void trie_set(trie * trie, const char * key, void * val);
-extern void *trie_get(trie * trie, const char * key);
+extern void trie_set(trie * trie, const char * key, void * val)
+    _nonnull(1, 2, 3);
+extern void *trie_get(trie * trie, const char * key)
+    _nonnull(1, 2);
 /* void cb(void *value, void *priv); */
-extern void trie_each(trie * trie, void(*cb)(), void * priv);
+extern void trie_each(trie * trie, void(*cb)(), void * priv)
+    _nonnull(1, 2);
 extern void *trie_del(trie * trie, const char * key);
 
-extern void trie_strtolower(char * s);
-extern void trie_strtoupper(char * s);
+extern void trie_strtolower(char * s)
+    _nonnull(1);
+extern void trie_strtoupper(char * s)
+    _nonnull(1);
 
-extern void trie_rfc1459_strtoupper(char * s);
-extern void trie_rfc1459_strtolower(char * s);
+extern void trie_rfc1459_strtoupper(char * s)
+    _nonnull(1);
+extern void trie_rfc1459_strtolower(char * s)
+    _nonnull(1);
 
 #endif
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

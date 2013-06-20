@@ -22,7 +22,7 @@
 
 extern void send_to_network(struct irc_network * buffer,
                             const char * msg, ...)
-    __attribute__((format (printf, 2, 3)));
+    _nonnull(1, 2) _format(printf, 2, 3);
 
 #endif /* NET_IO_H */
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

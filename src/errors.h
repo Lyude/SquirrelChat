@@ -21,7 +21,8 @@
 extern void dump_msg_to_buffer(struct buffer_info * buffer,
                                char * hostmask,
                                short argc,
-                               char * argv[]);
+                               char * argv[])
+    _nonnull(1);
 
 #endif // __SQUIRRELCHAT_ERRORS_H__
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

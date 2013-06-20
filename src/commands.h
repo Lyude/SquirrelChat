@@ -38,15 +38,20 @@ extern void add_irc_command(char * command,
                             irc_command_callback callback,
                             unsigned short argc_max,
                             char * syntax_msg,
-                            char * help_msg);
-extern void del_irc_command(char * command);
+                            char * help_msg)
+    _nonnull(1, 2, 4, 5);
+extern void del_irc_command(char * command)
+    _nonnull(1);
 extern void call_command(struct buffer_info * buffer,
                          char * command,
-                         char * params);
+                         char * params)
+    _nonnull(1, 2);
 extern void print_command_syntax(struct buffer_info * buffer,
-                                 char * command);
+                                 char * command)
+    _nonnull(1, 2);
 extern void print_command_help(struct buffer_info * buffer,
-                               char * command);
+                               char * command)
+    _nonnull(1, 2);
 
 #endif // __COMMANDS_H__
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
