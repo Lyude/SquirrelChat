@@ -26,3 +26,4 @@ extern gboolean net_input_handler(GIOChannel *source,
                                   struct irc_network * buffer);
 
 #endif // NET_INPUT_HANDLER_H
+// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
