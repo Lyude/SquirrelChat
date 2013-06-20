@@ -24,7 +24,7 @@ extern void init_message_types();
                           char * hostmask,              \
                           short argc,                   \
                           char * argv[])                \
-    __attribute__((nonnull(1)))
+    _nonnull(1)
 
 MSG_CB(cap_msg_callback);
 MSG_CB(join_msg_callback);
