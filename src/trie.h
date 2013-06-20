@@ -70,3 +70,4 @@ extern void trie_rfc1459_strtoupper(char * s);
 extern void trie_rfc1459_strtolower(char * s);
 
 #endif
+// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

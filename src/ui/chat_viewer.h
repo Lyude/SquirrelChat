@@ -6,3 +6,4 @@
 extern void create_chat_viewer(struct chat_window * window);
 
 #endif // __CHAT_VIEWER_H__
+// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
