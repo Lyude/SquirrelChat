@@ -24,3 +24,4 @@ void send_privmsg(struct irc_network * network,
                   const char * message);
 
 #endif /* CHAT_H */
+// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
