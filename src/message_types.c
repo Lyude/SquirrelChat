@@ -209,7 +209,7 @@ MSG_CB(part_msg_callback) {
                             nickname, address, argv[0]);
         else
             print_to_buffer(buffer,
-                            " %s (%s) has left %s (%s).\n",
+                            "* %s (%s) has left %s (%s).\n",
                             nickname, address, argv[0], argv[1]);
     }
 }
