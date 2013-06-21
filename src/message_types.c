@@ -166,7 +166,7 @@ MSG_CB(part_msg_callback) {
     char * address;
     split_irc_hostmask(hostmask, &nickname, &address);
 
-    if (argc < 2) {
+    if (argc < 1) {
         print_to_buffer(network->buffer,
                         "Error parsing message: Received PART from %s "
                         "without a channel!\n", nickname);
@@ -203,10 +203,14 @@ MSG_CB(part_msg_callback) {
                             nickname, address, argv[0]);
             return;
         }
-
-        print_to_buffer(buffer, 
-                        "* %s (%s) has left %s\n",
-                        nickname, address, argv[0]);
+        if (argc < 2)
+            print_to_buffer(buffer, 
+                            "* %s (%s) has left %s.\n",
+                            nickname, address, argv[0]);
+        else
+            print_to_buffer(buffer,
+                            " %s (%s) has left %s (%s).\n",
+                            nickname, address, argv[0], argv[1]);
     }
 }
 
