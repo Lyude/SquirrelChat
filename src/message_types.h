@@ -36,6 +36,7 @@ MSG_CB(nick_msg_callback);
 MSG_CB(topic_msg_callback);
 MSG_CB(mode_msg_callback);
 MSG_CB(quit_msg_callback);
+MSG_CB(kick_msg_callback);
 
 #undef MSG_CB
 

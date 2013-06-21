@@ -520,4 +520,53 @@ MSG_CB(quit_msg_callback) {
     trie_each(network->buffers, announce_quit, &params);
 }
 
+MSG_CB(kick_msg_callback) {
+    if (argc < 2) {
+        print_to_buffer(network->buffer,
+                        "Error parsing message: Received invalid KICK "
+                        "message.\n");
+        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
+        return;
+    }
+
+    struct buffer_info * channel;
+    char * nickname;
+    char * address;
+    split_irc_hostmask(hostmask, &nickname, &address);
+
+    // Attempt to look up the channel
+    if ((channel = trie_get(network->buffers, argv[0])) == NULL) {
+        print_to_buffer(network->buffer,
+                        "Error parsing message: Received KICK for %s, but "
+                        "we're not in that channel.\n",
+                        argv[0]);
+        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
+        return;
+    }
+
+    // If we're the one being kicked, leave the channel
+    if (network->casecmp(argv[1], network->nickname) == 0) {
+        // TODO: Make this behavior a bit better
+        remove_buffer_from_tree(channel);
+        destroy_buffer(channel);
+        if (argc < 3)
+            print_to_buffer(network->buffer,
+                            "* You were kicked from %s by %s.\n",
+                            argv[0], nickname);
+        else
+            print_to_buffer(network->buffer,
+                            "* You were kicked from %s by %s (%s).\n",
+                            argv[0], nickname, argv[2]);
+    }
+    else {
+        remove_user_from_list(channel, argv[1]);
+        if (argc < 3)
+            print_to_buffer(channel, "* %s has kicked %s from %s.\n",
+                            nickname, argv[1], argv[0]);
+        else
+            print_to_buffer(channel, "* %s has kicked %s from %s (%s).\n",
+                            nickname, argv[1], argv[0], argv[2]);
+    }
+}
+
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
