@@ -99,5 +99,8 @@ extern void disconnect_irc_network(struct irc_network * network,
 extern void network_tree_cursor_changed_handler(GtkTreeSelection *treeselection,
                                                 GtkTextView *chat_viewer)
     _nonnull(1, 2);
+
+#define IRC_IS_CHAN(_network, _str) (strchr((_network)->chantypes, *(_str)))
+
 #endif /* BUFFERS_H */
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

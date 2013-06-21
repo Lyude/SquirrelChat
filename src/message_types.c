@@ -194,7 +194,7 @@ MSG_CB(privmsg_msg_callback) {
     split_irc_hostmask(hostmask, &nickname, &address);
     
     // Check whether or not the message was meant to be sent to a channel
-    if (strchr(network->chantypes, *(argv[0])))
+    if (IRC_IS_CHAN(network, argv[0]))
         print_to_buffer(trie_get(network->buffers, argv[0]),
                         "<%s> %s\n", nickname, argv[1]);
     else {
