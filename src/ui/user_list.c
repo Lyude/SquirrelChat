@@ -94,7 +94,7 @@ void add_user_to_list(struct buffer_info * buffer,
                            &prefix_row_str[0], -1);
     }
 
-    if (buffer->parent_network->multi_prefix)
+    if (buffer->network->multi_prefix)
         gtk_list_store_set(buffer->user_list_store, &new_user_row, 1,
                            nickname, 2,
                            prefix_str ? strndup(prefix_str, prefix_len) : NULL,
@@ -184,7 +184,7 @@ int add_prefix_to_user(struct buffer_info * buffer,
      * privileges)
      */
     for (insert_pos = 0; current_prefixes[insert_pos] != '\0'; insert_pos++)
-        if (prefix < strchr(buffer->parent_network->prefix_symbols,
+        if (prefix < strchr(buffer->network->prefix_symbols,
                             current_prefixes[insert_pos]))
             break;
 

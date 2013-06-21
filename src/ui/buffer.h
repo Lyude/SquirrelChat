@@ -40,7 +40,7 @@ struct buffer_info {
     char * buffer_name;
     GtkTreeRowReference * row;
 
-    struct irc_network * parent_network;
+    struct irc_network * network;
     struct chat_window * window;
     GtkTextBuffer * buffer;
     double buffer_scroll_pos;

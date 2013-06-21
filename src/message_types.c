@@ -170,7 +170,7 @@ MSG_CB(part_msg_callback) {
     }
     else {
         if (remove_user_from_list(buffer, nickname) == -1) {
-            print_to_buffer(buffer->parent_network->buffer,
+            print_to_buffer(buffer->network->buffer,
                             "Error parsing message: Received a PART message "
                             "from %s (%s) in %s, but the user wasn't in the "
                             "channel.\n",
@@ -497,7 +497,7 @@ static void announce_quit(struct buffer_info * buffer,
         }
     }
     else {
-        if (buffer->parent_network->casecmp(buffer->parent_network->nickname,
+        if (buffer->network->casecmp(buffer->network->nickname,
                                             params->nickname) == 0) {
             if (params->quit_msg == NULL)
                 print_to_buffer(buffer, "* %s has quit.\n", params->nickname);

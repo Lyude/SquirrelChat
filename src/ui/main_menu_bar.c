@@ -88,7 +88,7 @@ void connect_current_network(GtkMenuItem * menuitem,
     GtkTreeIter selected_row;
     struct irc_network * network;
 
-    connect_irc_network(window->current_buffer->parent_network);
+    connect_irc_network(window->current_buffer->network);
 }
 
 // Connects all the signals for the items in the menu bar

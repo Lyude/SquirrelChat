@@ -30,7 +30,7 @@ struct buffer_info * new_buffer(const char * buffer_name,
     buffer->type = type;
     buffer->buffer_name = (type != NETWORK) ? strdup(buffer_name) : NULL;
     buffer->row = NULL;
-    buffer->parent_network = network;
+    buffer->network = network;
     buffer->window = network->window;
     buffer->buffer_scroll_pos = 0;
     buffer->buffer = gtk_text_buffer_new(NULL);

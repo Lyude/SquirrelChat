@@ -71,15 +71,15 @@ void command_box_activated_handler(GtkEntry * entry,
         if (window->current_buffer->type == NETWORK)
             print_to_buffer(window->current_buffer,
                             "You can't say stuff in this buffer!\n");
-        else if (window->current_buffer->parent_network->status != CONNECTED)
+        else if (window->current_buffer->network->status != CONNECTED)
             print_to_buffer(window->current_buffer,
                             "Not connected!\n");
         else {
-            send_privmsg(window->current_buffer->parent_network, 
+            send_privmsg(window->current_buffer->network, 
                          window->current_buffer->buffer_name, 
                          input);
             print_to_buffer(window->current_buffer, "<%s> %s\n", 
-                            window->current_buffer->parent_network->nickname, 
+                            window->current_buffer->network->nickname, 
                             input);
         }
 	}

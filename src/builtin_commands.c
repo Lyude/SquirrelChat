@@ -101,18 +101,18 @@ BI_CMD(cmd_help) {
 BI_CMD(cmd_nick) {
     if (argc < 1)
         return IRC_CMD_SYNTAX_ERR;
-    else if (buffer->parent_network->nickname &&
-             strcmp(buffer->parent_network->nickname, argv[0]) == 0)
+    else if (buffer->network->nickname &&
+             strcmp(buffer->network->nickname, argv[0]) == 0)
         return 0;
 
     //TODO: Add code to check the length of the nickname
-    if (buffer->parent_network->status != DISCONNECTED) {
-        send_to_network(buffer->parent_network, "NICK %s\r\n", argv[0]);
-        claim_response(buffer->parent_network, buffer, strdup(argv[0]), free);
+    if (buffer->network->status != DISCONNECTED) {
+        send_to_network(buffer->network, "NICK %s\r\n", argv[0]);
+        claim_response(buffer->network, buffer, strdup(argv[0]), free);
     }
     else {
-        free(buffer->parent_network->nickname);
-        buffer->parent_network->nickname = strdup(argv[0]);
+        free(buffer->network->nickname);
+        buffer->network->nickname = strdup(argv[0]);
         print_to_buffer(buffer, "* You are now known as %s.\n", argv[0]);
     }
     return 0;
@@ -127,14 +127,14 @@ BI_CMD(cmd_server) {
     char * address = strtok_r(argv[0], ":", &saveptr);
     char * port = strtok_r(NULL, ":", &saveptr);
 
-    free(buffer->parent_network->address);
-    free(buffer->parent_network->port);
-    buffer->parent_network->address = strdup(address);
-    buffer->parent_network->port = strdup(port ? port : "6667");
+    free(buffer->network->address);
+    free(buffer->network->port);
+    buffer->network->address = strdup(address);
+    buffer->network->port = strdup(port ? port : "6667");
 
     print_to_buffer(buffer, "Server set to %s:%s\n",
-                    buffer->parent_network->address,
-                    buffer->parent_network->port);
+                    buffer->network->address,
+                    buffer->network->port);
     return 0;
 }
 
@@ -142,30 +142,30 @@ BI_CMD(cmd_server) {
 BI_CMD(cmd_msg) {
     if (argc < 1)
         return IRC_CMD_SYNTAX_ERR;
-    else if (buffer->parent_network->status != CONNECTED)
+    else if (buffer->network->status != CONNECTED)
         print_to_buffer(buffer, "Not connected!\n");
     // TODO: Add support for sending messages > 512 chars
     else if (strlen(trailing) > IRC_MSG_LEN - 
-                           (strlen(buffer->parent_network->nickname) + 
+                           (strlen(buffer->network->nickname) + 
                             sizeof(" :")))
         print_to_buffer(buffer, "Message too long!\n");
     else
-        send_privmsg(buffer->parent_network, argv[0], trailing);
+        send_privmsg(buffer->network, argv[0], trailing);
     return 0;
 }
 
 BI_CMD(cmd_notice) {
     if (argc < 1)
         return IRC_CMD_SYNTAX_ERR;
-    else if (buffer->parent_network->status != CONNECTED)
+    else if (buffer->network->status != CONNECTED)
         print_to_buffer(buffer, "Not connected!\n");
     // TODO: add support for sending notices > 512 chars
     else if (strlen(trailing) > IRC_MSG_LEN -
-                                (strlen(buffer->parent_network->nickname) +
+                                (strlen(buffer->network->nickname) +
                                 sizeof(" :")))
         print_to_buffer(buffer, "Notice too long!\n");
     else
-        send_to_network(buffer->parent_network, "NOTICE %s :%s\r\n",
+        send_to_network(buffer->network, "NOTICE %s :%s\r\n",
                         argv[0], trailing);
     return 0;
 }
@@ -177,8 +177,8 @@ BI_CMD(cmd_notice) {
 BI_CMD(cmd_join) {
     if (argc < 1)
         return IRC_CMD_SYNTAX_ERR;
-    else if (buffer->parent_network->status == CONNECTED)
-        send_to_network(buffer->parent_network, "JOIN %s\r\n",
+    else if (buffer->network->status == CONNECTED)
+        send_to_network(buffer->network, "JOIN %s\r\n",
                         argv[0]);
     else
         print_to_buffer(buffer, "Not connected!\n");
@@ -189,22 +189,22 @@ BI_CMD(cmd_join) {
 BI_CMD(cmd_part) {
     if (argc < 1) {
         if (buffer->type == CHANNEL)
-            send_to_network(buffer->parent_network, "PART %s\r\n",
+            send_to_network(buffer->network, "PART %s\r\n",
                             buffer->buffer_name);
         else
             print_to_buffer(buffer, "You're not in a channel!\n");
     }
-    else if (buffer->parent_network->status != CONNECTED)
+    else if (buffer->network->status != CONNECTED)
         print_to_buffer(buffer, "Not connected!\n");
     else
-        send_to_network(buffer->parent_network, "PART %s :%s\r\n",
+        send_to_network(buffer->network, "PART %s :%s\r\n",
                         argv[0], trailing ? trailing : "");
     return 0;
 }
 
 // Max argc: 0
 BI_CMD(cmd_topic) {
-    if (buffer->parent_network->status != CONNECTED) {
+    if (buffer->network->status != CONNECTED) {
         print_to_buffer(buffer, "Not connected!\n");
         return 0;
     }
@@ -212,16 +212,16 @@ BI_CMD(cmd_topic) {
     // Check if the user specified any parameters
     if (trailing == NULL) {
         if (buffer->type == CHANNEL) {
-            send_to_network(buffer->parent_network, "TOPIC %s\r\n",
+            send_to_network(buffer->network, "TOPIC %s\r\n",
                             buffer->buffer_name);
-            claim_response(buffer->parent_network, buffer, NULL, NULL);
+            claim_response(buffer->network, buffer, NULL, NULL);
         }
         else
             print_to_buffer(buffer, "You're not in a channel!\n");
     }
     else {
         char * channel;
-        if (strchr(buffer->parent_network->chantypes, trailing[0]) != NULL)
+        if (strchr(buffer->network->chantypes, trailing[0]) != NULL)
             channel = strtok_r(trailing, " ", &trailing);
         else {
             if (buffer->type != CHANNEL) {
@@ -231,12 +231,12 @@ BI_CMD(cmd_topic) {
             channel = buffer->buffer_name;
         }
         if (*trailing == '\0') {
-            send_to_network(buffer->parent_network, "TOPIC %s\n",
+            send_to_network(buffer->network, "TOPIC %s\n",
                             channel);
-            claim_response(buffer->parent_network, buffer, NULL, NULL);
+            claim_response(buffer->network, buffer, NULL, NULL);
         }
         else
-            send_to_network(buffer->parent_network, "TOPIC %s :%s\r\n", channel,
+            send_to_network(buffer->network, "TOPIC %s :%s\r\n", channel,
                             trailing);
     }
     return 0;
@@ -244,79 +244,79 @@ BI_CMD(cmd_topic) {
 
 // Max argc: 0
 BI_CMD(cmd_connect) {
-    if (buffer->parent_network->status == DISCONNECTED)
-        connect_irc_network(buffer->parent_network);
+    if (buffer->network->status == DISCONNECTED)
+        connect_irc_network(buffer->network);
     return 0;
 }
 
 // Max argc: 0
 BI_CMD(cmd_quit) {
-    if (buffer->parent_network->status == DISCONNECTED)
+    if (buffer->network->status == DISCONNECTED)
         print_to_buffer(buffer, "Not connected!\n");
     else
-        disconnect_irc_network(buffer->parent_network, trailing);
+        disconnect_irc_network(buffer->network, trailing);
     return 0;
 }
 
 BI_CMD(cmd_quote) {
-    if (buffer->parent_network->status == DISCONNECTED)
+    if (buffer->network->status == DISCONNECTED)
         print_to_buffer(buffer, "Not connected!\n");
     else if (trailing != NULL)
-        send_to_network(buffer->parent_network, "%s\r\n", trailing);
+        send_to_network(buffer->network, "%s\r\n", trailing);
     else
         return IRC_CMD_SYNTAX_ERR;
     return 0;
 }
 
 BI_CMD(cmd_motd) {
-    if (buffer->parent_network->status != CONNECTED) {
+    if (buffer->network->status != CONNECTED) {
         print_to_buffer(buffer, "Not connected!\n");
         return 0;
     }
 
-    claim_response(buffer->parent_network, buffer, NULL, NULL);
-    send_to_network(buffer->parent_network, "MOTD %s\r\n",
+    claim_response(buffer->network, buffer, NULL, NULL);
+    send_to_network(buffer->network, "MOTD %s\r\n",
                     (argc >= 1) ? argv[0] : "");
     return 0;
 }
 
 BI_CMD(cmd_mode) {
-    if (buffer->parent_network->status != CONNECTED) {
+    if (buffer->network->status != CONNECTED) {
         print_to_buffer(buffer, "Not connected!\n");
         return 0;
     }
 
     if (argc == 0) {
         if (buffer->type == NETWORK)
-            send_to_network(buffer->parent_network,
-                            "MODE %s\r\n", buffer->parent_network->nickname);
+            send_to_network(buffer->network,
+                            "MODE %s\r\n", buffer->network->nickname);
         else if (buffer->type == CHANNEL)
-            send_to_network(buffer->parent_network,
+            send_to_network(buffer->network,
                         "MODE %s\r\n", buffer->buffer_name);
         else
             return IRC_CMD_SYNTAX_ERR;
     }
 
     // Check if the user explicitly specified a target
-    else if (strchr(buffer->parent_network->chantypes, *(argv[0])) ||
-             buffer->parent_network->casecmp(buffer->parent_network->nickname,
+    else if (strchr(buffer->network->chantypes, *(argv[0])) ||
+             buffer->network->casecmp(buffer->network->nickname,
                                              argv[0]) == 0)
-        send_to_network(buffer->parent_network,
+        send_to_network(buffer->network,
                         "MODE %s %s\r\n", argv[0], trailing ? trailing : "");
     else {
         if (buffer->type == NETWORK)
-            send_to_network(buffer->parent_network,
+            send_to_network(buffer->network,
                             "MODE %s %s %s\r\n",
-                            buffer->parent_network->nickname, argv[0],
+                            buffer->network->nickname, argv[0],
                             trailing ? trailing : "");
         else if (buffer->type == CHANNEL)
-            send_to_network(buffer->parent_network,
+            send_to_network(buffer->network,
                             "MODE %s %s %s\r\n", buffer->buffer_name, argv[0],
                             trailing ? trailing : "");
         else
             return IRC_CMD_SYNTAX_ERR;
     }
-    claim_response(buffer->parent_network, buffer, NULL, NULL);
+    claim_response(buffer->network, buffer, NULL, NULL);
     return 0;
 }
 
