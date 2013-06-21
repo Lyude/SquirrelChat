@@ -33,6 +33,8 @@ add_executable(squirrelchat
                numerics.c
                casemap.c
                errors.c
+               ctcp.c
+               builtin_ctcp.c
                ui/chat_window.c
                ui/network_tree.c
                ui/buffer.c

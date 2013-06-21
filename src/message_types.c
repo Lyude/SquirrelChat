@@ -23,6 +23,7 @@
 #include "cmd_responses.h"
 #include "errors.h"
 #include "trie.h"
+#include "ctcp.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -189,23 +190,28 @@ MSG_CB(part_msg_callback) {
 }
 
 MSG_CB(privmsg_msg_callback) {
-    char * nickname;
-    char * address;
-    split_irc_hostmask(hostmask, &nickname, &address);
-    
-    // Check whether or not the message was meant to be sent to a channel
-    if (IRC_IS_CHAN(network, argv[0]))
-        print_to_buffer(trie_get(network->buffers, argv[0]),
-                        "<%s> %s\n", nickname, argv[1]);
+    // Check if the message being sent is a CTCP
+    if ((argv[1])[0] == CTCP_DELIM)
+        process_ctcp(network, hostmask, argv[0], argv[1]);
     else {
-        struct buffer_info * buffer;
+        char * nickname;
+        char * address;
+        split_irc_hostmask(hostmask, &nickname, &address);
+        
+        // Check whether or not the message was meant to be sent to a channel
+        if (IRC_IS_CHAN(network, argv[0]))
+            print_to_buffer(trie_get(network->buffers, argv[0]),
+                            "<%s> %s\n", nickname, argv[1]);
+        else {
+            struct buffer_info * buffer;
 
-        if ((buffer = trie_get(network->buffers, nickname)) == NULL) {
-            buffer = new_buffer(nickname, QUERY, network);
-            add_buffer_to_tree(buffer, network);
+            if ((buffer = trie_get(network->buffers, nickname)) == NULL) {
+                buffer = new_buffer(nickname, QUERY, network);
+                add_buffer_to_tree(buffer, network);
+            }
+
+            print_to_buffer(buffer, "<%s> %s\n", nickname, argv[1]);
         }
-
-        print_to_buffer(buffer, "<%s> %s\n", nickname, argv[1]);
     }
 }
 
@@ -214,23 +220,25 @@ MSG_CB(notice_msg_callback) {
         print_to_buffer(network->buffer,
                         "Received NOTICE with missing params\n");
         dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
-        return;
     }
-
-    char * nickname;
-    char * address;
-    split_irc_hostmask(hostmask, &nickname, &address);
-
-    if (strcmp(argv[0], "*") == 0)
-        print_to_buffer(network->buffer, "* %s: %s\n", nickname, argv[1]);
-    else if (strcmp(argv[0], network->nickname) == 0)
-        print_to_buffer(network->window->current_buffer,
-                        "-%s- %s\n", nickname, argv[1]);
+    else if ((argv[1])[0] == CTCP_DELIM)
+        process_ctcp(network, hostmask, argv[0], argv[1]);
     else {
-        struct buffer_info * output;
-        if ((output = trie_get(network->buffers, argv[0])) != NULL)
+        char * nickname;
+        char * address;
+        split_irc_hostmask(hostmask, &nickname, &address);
+
+        if (strcmp(argv[0], "*") == 0)
+            print_to_buffer(network->buffer, "* %s: %s\n", nickname, argv[1]);
+        else if (strcmp(argv[0], network->nickname) == 0)
             print_to_buffer(network->window->current_buffer,
-                            "-%s:%s- %s\n", nickname, argv[0], argv[1]);
+                            "-%s- %s\n", nickname, argv[1]);
+        else {
+            struct buffer_info * output;
+            if ((output = trie_get(network->buffers, argv[0])) != NULL)
+                print_to_buffer(network->window->current_buffer,
+                                "-%s:%s- %s\n", nickname, argv[0], argv[1]);
+        }
     }
 }
 

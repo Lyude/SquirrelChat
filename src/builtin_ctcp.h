@@ -1,4 +1,4 @@
-/*
+/* Callbacks for the built-in CTCP types
  * Copyright (C) 2013 Stephen Chandler Paul
  *
  * This file is free software: you may copy it, redistribute it and/or modify it
@@ -13,37 +13,23 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef __BUILTIN_COMMANDS_H__
-#define __BUILTIN_COMMANDS_H__
+#ifndef __BUILTIN_CTCP_H__
+#define __BUILTIN_CTCP_H__
+#include "ctcp.h"
 
-#include "ui/buffer.h"
+#define BUILTIN_CTCP(func_name)                         \
+    extern void func_name(struct irc_network * network, \
+                          char * hostmask,              \
+                          char * target,                \
+                          char * msg)                   \
+    _nonnull(1, 2)
 
-extern void add_builtin_commands();
+BUILTIN_CTCP(ctcp_cb_action);
+BUILTIN_CTCP(ctcp_cb_version);
+BUILTIN_CTCP(ctcp_cb_ping);
 
-#define BI_CMD(func_name)                               \
-    extern short func_name(struct buffer_info * buffer, \
-                           unsigned short argc,         \
-                           char * argv[],               \
-                           char * trailing)             \
-    _nonnull(1)
+#undef BUILTIN_CTCP
 
-BI_CMD(cmd_help);
-BI_CMD(cmd_nick);
-BI_CMD(cmd_server);
-BI_CMD(cmd_msg);
-BI_CMD(cmd_join);
-BI_CMD(cmd_part);
-BI_CMD(cmd_connect);
-BI_CMD(cmd_quit);
-BI_CMD(cmd_quote);
-BI_CMD(cmd_motd);
-BI_CMD(cmd_topic);
-BI_CMD(cmd_notice);
-BI_CMD(cmd_mode);
-BI_CMD(cmd_ctcp);
-BI_CMD(cmd_me);
+#endif // __BUILTIN_CTCP_H__
 
-#undef BI_CMD
-
-#endif // __BUILTIN_COMMANDS_H__
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

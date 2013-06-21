@@ -16,6 +16,8 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
+#include <strings.h>
 
 #include "chat.h"
 #include "builtin_commands.h"
@@ -25,6 +27,7 @@
 #include "ui/buffer.h"
 #include "irc_numerics.h"
 #include "cmd_responses.h"
+#include "ctcp.h"
 
 void add_builtin_commands() {
     add_irc_command("help", cmd_help, 1,
@@ -82,6 +85,17 @@ void add_builtin_commands() {
     add_irc_command("mode", cmd_mode, 1,
                     "/mode [target] [modes] [mode arguments]",
                     "Changes or displays the mode of a user or a channel.\n");
+    add_irc_command("ctcp", cmd_ctcp, 2,
+                    "/ctcp <target> <type> [arguments]",
+                    "Sends a CTCP request of the specified type to the "
+                    "target.\n");
+    add_irc_command("me", cmd_me, 0,
+                    "/me <action>",
+                    "Sends an action to the current buffer. For example:\n"
+                    "/me does the safety dance\n"
+                    "Would send a message to the buffer that looks like:\n"
+                    "* Foo does the safety dance\n"
+                    "(replacing \"Foo\" with your nickname)\n");
 }
 
 #define BI_CMD(func_name)                       \
@@ -317,6 +331,52 @@ BI_CMD(cmd_mode) {
             return IRC_CMD_SYNTAX_ERR;
     }
     claim_response(buffer->network, buffer, NULL, NULL);
+    return 0;
+}
+
+BI_CMD(cmd_ctcp) {
+    if (buffer->network->status != CONNECTED) {
+        print_to_buffer(buffer, "Not connected!\n");
+        return 0;
+    }
+
+    // TODO: Choose the target automatically for query buffers
+    if (argc < 2)
+        return IRC_CMD_SYNTAX_ERR;
+
+    /* If the ctcp being sent is a PING, we need to record the time the command
+     * was sent
+     */
+    if (strcasecmp(argv[1], "PING") == 0) {
+        struct timespec current_time;
+        clock_gettime(CLOCK_REALTIME, &current_time);
+        sendf_ctcp(buffer->network, argv[0], "PING", "%li",
+                   (current_time.tv_sec * 1000000000) + current_time.tv_nsec);
+    }
+    else {
+        if (trailing == NULL)
+            send_ctcp(buffer->network, argv[0], argv[1]);
+        else
+            sendf_ctcp(buffer->network, argv[0], argv[1], "%s", trailing);
+    }
+
+    print_to_buffer(buffer, "* Sent a CTCP %s to %s.\n", argv[1], argv[0]);
+    return 0;
+}
+
+BI_CMD(cmd_me) {
+    if (buffer->network->status != CONNECTED)
+        print_to_buffer(buffer, "Not connected!\n");
+    else if (trailing == NULL)
+        return IRC_CMD_SYNTAX_ERR;
+    else if (buffer->type == NETWORK)
+        print_to_buffer(buffer, "You can't send messages to this buffer.\n");
+    else {
+        sendf_ctcp(buffer->network, buffer->buffer_name, "ACTION", "%s",
+                   trailing);
+        print_to_buffer(buffer, "* %s %s\n", buffer->network->nickname,
+                        trailing);
+    }
     return 0;
 }
 

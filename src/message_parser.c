@@ -24,6 +24,7 @@
 #include "ui/buffer.h"
 #include "chat.h"
 #include "errors.h"
+#include "ctcp.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -72,6 +73,7 @@ void init_message_parser() {
     trie_set(message_types, "KICK", kick_msg_callback);
 
     init_message_types();
+    init_ctcp();
 
     numerics[IRC_RPL_WELCOME] = echo_argv_1;
     numerics[IRC_RPL_YOURHOST] = echo_argv_1;
