@@ -17,6 +17,7 @@
 #include "irc_network.h"
 #include "ui/buffer.h"
 #include "ui/user_list.h"
+#include "ui/network_tree.h"
 #include "net_io.h"
 #include "irc_macros.h"
 #include "cmd_responses.h"
@@ -120,28 +121,8 @@ MSG_CB(join_msg_callback) {
                         "Error parsing message: Received a JOIN from %s, but "
                         "no channel was specified\n", nickname);
     // Check if we're the user joining a channel
-    else if (strcmp(network->nickname, nickname) == 0) {
-        GtkTreeModel * network_tree_model;
-        GtkTreeIter network_iter;
-        GtkTreeIter channel_iter;
-        struct buffer_info * new_channel = new_buffer(argv[0],
-                                                      CHANNEL, network);
-
-        trie_set(network->buffers, argv[0], new_channel);
-        // Add a new row as a child of the network
-        network_tree_model = gtk_tree_row_reference_get_model(network->row);
-        gtk_tree_model_get_iter(network_tree_model, &network_iter,
-                                gtk_tree_row_reference_get_path(network->row));
-
-        gtk_tree_store_append(GTK_TREE_STORE(network_tree_model),
-                               &channel_iter, &network_iter);
-        gtk_tree_store_set(GTK_TREE_STORE(network_tree_model), &channel_iter,
-                           0, argv[0], 1, new_channel, -1);
-        
-        // Store a reference to the row in the buffer
-        new_channel->row = gtk_tree_row_reference_new(network_tree_model,
-                gtk_tree_model_get_path(network_tree_model, &channel_iter));
-    }
+    else if (strcmp(network->nickname, nickname) == 0)
+        add_buffer_to_tree(new_buffer(argv[0], CHANNEL, network), network);
     else {
         struct buffer_info * buffer;
         GtkTreeIter new_user_row;
@@ -183,14 +164,7 @@ MSG_CB(part_msg_callback) {
     // Check if we're the one the part message is coming from
     if (strcmp(network->nickname, nickname) == 0) {
         // Remove the buffer from the network tree
-        GtkTreeModel * network_tree_model;
-        GtkTreeIter buffer_row;
-        network_tree_model = gtk_tree_row_reference_get_model(buffer->row);
-        gtk_tree_model_get_iter(network_tree_model,
-                                &buffer_row,
-                                gtk_tree_row_reference_get_path(buffer->row));
-
-        gtk_tree_store_remove(GTK_TREE_STORE(network_tree_model), &buffer_row);
+        remove_buffer_from_tree(buffer);
 
         destroy_buffer(buffer);
     }
@@ -225,28 +199,12 @@ MSG_CB(privmsg_msg_callback) {
                         "<%s> %s\n", nickname, argv[1]);
     else {
         struct buffer_info * buffer;
+
         if ((buffer = trie_get(network->buffers, nickname)) == NULL) {
             buffer = new_buffer(nickname, QUERY, network);
-            GtkTreeModel * network_tree_model;
-            GtkTreeIter network_iter;
-            GtkTreeIter buffer_iter;
-
-            network_tree_model = gtk_tree_row_reference_get_model(network->row);
-            gtk_tree_model_get_iter(network_tree_model, &network_iter,
-                                    gtk_tree_row_reference_get_path(
-                                        network->row
-                                    ));
-
-            gtk_tree_store_append(GTK_TREE_STORE(network_tree_model),
-                                  &buffer_iter, &network_iter);
-            gtk_tree_store_set(GTK_TREE_STORE(network_tree_model), &buffer_iter,
-                               0, nickname, 1, buffer, -1);
-
-            buffer->row = gtk_tree_row_reference_new(network_tree_model,
-                    gtk_tree_model_get_path(network_tree_model, &buffer_iter));
-
-            trie_set(network->buffers, nickname, buffer);
+            add_buffer_to_tree(buffer, network);
         }
+
         print_to_buffer(buffer, "<%s> %s\n", nickname, argv[1]);
     }
 }

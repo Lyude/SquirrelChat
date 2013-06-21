@@ -87,6 +87,42 @@ struct irc_network * get_current_network(struct chat_window * window) {
     return network;
 }
 
+void add_buffer_to_tree(struct buffer_info * buffer,
+                        struct irc_network * network) {
+    GtkTreeIter network_row;
+    GtkTreeIter buffer_row;
+    GtkTreeRowReference * buffer_ref;
+    GtkTreeModel * tree_model = gtk_tree_row_reference_get_model(network->row);
+
+    gtk_tree_model_get_iter(tree_model, &network_row,
+                            gtk_tree_row_reference_get_path(network->row));
+
+    // Append a new buffer
+    gtk_tree_store_append(GTK_TREE_STORE(tree_model), &buffer_row,
+                          &network_row);
+    gtk_tree_store_set(GTK_TREE_STORE(tree_model), &buffer_row, 0,
+                       buffer->buffer_name, 1, buffer, -1);
+
+    // Store a reference in the network's trie and in the buffer
+    buffer_ref = gtk_tree_row_reference_new(tree_model,
+                                            gtk_tree_model_get_path(tree_model,
+                                                                    &buffer_row)
+                                           );
+    trie_set(network->buffers, buffer->buffer_name, buffer);
+    buffer->row = buffer_ref;
+}
+
+void remove_buffer_from_tree(struct buffer_info * buffer) {
+    GtkTreeModel * network_tree_model;
+    GtkTreeIter buffer_row;
+    network_tree_model = gtk_tree_row_reference_get_model(buffer->row);
+    gtk_tree_model_get_iter(network_tree_model,
+                            &buffer_row,
+                            gtk_tree_row_reference_get_path(buffer->row));
+
+    gtk_tree_store_remove(GTK_TREE_STORE(network_tree_model), &buffer_row);
+}
+
 // Callbacks
 /* TODO: Modify this handler to also work with all types of buffers, not just
  * network buffers

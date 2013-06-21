@@ -33,6 +33,12 @@ extern void add_network(struct chat_window * window,
                         struct irc_network * network)
     _nonnull(1, 2);
 
+extern void add_buffer_to_tree(struct buffer_info * buffer,
+                               struct irc_network * network)
+    _nonnull(1, 2);
+extern void remove_buffer_from_tree(struct buffer_info * buffer)
+    _nonnull(1);
+
 #endif /* NETWORK_TREE_H */
 
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
