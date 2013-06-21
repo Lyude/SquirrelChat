@@ -169,7 +169,7 @@ int add_prefix_to_user(struct buffer_info * buffer,
         current_prefixes[0] = *prefix;
         current_prefixes[1] = '\0';
         set_user_prefixes(buffer, &user_row, current_prefixes);
-        set_user_prefix(buffer, nickname, *prefix);
+        set_user_prefix(buffer, &user_row, *prefix);
         return 0;
     }
 
@@ -194,7 +194,7 @@ int add_prefix_to_user(struct buffer_info * buffer,
             current_prefixes_size - insert_pos + 1);
     current_prefixes[insert_pos] = *prefix;
 
-    set_user_prefix(buffer, nickname, current_prefixes[0]);
+    set_user_prefix(buffer, &user_row, current_prefixes[0]);
 
     gtk_list_store_set(buffer->user_list_store, &user_row, 2, current_prefixes,
                        -1);
@@ -221,7 +221,7 @@ int remove_prefix_from_user(struct buffer_info * buffer,
     else if (current_prefixes_size == 2) { // The user only has one prefix
         free(current_prefixes);
         set_user_prefixes(buffer, &user_row, NULL);
-        set_user_prefix(buffer, nickname, '\0');
+        set_user_prefix(buffer, &user_row, '\0');
     }
     // Remove the prefix from the string
     memmove(pos, pos + 1,
@@ -232,7 +232,7 @@ int remove_prefix_from_user(struct buffer_info * buffer,
 
     // Update the user's row
     set_user_prefixes(buffer, &user_row, current_prefixes);
-    set_user_prefix(buffer, nickname, current_prefixes[0]);
+    set_user_prefix(buffer, &user_row, current_prefixes[0]);
     gtk_list_store_set(buffer->user_list_store, &user_row, 2, current_prefixes,
                        -1);
     return 0;
