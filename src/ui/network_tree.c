@@ -109,6 +109,7 @@ void add_buffer_to_tree(struct buffer_info * buffer,
                                                                     &buffer_row)
                                            );
     buffer->row = buffer_ref;
+    buffer->window = network->window;
 }
 
 void remove_buffer_from_tree(struct buffer_info * buffer) {
