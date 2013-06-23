@@ -108,7 +108,6 @@ void add_buffer_to_tree(struct buffer_info * buffer,
                                             gtk_tree_model_get_path(tree_model,
                                                                     &buffer_row)
                                            );
-    trie_set(network->buffers, buffer->buffer_name, buffer);
     buffer->row = buffer_ref;
 }
 
@@ -121,7 +120,6 @@ void remove_buffer_from_tree(struct buffer_info * buffer) {
                             gtk_tree_row_reference_get_path(buffer->row));
 
     gtk_tree_store_remove(GTK_TREE_STORE(network_tree_model), &buffer_row);
-    trie_del(buffer->network->buffers, buffer->buffer_name);
 }
 
 // Callbacks

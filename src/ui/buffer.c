@@ -42,6 +42,10 @@ struct buffer_info * new_buffer(const char * buffer_name,
             gtk_list_store_new(3, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_POINTER);
         buffer->users = trie_new(trie_strtolower);
     }
+
+    if (type != NETWORK)
+        trie_set(network->buffers, buffer_name, buffer);
+
     return buffer;
 }
 
@@ -50,6 +54,9 @@ void destroy_buffer(struct buffer_info * buffer) {
         g_object_unref(buffer->user_list_store);
     g_object_unref(buffer->buffer);
     g_object_unref(buffer->command_box_buffer);
+
+    if (buffer->type != NETWORK)
+        trie_del(buffer->network->buffers, buffer->buffer_name);
 
     free(buffer->buffer_name);
     gtk_tree_row_reference_free(buffer->row);
