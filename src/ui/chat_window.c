@@ -99,7 +99,7 @@ struct chat_window * create_new_chat_window(struct irc_network * network) {
      */
     if (network == NULL) {
         struct irc_network * placeholder = new_irc_network();
-        add_network(new_window, placeholder);
+        add_network_to_tree(new_window, placeholder);
         change_active_buffer(new_window, placeholder->buffer);
     }
 

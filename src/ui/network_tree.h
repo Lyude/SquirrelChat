@@ -29,8 +29,8 @@ extern void connect_network_tree_signals(struct chat_window * window)
 extern struct irc_network * get_current_network(struct chat_window * window)
     _nonnull(1);
 
-extern void add_network(struct chat_window * window,
-                        struct irc_network * network)
+extern void add_network_to_tree(struct chat_window * window,
+                                struct irc_network * network)
     _nonnull(1, 2);
 
 extern void add_buffer_to_tree(struct buffer_info * buffer,

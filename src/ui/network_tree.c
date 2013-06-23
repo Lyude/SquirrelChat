@@ -56,8 +56,8 @@ void create_network_tree(struct chat_window * window) {
 }
 
 // Adds an empty network buffer to the network tree
-void add_network(struct chat_window * window,
-                 struct irc_network * network) {
+void add_network_to_tree(struct chat_window * window,
+                         struct irc_network * network) {
     GtkTreePath * toplevel_path;
     gtk_tree_store_append(window->network_tree_store,
                           &network_tree_toplevel, NULL);

@@ -62,7 +62,7 @@ void create_main_menu_bar(struct chat_window * window) {
 
 void new_network_menu_item_callback(GtkMenuItem * menuitem,
                                           struct chat_window * window) {
-    add_network(window, new_irc_network());
+    add_network_to_tree(window, new_irc_network());
 }
 
 void about_menu_item_callback(GtkMenuItem * menuitem,
