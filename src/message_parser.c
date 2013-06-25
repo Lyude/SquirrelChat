@@ -85,6 +85,7 @@ void init_message_parser() {
     numerics[IRC_RPL_MOTDSTART] = rpl_motdstart;
     numerics[IRC_RPL_MOTD] = rpl_motd;
     numerics[IRC_RPL_ENDOFMOTD] = rpl_endofmotd;
+    numerics[IRC_ERR_NOMOTD] = generic_error;
     numerics[IRC_ERR_NICKNAMEINUSE] = nick_change_error;
     numerics[IRC_ERR_ERRORNEUSNICKNAME] = nick_change_error;
     numerics[IRC_RPL_TOPIC] = rpl_topic;
@@ -93,6 +94,20 @@ void init_message_parser() {
     numerics[IRC_RPL_CHANNELMODEIS] = rpl_channelmodeis;
     numerics[IRC_RPL_CREATIONTIME] = rpl_creationtime;
     numerics[IRC_ERR_NOTREGISTERED] = err_notregistered;
+    numerics[IRC_ERR_NOADMININFO] = generic_error;
+    numerics[IRC_ERR_NOSUCHNICK] = generic_target_error;
+    numerics[IRC_ERR_NOSUCHSERVER] = generic_target_error;
+    numerics[IRC_ERR_CANNOTSENDTOCHAN] = generic_channel_error;
+    numerics[IRC_ERR_TOOMANYCHANNELS] = generic_channel_error;
+    numerics[IRC_ERR_WASNOSUCHNICK] = generic_target_error;
+    numerics[IRC_ERR_TOOMANYTARGETS] = generic_target_error;
+    numerics[IRC_ERR_NOSUCHSERVICE] = generic_target_error;
+    numerics[IRC_ERR_NOORIGIN] = generic_error;
+    numerics[IRC_ERR_NORECEPIENT] = generic_error;
+    numerics[IRC_ERR_NOTEXTTOSEND] = generic_error;
+    numerics[IRC_ERR_NOTOPLEVEL] = generic_target_error;
+    numerics[IRC_ERR_WILDTOPLEVEL] = generic_target_error;
+    numerics[IRC_ERR_BADMASK] = generic_target_error;
     numerics[IRC_ERR_NOSUCHCHANNEL] = generic_channel_error;
     numerics[IRC_ERR_KEYSET] = generic_channel_error;
     numerics[IRC_ERR_NOCHANMODES] = generic_channel_error;
@@ -103,6 +118,24 @@ void init_message_parser() {
     numerics[IRC_ERR_NEEDMOREPARAMS] = generic_command_error;
     numerics[IRC_ERR_UNKNOWNCOMMAND] = generic_command_error;
     numerics[IRC_RPL_TRYAGAIN] = generic_command_error;
+    numerics[IRC_ERR_FILEERROR] = generic_error;
+    numerics[IRC_ERR_NONICKNAMEGIVEN] = generic_target_error;
+    numerics[IRC_ERR_NICKCOLLISION] = generic_target_error;
+    numerics[IRC_ERR_UNAVAILRESOURCE] = generic_target_error;
+    numerics[IRC_ERR_USERNOTINCHANNEL] = generic_user_channel_error;
+    numerics[IRC_ERR_NOTONCHANNEL] = generic_channel_error;
+    numerics[IRC_ERR_USERONCHANNEL] = generic_user_channel_error;
+    numerics[IRC_ERR_ALREADYREGISTERED] = generic_error;
+    numerics[IRC_ERR_NOPERMFORHOST] = generic_network_error;
+    numerics[IRC_ERR_PASSWDMISMATCH] = generic_network_error;
+    numerics[IRC_ERR_YOUREBANNEDCREEP] = generic_network_error;
+    numerics[IRC_ERR_YOUWILLBEBANNED] = generic_error;
+    numerics[IRC_ERR_CANTKILLSERVER] = generic_error;
+    numerics[IRC_ERR_RESTRICTED] = echo_argv_1;
+    numerics[IRC_ERR_UNIQOPPRIVSNEEDED] = generic_error;
+    numerics[IRC_ERR_NOOPERHOST] = generic_error;
+    numerics[IRC_ERR_UMODEUNKNOWNFLAG] = generic_error;
+    numerics[IRC_ERR_USERSDONTMATCH] = generic_error;
 }
 
 void process_irc_message(struct irc_network * network, char * msg) {

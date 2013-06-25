@@ -361,6 +361,24 @@ NUMERIC_CB(rpl_creationtime) {
                     ctime((const long *)&epoch_time));
 }
 
+// Used for generic errors with only an error message
+NUMERIC_CB(generic_error) {
+    struct buffer_info * output;
+    if (network->claimed_responses) {
+        output = network->claimed_responses->buffer;
+        remove_last_response_claim(network);
+    }
+    else
+        output = network->window->current_buffer;
+
+    print_to_buffer(output, "Error: %s\n", argv[0]);
+}
+
+// Used for errors that can potentially affect the status of the connection
+NUMERIC_CB(generic_network_error) {
+    print_to_buffer(network->buffer, "Error: %s\n", argv[0]);
+}
+
 // Used for generic errors that come with a channel argument
 NUMERIC_CB(generic_channel_error) {
     if (argc < 3) {
@@ -401,6 +419,49 @@ NUMERIC_CB(generic_command_error) {
         output = network->buffer;
 
     print_to_buffer(output, "Error: %s: %s\n", argv[1], argv[2]);
+}
+
+// Used for errors with a single non-channel argument
+NUMERIC_CB(generic_target_error) {
+    if (argc < 3) {
+        print_to_buffer(network->buffer,
+                        "Error parsing message: Received invalid generic error "
+                        "with a non-channel target argument.\n");
+        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
+        return;
+    }
+    
+    struct buffer_info * output;
+    if (network->claimed_responses) {
+        output = network->claimed_responses->buffer;
+        remove_last_response_claim(network);
+    }
+    else
+        output = network->window->current_buffer;
+
+    print_to_buffer(output, "Error: %s: %s\n", argv[1], argv[2]);
+}
+
+// Used for errors with a user argument and a channel argument
+NUMERIC_CB(generic_user_channel_error) {
+    if (argc < 4) {
+        print_to_buffer(network->buffer,
+                        "Error parsing message: Received invalid generic error "
+                        "with a nickname and channel argument.\n");
+        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
+        return;
+    }
+
+    struct buffer_info * output;
+    if (network->claimed_responses) {
+        output = network->claimed_responses->buffer;
+        remove_last_response_claim(network);
+    }
+    else
+        output = network->window->current_buffer;
+
+    print_to_buffer(output, "Error: %s with %s: %s\n",
+                    argv[1], argv[0], argv[2]);
 }
 
 NUMERIC_CB(nick_change_error) {
