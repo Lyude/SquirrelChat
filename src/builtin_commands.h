@@ -42,6 +42,7 @@ BI_CMD(cmd_notice);
 BI_CMD(cmd_mode);
 BI_CMD(cmd_ctcp);
 BI_CMD(cmd_me);
+BI_CMD(cmd_whois);
 
 #undef BI_CMD
 

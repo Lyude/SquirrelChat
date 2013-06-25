@@ -96,6 +96,11 @@ void add_builtin_commands() {
                     "Would send a message to the buffer that looks like:\n"
                     "* Foo does the safety dance\n"
                     "(replacing \"Foo\" with your nickname)\n");
+    add_irc_command("whois", cmd_whois, 2,
+                    "/whois [server] <user>",
+                    "Queries the server for information on the specified user."
+                    "The information can be queried from an alternate server "
+                    "if one is specified.\n");
 }
 
 #define BI_CMD(func_name)                       \
@@ -376,6 +381,21 @@ BI_CMD(cmd_me) {
                    trailing);
         print_to_buffer(buffer, "* %s %s\n", buffer->network->nickname,
                         trailing);
+    }
+    return 0;
+}
+
+BI_CMD(cmd_whois) {
+    if (buffer->network->status != CONNECTED)
+        print_to_buffer(buffer, "Not connected!\n");
+    else if (argc == 0)
+        return IRC_CMD_SYNTAX_ERR;
+    else {
+        if (argc == 1)
+            send_to_network(buffer->network, "WHOIS %s\r\n", argv[0]);
+        else
+            send_to_network(buffer->network, "WHOIS %s %s\r\n", argv[0], argv[1]);
+        claim_response(buffer->network, buffer, NULL, NULL);
     }
     return 0;
 }

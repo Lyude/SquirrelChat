@@ -363,6 +363,70 @@ NUMERIC_CB(rpl_creationtime) {
     return 0;
 }
 
+NUMERIC_CB(rpl_whoisuser) {
+    if (argc < 6)
+        return IRC_MSG_ERR_ARGS;
+
+    struct buffer_info * output = route_rpl(network);
+
+    print_to_buffer(output, "[%s] Address: %s@%s\n"
+                            "[%s] Real name: %s\n",
+                    argv[1], argv[2], argv[3], argv[1], argv[5]);
+    return 0;
+}
+
+NUMERIC_CB(rpl_whoisserver) {
+    if (argc < 3)
+        return IRC_MSG_ERR_ARGS;
+
+    struct buffer_info * output = route_rpl(network);
+
+    if (argc == 3)
+        print_to_buffer(output, "[%s] connected to %s\n", argv[1],
+                        argv[2]);
+    else
+        print_to_buffer(output, "[%s] connected to %s: %s\n", argv[1],
+                        argv[2], argv[3]);
+    return 0;
+}
+
+NUMERIC_CB(rpl_whoisoperator) {
+    if (argc < 2)
+        return IRC_MSG_ERR_ARGS;
+
+    struct buffer_info * output = route_rpl(network);
+
+    print_to_buffer(output, "[%s] %s\n", argv[1], argv[2]);
+    return 0;
+}
+
+NUMERIC_CB(rpl_whoisidle) {
+    if (argc < 2)
+        return IRC_MSG_ERR_ARGS;
+
+    print_to_buffer(route_rpl(network),
+                    "[%s] has been idle for %s seconds\n", argv[1], argv[2]);
+    return 0;
+}
+
+NUMERIC_CB(rpl_whoischannels) {
+    if (argc < 3)
+        return IRC_MSG_ERR_ARGS;
+
+    print_to_buffer(route_rpl(network),
+                    "[%s] Channels: %s\n", argv[1], argv[2]);
+    return 0;
+}
+
+NUMERIC_CB(rpl_endofwhois) {
+    if (argc < 2)
+        return IRC_MSG_ERR_ARGS;
+
+    print_to_buffer(route_rpl_end(network),
+                    "[%s] End of WHOIS.\n", argv[1]);
+    return 0;
+}
+
 // Used for generic errors with only an error message
 NUMERIC_CB(generic_error) {
     struct buffer_info * output = route_rpl_end(network);

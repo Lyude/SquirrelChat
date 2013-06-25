@@ -94,6 +94,12 @@ void init_message_parser() {
     numerics[IRC_RPL_TOPICWHOTIME] = rpl_topicwhotime;
     numerics[IRC_RPL_CHANNELMODEIS] = rpl_channelmodeis;
     numerics[IRC_RPL_CREATIONTIME] = rpl_creationtime;
+    numerics[IRC_RPL_WHOISUSER] = rpl_whoisuser;
+    numerics[IRC_RPL_WHOISSERVER] = rpl_whoisserver;
+    numerics[IRC_RPL_WHOISOPERATOR] = rpl_whoisoperator;
+    numerics[IRC_RPL_WHOISIDLE] = rpl_whoisidle;
+    numerics[IRC_RPL_WHOISCHANNELS] = rpl_whoischannels;
+    numerics[IRC_RPL_ENDOFWHOIS] = rpl_endofwhois;
     numerics[IRC_ERR_NOTREGISTERED] = err_notregistered;
     numerics[IRC_ERR_NOADMININFO] = generic_error;
     numerics[IRC_ERR_NOSUCHNICK] = generic_target_error;
