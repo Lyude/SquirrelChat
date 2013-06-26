@@ -55,6 +55,28 @@ void init_numerics() {
     trie_set(isupport_tokens, "CASEMAPPING",(void*)ISUPPORT_CASEMAPPING);
 }
 
+/* These define the two different output behaviors many response handlers
+ * follow; one for responses that check for response claims but can't satisfy
+ * them, and one for responses that do the same but can satisfy claims.
+ */
+struct buffer_info * route_rpl(const struct irc_network * network) {
+    if (network->claimed_responses != NULL)
+        return network->claimed_responses->buffer;
+    else
+        return network->window->current_buffer;
+}
+
+struct buffer_info * route_rpl_end(struct irc_network * network) {
+    if (network->claimed_responses != NULL) {
+        struct buffer_info * output = network->claimed_responses->buffer;
+        remove_last_response_claim(network);
+        return output;
+    }
+    else
+        return network->window->current_buffer;
+}
+
+
 #define NUMERIC_CB(func_name)                   \
     void func_name(struct irc_network * network,\
                    char * hostmask,             \
@@ -363,13 +385,7 @@ NUMERIC_CB(rpl_creationtime) {
 
 // Used for generic errors with only an error message
 NUMERIC_CB(generic_error) {
-    struct buffer_info * output;
-    if (network->claimed_responses) {
-        output = network->claimed_responses->buffer;
-        remove_last_response_claim(network);
-    }
-    else
-        output = network->window->current_buffer;
+    struct buffer_info * output = route_rpl_end(network);
 
     print_to_buffer(output, "Error: %s\n", argv[0]);
 }
@@ -410,13 +426,7 @@ NUMERIC_CB(generic_command_error) {
         return;
     }
 
-    struct buffer_info * output;
-    if (network->claimed_responses) {
-        output = network->claimed_responses->buffer;
-        remove_last_response_claim(network);
-    }
-    else
-        output = network->buffer;
+    struct buffer_info * output = route_rpl_end(network);
 
     print_to_buffer(output, "Error: %s: %s\n", argv[1], argv[2]);
 }
@@ -431,13 +441,7 @@ NUMERIC_CB(generic_target_error) {
         return;
     }
     
-    struct buffer_info * output;
-    if (network->claimed_responses) {
-        output = network->claimed_responses->buffer;
-        remove_last_response_claim(network);
-    }
-    else
-        output = network->window->current_buffer;
+    struct buffer_info * output = route_rpl_end(network);
 
     print_to_buffer(output, "Error: %s: %s\n", argv[1], argv[2]);
 }
@@ -452,13 +456,7 @@ NUMERIC_CB(generic_user_channel_error) {
         return;
     }
 
-    struct buffer_info * output;
-    if (network->claimed_responses) {
-        output = network->claimed_responses->buffer;
-        remove_last_response_claim(network);
-    }
-    else
-        output = network->window->current_buffer;
+    struct buffer_info * output = route_rpl_end(network);
 
     print_to_buffer(output, "Error: %s with %s: %s\n",
                     argv[1], argv[0], argv[2]);
