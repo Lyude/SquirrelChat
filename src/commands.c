@@ -75,6 +75,7 @@ void call_command(struct buffer_info * buffer,
             if (param_end == NULL) {
                 argv[argc] = params;
                 params = NULL;
+                break;
             }
             else {
                 *param_end = '\0';
