@@ -25,6 +25,7 @@
 #include "chat.h"
 #include "errors.h"
 #include "ctcp.h"
+#include "cmd_responses.h"
 
 #include <string.h>
 #include <stdlib.h>
