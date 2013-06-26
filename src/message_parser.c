@@ -195,6 +195,8 @@ void process_irc_message(struct irc_network * network, char * msg) {
                                     "response.\n"
                                     "Numeric: %i\n", numeric);
                     dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
+                    if (network->claimed_responses)
+                        remove_last_response_claim(network);
                     break;
                 case IRC_MSG_ERR_ARGS_FATAL:
                     print_to_buffer(network->buffer,
@@ -208,6 +210,8 @@ void process_irc_message(struct irc_network * network, char * msg) {
                 case IRC_MSG_ERR_MISC:
                     dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
                 case IRC_MSG_ERR_MISC_NODUMP:
+                    if (network->claimed_responses)
+                        remove_last_response_claim(network);
                     break;
             }
         }
@@ -227,6 +231,8 @@ void process_irc_message(struct irc_network * network, char * msg) {
                                 "included in the message.\n"
                                 "Type: %s\n", command);
                 dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
+                if (network->claimed_responses)
+                    remove_last_response_claim(network);
                 break;
             case IRC_MSG_ERR_ARGS_FATAL:
                 print_to_buffer(network->buffer,
@@ -239,6 +245,8 @@ void process_irc_message(struct irc_network * network, char * msg) {
             case IRC_MSG_ERR_MISC:
                 dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
             case IRC_MSG_ERR_MISC_NODUMP:
+                if (network->claimed_responses)
+                    remove_last_response_claim(network);
                 break;
         }
     }
