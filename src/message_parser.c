@@ -186,8 +186,31 @@ void process_irc_message(struct irc_network * network, char * msg) {
     }
 
     if ((numeric = numeric_to_short(command)) != -1) {
-        if (numeric > 0 && numeric <= IRC_NUMERIC_MAX && numerics[numeric] != NULL)
-            numerics[numeric](network, hostmask, argc, argv);
+        if (numeric > 0 && numeric <= IRC_NUMERIC_MAX && numerics[numeric] != NULL) {
+            switch (numerics[numeric](network, hostmask, argc, argv)) {
+                case IRC_MSG_ERR_ARGS:
+                    print_to_buffer(network->buffer,
+                                    "Error parsing numeric response: Not "
+                                    "enough arguments included in the "
+                                    "response.\n"
+                                    "Numeric: %i\n", numeric);
+                    dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
+                    break;
+                case IRC_MSG_ERR_ARGS_FATAL:
+                    print_to_buffer(network->buffer,
+                                    "Fatal: Error parsing numeric response: "
+                                    "Not enough arguments included in the "
+                                    "response.\n"
+                                    "Numeric: %i\n", numeric);
+                    dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
+                    disconnect_irc_network(network, "Invalid data received");
+                    break;
+                case IRC_MSG_ERR_MISC:
+                    dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
+                case IRC_MSG_ERR_MISC_NODUMP:
+                    break;
+            }
+        }
         else {
             print_to_buffer(network->buffer,
                             "Error parsing message: unknown numeric %i\n",
@@ -196,8 +219,29 @@ void process_irc_message(struct irc_network * network, char * msg) {
         }
     }
     // Attempt to look up the command
-    else if ((callback = trie_get(message_types, command)) != NULL)
-        callback(network, hostmask, argc, argv);
+    else if ((callback = trie_get(message_types, command)) != NULL) {
+        switch (callback(network, hostmask, argc, argv)) {
+            case IRC_MSG_ERR_ARGS:
+                print_to_buffer(network->buffer,
+                                "Error parsing message: Not enough arguments "
+                                "included in the message.\n"
+                                "Type: %s\n", command);
+                dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
+                break;
+            case IRC_MSG_ERR_ARGS_FATAL:
+                print_to_buffer(network->buffer,
+                                "Fatal: Error parsing message: Not enough "
+                                "arguments included in the message.\n"
+                                "Type: %s\n", command);
+                dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
+                disconnect_irc_network(network, "Invalid data received");
+                break;
+            case IRC_MSG_ERR_MISC:
+                dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
+            case IRC_MSG_ERR_MISC_NODUMP:
+                break;
+        }
+    }
     else {
         print_to_buffer(network->buffer,
                         "Error parsing message: unknown message type: \"%s\"\n",

@@ -26,10 +26,10 @@ extern struct buffer_info * route_rpl_end(struct irc_network * network)
     _nonnull(1);
 
 #define NUMERIC_CB(name)                            \
-    extern void name(struct irc_network * network,  \
-                     char * hostmask,               \
-                     short argc,                    \
-                     char * argv[])                 \
+    extern short name(struct irc_network * network, \
+                      char * hostmask,              \
+                      short argc,                   \
+                      char * argv[])                \
     _nonnull(1)
 
 NUMERIC_CB(echo_argv_1);

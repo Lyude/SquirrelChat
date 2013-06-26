@@ -17,10 +17,15 @@
 #define __MESSAGE_PARSER_H__
 #include "irc_network.h"
 
-typedef void (*irc_message_callback)(struct irc_network *,
-                                     char *,     // hostmask
-                                     short,      // argc
-                                     char*[]);   // argv
+typedef short (*irc_message_callback)(struct irc_network *,
+                                      char *,     // hostmask
+                                      short,      // argc
+                                      char*[]);   // argv
+
+#define IRC_MSG_ERR_ARGS        1
+#define IRC_MSG_ERR_ARGS_FATAL  2
+#define IRC_MSG_ERR_MISC        3
+#define IRC_MSG_ERR_MISC_NODUMP 4
 
 extern void init_message_parser();
 

@@ -20,10 +20,10 @@
 extern void init_message_types();
 
 #define MSG_CB(func_name)                               \
-    extern void func_name(struct irc_network * network, \
-                          char * hostmask,              \
-                          short argc,                   \
-                          char * argv[])                \
+    extern short func_name(struct irc_network * network, \
+                           char * hostmask,              \
+                           short argc,                   \
+                           char * argv[])                \
     _nonnull(1)
 
 MSG_CB(cap_msg_callback);

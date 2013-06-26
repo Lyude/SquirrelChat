@@ -40,18 +40,15 @@ void init_message_types() {
 }
 
 #define MSG_CB(func_name)                       \
-    void func_name(struct irc_network * network,\
-                   char * hostmask,             \
-                   short argc,                  \
-                   char * argv[])
+    short func_name(struct irc_network * network,\
+                    char * hostmask,             \
+                    short argc,                  \
+                    char * argv[])
 
 MSG_CB(cap_msg_callback) {
-    if (argc < 2) {
-        print_to_buffer(network->buffer, "Fatal error: Invalid CAP received\n");
-        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
-        disconnect_irc_network(network, NULL);
-        return;
-    }
+    return IRC_MSG_ERR_ARGS_FATAL;
+    if (argc < 2)
+        return IRC_MSG_ERR_ARGS_FATAL;
     
     if (strcmp(argv[1], "LS") == 0) {
         char cap_str[IRC_MSG_BUF_LEN];
@@ -110,19 +107,19 @@ MSG_CB(cap_msg_callback) {
             network->status = CONNECTED;
         }
     }
+    return 0;
 }
 
 MSG_CB(join_msg_callback) {
+    if (argc < 1)
+        return IRC_MSG_ERR_ARGS;
+
     char * nickname;
     char * address;
     split_irc_hostmask(hostmask, &nickname, &address);
 
-    if (argc < 1)
-        print_to_buffer(network->buffer,
-                        "Error parsing message: Received a JOIN from %s, but "
-                        "no channel was specified\n", nickname);
     // Check if we're the user joining a channel
-    else if (strcmp(network->nickname, nickname) == 0)
+    if (strcmp(network->nickname, nickname) == 0)
         add_buffer_to_tree(new_buffer(argv[0], CHANNEL, network), network);
     else {
         struct buffer_info * buffer;
@@ -132,7 +129,7 @@ MSG_CB(join_msg_callback) {
                             "Error parsing message: received JOIN from %s for "
                             "%s, but we're not in that channel!\n",
                             nickname, argv[0]);
-            return;
+            return IRC_MSG_ERR_MISC_NODUMP;
         }
 
         add_user_to_list(buffer, nickname, NULL, 0);
@@ -140,26 +137,23 @@ MSG_CB(join_msg_callback) {
         print_to_buffer(buffer, "* %s (%s) has joined %s\n",
                         nickname, address, argv[0]);
     }
+    return 0;
 }
 
 MSG_CB(part_msg_callback) {
+    if (argc < 1)
+        return IRC_MSG_ERR_ARGS;
+
     struct buffer_info * buffer;
     char * nickname;
     char * address;
     split_irc_hostmask(hostmask, &nickname, &address);
 
-    if (argc < 1) {
-        print_to_buffer(network->buffer,
-                        "Error parsing message: Received PART from %s "
-                        "without a channel!\n", nickname);
-        return;
-    }
-
     if ((buffer = trie_get(network->buffers, argv[0])) == NULL) {
         print_to_buffer(network->buffer,
                         "Received a PART message for %s, but we're not in that "
                         "channel!\n", argv[0]);
-        return;
+        return IRC_MSG_ERR_MISC_NODUMP;
     }
 
     // Check if we're the one the part message is coming from
@@ -176,7 +170,7 @@ MSG_CB(part_msg_callback) {
                             "from %s (%s) in %s, but the user wasn't in the "
                             "channel.\n",
                             nickname, address, argv[0]);
-            return;
+            return IRC_MSG_ERR_MISC_NODUMP;
         }
         if (argc < 2)
             print_to_buffer(buffer, 
@@ -187,6 +181,7 @@ MSG_CB(part_msg_callback) {
                             "* %s (%s) has left %s (%s).\n",
                             nickname, address, argv[0], argv[1]);
     }
+    return 0;
 }
 
 MSG_CB(privmsg_msg_callback) {
@@ -213,15 +208,14 @@ MSG_CB(privmsg_msg_callback) {
             print_to_buffer(buffer, "<%s> %s\n", nickname, argv[1]);
         }
     }
+    return 0;
 }
 
 MSG_CB(notice_msg_callback) {
-    if (argc < 2) {
-        print_to_buffer(network->buffer,
-                        "Received NOTICE with missing params\n");
-        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
-    }
-    else if ((argv[1])[0] == CTCP_DELIM)
+    if (argc < 2)
+        return IRC_MSG_ERR_ARGS;
+    
+    if ((argv[1])[0] == CTCP_DELIM)
         process_ctcp(network, hostmask, argv[0], argv[1]);
     else {
         char * nickname;
@@ -240,6 +234,7 @@ MSG_CB(notice_msg_callback) {
                                 "-%s:%s- %s\n", nickname, argv[0], argv[1]);
         }
     }
+    return 0;
 }
 
 struct announce_nick_change_param {
@@ -303,16 +298,11 @@ void announce_our_nick_change(struct buffer_info * buffer,
 }
 
 MSG_CB(nick_msg_callback) {
+    if (argc < 1)
+        return IRC_MSG_ERR_ARGS;
+
     char * nickname;
     char * address;
-
-    if (argc < 1) {
-        print_to_buffer(network->buffer,
-                        "Received NICK message, but did not receive a "
-                        "nickname?\n");
-        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
-        return;
-    }
 
     split_irc_hostmask(hostmask, &nickname, &address);
 
@@ -361,20 +351,17 @@ MSG_CB(nick_msg_callback) {
             trie_set(network->buffers, argv[0], query);
         }
     }
+    return 0;
 }
 
 MSG_CB(ping_msg_callback) {
     send_to_network(network, "PONG %s\r\n", argv[0]);
+    return 0;
 }
 
 MSG_CB(topic_msg_callback) {
-    if (argc < 1) {
-        print_to_buffer(network->buffer,
-                        "Error parsing message: Received TOPIC message, but "
-                        "the message did not specify a channel.\n");
-        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
-        return;
-    }
+    if (argc < 1)
+        return IRC_MSG_ERR_ARGS;
     
     struct buffer_info * channel;
     char * nickname;
@@ -386,11 +373,12 @@ MSG_CB(topic_msg_callback) {
                         "Error parsing message: Received TOPIC message for %s, "
                         "but we're not in that channel.",
                         argv[0]);
-        return;
+        return IRC_MSG_ERR_MISC_NODUMP;
     }
 
     print_to_buffer(channel, "* %s changed the topic to \"%s\"\n",
                     nickname, argv[0]);
+    return 0;
 }
 
 MSG_CB(mode_msg_callback) {
@@ -402,8 +390,7 @@ MSG_CB(mode_msg_callback) {
                             "Error parsing message: Received MODE message for "
                             "%s but we're not in that channel.\n",
                             argv[0]);
-            dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
-            return;
+            return IRC_MSG_ERR_MISC;
         }
 
         char * nickname;
@@ -485,6 +472,7 @@ escape_user_mode_check:
             output = network->buffer;
         print_to_buffer(output, "Your mode is %s\n", argv[1]);
     }
+    return 0;
 }
 
 struct announce_quit_params {
@@ -526,16 +514,12 @@ MSG_CB(quit_msg_callback) {
     params.quit_msg = (argc >= 1) ? argv[0] : NULL;
 
     trie_each(network->buffers, announce_quit, &params);
+    return 0;
 }
 
 MSG_CB(kick_msg_callback) {
-    if (argc < 2) {
-        print_to_buffer(network->buffer,
-                        "Error parsing message: Received invalid KICK "
-                        "message.\n");
-        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
-        return;
-    }
+    if (argc < 2)
+        return IRC_MSG_ERR_ARGS;
 
     struct buffer_info * channel;
     char * nickname;
@@ -549,7 +533,7 @@ MSG_CB(kick_msg_callback) {
                         "we're not in that channel.\n",
                         argv[0]);
         dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
-        return;
+        return IRC_MSG_ERR_MISC_NODUMP;
     }
 
     // If we're the one being kicked, leave the channel
@@ -575,6 +559,7 @@ MSG_CB(kick_msg_callback) {
             print_to_buffer(channel, "* %s has kicked %s from %s (%s).\n",
                             nickname, argv[1], argv[0], argv[2]);
     }
+    return 0;
 }
 
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

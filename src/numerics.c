@@ -77,29 +77,26 @@ struct buffer_info * route_rpl_end(struct irc_network * network) {
 }
 
 
-#define NUMERIC_CB(func_name)                   \
-    void func_name(struct irc_network * network,\
-                   char * hostmask,             \
-                   short argc,                  \
-                   char * argv[])
+#define NUMERIC_CB(func_name)                       \
+    short func_name(struct irc_network * network,   \
+                    char * hostmask,                \
+                    short argc,                     \
+                    char * argv[])
 
 // Used for numerics that just give us a message requiring no special handling
 NUMERIC_CB(echo_argv_1) {
     print_to_buffer(network->buffer, "%s\n", argv[1]);
+    return 0;
 }
 
 NUMERIC_CB(rpl_myinfo) {
-    if (argc < 5) {
-        print_to_buffer(network->buffer, 
-                        "Error parsing message: Received invalid RPL_MYINFO: "
-                        "not enough arguments provided (only given %i)\n",
-                        argc);
-        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
-    }
+    if (argc < 5)
+        return IRC_MSG_ERR_ARGS;
     else {
         network->version = strdup(argv[2]);
         network->usermodes = strdup(argv[3]);
         network->chanmodes = strdup(argv[4]);
+        return 0;
     }
 }
 
@@ -183,6 +180,7 @@ NUMERIC_CB(rpl_isupport) {
                 break;
         }
     }
+    return 0;
 }
 
 NUMERIC_CB(rpl_namreply) {
@@ -222,11 +220,13 @@ NUMERIC_CB(rpl_namreply) {
                                  (size_t)(nick - prefix));
         }
     }
+    return 0;
     // TODO: Print results to current buffer if we're not in the channel
 }
 
 NUMERIC_CB(rpl_endofnames) {
     // TODO: Do something here
+    return 0;
 }
 
 NUMERIC_CB(rpl_motdstart) {
@@ -237,6 +237,7 @@ NUMERIC_CB(rpl_motdstart) {
                         network->claimed_responses->buffer :
                         network->buffer,
                     "---Start of MOTD---\n");
+    return 0;
 }
 
 NUMERIC_CB(rpl_motd) {
@@ -244,6 +245,7 @@ NUMERIC_CB(rpl_motd) {
                         network->claimed_responses->buffer :
                         network->buffer,
                     "%s\n", argv[1]);
+    return 0;
 }
 
 NUMERIC_CB(rpl_endofmotd) {
@@ -254,16 +256,12 @@ NUMERIC_CB(rpl_endofmotd) {
                         "---End of MOTD---\n");
         remove_last_response_claim(network);
     }
+    return 0;
 }
 
 NUMERIC_CB(rpl_topic) {
-    if (argc < 3) {
-        print_to_buffer(network->buffer,
-                        "Error parsing message: missing parameters for "
-                        "RPL_TOPIC.\n");
-        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
-        return;
-    }
+    if (argc < 3)
+        return IRC_MSG_ERR_ARGS;
 
     struct buffer_info * output;
 
@@ -274,16 +272,12 @@ NUMERIC_CB(rpl_topic) {
         output = network->buffer;
 
     print_to_buffer(output, "* Topic for %s is \"%s\"\n", argv[1], argv[2]);
+    return 0;
 }
 
 NUMERIC_CB(rpl_notopic) {
-    if (argc < 2) {
-        print_to_buffer(network->buffer,
-                        "Error parsing message: Missing parameters for "
-                        "RPL_NOTOPIC.\n");
-        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
-        return;
-    }
+    if (argc < 2)
+        return IRC_MSG_ERR_ARGS;
 
     struct buffer_info * output;
     if (network->claimed_responses != NULL) {
@@ -294,17 +288,12 @@ NUMERIC_CB(rpl_notopic) {
         output = network->buffer;
 
     print_to_buffer(output, "* No topic set for %s\n", argv[1]);
+    return 0;
 }
 
 NUMERIC_CB(rpl_topicwhotime) {
-    if (argc < 3) {
-        print_to_buffer(network->buffer,
-                        "Error parsing message: Received RPL_TOPICWHOTIME but "
-                        "not enough arguments were provided with the "
-                        "message.\n");
-        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
-        return;
-    }
+    if (argc < 3)
+        return IRC_MSG_ERR_ARGS;
 
     struct buffer_info * output;
     char * nickname;
@@ -322,16 +311,12 @@ NUMERIC_CB(rpl_topicwhotime) {
     split_irc_hostmask(argv[2], &nickname, &address);
 
     print_to_buffer(output, "* Set by %s (%s)\n", nickname, address);
+    return 0;
 }
 
 NUMERIC_CB(rpl_channelmodeis) {
-    if (argc < 3) {
-        print_to_buffer(network->buffer,
-                        "Error parsing message: Received invalid "
-                        "RPL_CHANNELMODEIS.");
-        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
-        return;
-    }
+    if (argc < 3)
+        return IRC_MSG_ERR_ARGS;
 
     struct buffer_info * output;
     /* Check if the response was requested in another channel
@@ -345,17 +330,12 @@ NUMERIC_CB(rpl_channelmodeis) {
 
     print_to_buffer(output, "The modes for %s are: %s\r\n",
                     argv[1], argv[2]);
+    return 0;
 }
 
 NUMERIC_CB(rpl_creationtime) {
-    if (argc < 3) {
-        print_to_buffer(network->buffer,
-                        "Error parsing message: Received invalid "
-                        "RPL_CREATIONTIME.\n");
-        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
-        remove_last_response_claim(network);
-        return;
-    }
+    if (argc < 3)
+        return IRC_MSG_ERR_ARGS;
 
     struct buffer_info * output;
     unsigned long epoch_time;
@@ -375,12 +355,12 @@ NUMERIC_CB(rpl_creationtime) {
                         "RPL_CREATIONTIME.\n"
                         "strtoul() returned the following error: %s\n",
                         strerror(errno));
-        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
-        return;
+        return IRC_MSG_ERR_MISC;
     }
 
     print_to_buffer(output, "* Channel created on %s",
                     ctime((const long *)&epoch_time));
+    return 0;
 }
 
 // Used for generic errors with only an error message
@@ -388,22 +368,19 @@ NUMERIC_CB(generic_error) {
     struct buffer_info * output = route_rpl_end(network);
 
     print_to_buffer(output, "Error: %s\n", argv[0]);
+    return 0;
 }
 
 // Used for errors that can potentially affect the status of the connection
 NUMERIC_CB(generic_network_error) {
     print_to_buffer(network->buffer, "Error: %s\n", argv[0]);
+    return 0;
 }
 
 // Used for generic errors that come with a channel argument
 NUMERIC_CB(generic_channel_error) {
-    if (argc < 3) {
-        print_to_buffer(network->buffer,
-                        "Error parsing message: Received invalid generic error "
-                        "with a channel argument.\n");
-        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
-        return;
-    }
+    if (argc < 3)
+        return IRC_MSG_ERR_ARGS;
 
     struct buffer_info * output;
     if (network->claimed_responses) {
@@ -414,62 +391,52 @@ NUMERIC_CB(generic_channel_error) {
         output = network->buffer;
 
     print_to_buffer(output, "Error: %s: %s\n", argv[1], argv[2]);
+    return 0;
 }
 
 // Used for generic errors that come with a command argument
 NUMERIC_CB(generic_command_error) {
-    if (argc < 3) {
-        print_to_buffer(network->buffer,
-                        "Error parsing message: Received invalid generic error "
-                        "with a command argument.\n");
-        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
-        return;
-    }
+    if (argc < 3)
+        return IRC_MSG_ERR_ARGS;
 
     struct buffer_info * output = route_rpl_end(network);
 
     print_to_buffer(output, "Error: %s: %s\n", argv[1], argv[2]);
+    return 0;
 }
 
 // Used for errors with a single non-channel argument
 NUMERIC_CB(generic_target_error) {
-    if (argc < 3) {
-        print_to_buffer(network->buffer,
-                        "Error parsing message: Received invalid generic error "
-                        "with a non-channel target argument.\n");
-        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
-        return;
-    }
+    if (argc < 3)
+        return IRC_MSG_ERR_ARGS;
     
     struct buffer_info * output = route_rpl_end(network);
 
     print_to_buffer(output, "Error: %s: %s\n", argv[1], argv[2]);
+    return 0;
 }
 
 // Used for errors with a user argument and a channel argument
 NUMERIC_CB(generic_user_channel_error) {
-    if (argc < 4) {
-        print_to_buffer(network->buffer,
-                        "Error parsing message: Received invalid generic error "
-                        "with a nickname and channel argument.\n");
-        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
-        return;
-    }
+    if (argc < 4)
+        return IRC_MSG_ERR_ARGS;
 
     struct buffer_info * output = route_rpl_end(network);
 
     print_to_buffer(output, "Error: %s with %s: %s\n",
                     argv[1], argv[0], argv[2]);
+    return 0;
 }
 
 NUMERIC_CB(nick_change_error) {
     if (network->claimed_responses == NULL)
-        return;
+        return 0;
 
     print_to_buffer(network->claimed_responses->buffer,
                     "Could not change nickname to %s: %s\n",
                     network->claimed_responses->data, argv[2]);
     remove_last_response_claim(network);
+    return 0;
 }
 
 NUMERIC_CB(err_notregistered) {
@@ -485,5 +452,6 @@ NUMERIC_CB(err_notregistered) {
                     "USER %s X X %s\r\n",
                     network->nickname, network->username, network->real_name);
     network->status = CONNECTED;
+    return 0;
 }
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
