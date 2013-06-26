@@ -46,7 +46,6 @@ void init_message_types() {
                     char * argv[])
 
 MSG_CB(cap_msg_callback) {
-    return IRC_MSG_ERR_ARGS_FATAL;
     if (argc < 2)
         return IRC_MSG_ERR_ARGS_FATAL;
     
