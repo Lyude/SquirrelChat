@@ -73,7 +73,7 @@ void call_command(struct buffer_info * buffer,
             
             // Null terminate the parameter and add it to argv
             if (param_end == NULL) {
-                argv[argc] = params;
+                argv[argc++] = params;
                 params = NULL;
                 break;
             }
