@@ -17,7 +17,7 @@
 #ifndef __IRC_NUMERICS_H__
 #define __IRC_NUMERICS_H__
 
-#define IRC_NUMERIC_MAX 502
+#define IRC_NUMERIC_MAX 999
 
 #define IRC_RPL_WELCOME             001
 #define IRC_RPL_YOURHOST            002
@@ -37,6 +37,12 @@
 #define IRC_RPL_WHOISIDLE           317
 #define IRC_RPL_ENDOFWHOIS          318
 #define IRC_RPL_WHOISCHANNELS       319
+#define IRC_RPL_WHOISACCOUNT        330
+#define IRC_RPL_WHOISREGNICK        307
+#define IRC_RPL_WHOISSECURE         671
+#define IRC_RPL_WHOISHOST           378
+#define IRC_RPL_WHOISSPECIAL        320
+#define IRC_RPL_WHOISMODES          379
 
 #define IRC_RPL_WHOWASUSER          314
 #define IRC_RPL_ENDOFWHOWAS         369

@@ -367,10 +367,8 @@ NUMERIC_CB(rpl_whoisuser) {
     if (argc < 6)
         return IRC_MSG_ERR_ARGS;
 
-    struct buffer_info * output = route_rpl(network);
-
-    print_to_buffer(output, "[%s] Address: %s@%s\n"
-                            "[%s] Real name: %s\n",
+    print_to_buffer(route_rpl(network), "[%s] address is: %s@%s\n"
+                                        "[%s] real name is: %s\n",
                     argv[1], argv[2], argv[3], argv[1], argv[5]);
     return 0;
 }
@@ -394,9 +392,7 @@ NUMERIC_CB(rpl_whoisoperator) {
     if (argc < 2)
         return IRC_MSG_ERR_ARGS;
 
-    struct buffer_info * output = route_rpl(network);
-
-    print_to_buffer(output, "[%s] %s\n", argv[1], argv[2]);
+    print_to_buffer(route_rpl(network), "[%s] %s\n", argv[1], argv[2]);
     return 0;
 }
 
@@ -414,7 +410,32 @@ NUMERIC_CB(rpl_whoischannels) {
         return IRC_MSG_ERR_ARGS;
 
     print_to_buffer(route_rpl(network),
-                    "[%s] Channels: %s\n", argv[1], argv[2]);
+                    "[%s] channels: %s\n", argv[1], argv[2]);
+    return 0;
+}
+
+NUMERIC_CB(rpl_whoissecure) {
+    print_to_buffer(route_rpl(network),
+                    "[%s] %s\n", argv[1], argv[2]);
+    return 0;
+}
+
+NUMERIC_CB(rpl_whoisaccount) {
+    if (argc < 4)
+        return IRC_MSG_ERR_ARGS;
+
+    print_to_buffer(route_rpl(network), "[%s] %s %s\n",
+                    argv[1], argv[3], argv[2]);
+    return 0;
+}
+
+// Used for all whois replies that pretty much just echo back their arguments
+NUMERIC_CB(rpl_whois_generic) {
+    if (argc < 3)
+        return IRC_MSG_ERR_ARGS;
+
+    print_to_buffer(route_rpl(network), "[%s] %s\n",
+                    argv[1], argv[2]);
     return 0;
 }
 
