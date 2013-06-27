@@ -43,6 +43,7 @@
 #define IRC_RPL_WHOISHOST           378
 #define IRC_RPL_WHOISSPECIAL        320
 #define IRC_RPL_WHOISMODES          379
+#define IRC_RPL_WHOISACTUALLY       338
 
 #define IRC_RPL_WHOWASUSER          314
 #define IRC_RPL_ENDOFWHOWAS         369

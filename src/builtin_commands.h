@@ -44,6 +44,8 @@ BI_CMD(cmd_ctcp);
 BI_CMD(cmd_me);
 BI_CMD(cmd_whois);
 BI_CMD(cmd_oper);
+BI_CMD(cmd_whowas);
+
 
 #undef BI_CMD
 

@@ -429,6 +429,15 @@ NUMERIC_CB(rpl_whoisaccount) {
     return 0;
 }
 
+NUMERIC_CB(rpl_whoisactually) {
+    if (argc < 4)
+        return IRC_MSG_ERR_ARGS;
+
+    print_to_buffer(route_rpl(network), "[%s] %s %s\n",
+                    argv[1], argv[3], argv[2]);
+    return 0;
+}
+
 // Used for all whois replies that pretty much just echo back their arguments
 NUMERIC_CB(rpl_whois_generic) {
     if (argc < 3)
@@ -445,6 +454,25 @@ NUMERIC_CB(rpl_endofwhois) {
 
     print_to_buffer(route_rpl_end(network),
                     "[%s] End of WHOIS.\n", argv[1]);
+    return 0;
+}
+
+NUMERIC_CB(rpl_whowasuser) {
+    if (argc < 6)
+        return IRC_MSG_ERR_ARGS;
+
+    print_to_buffer(route_rpl(network), "[%s] address was: %s@%s\n"
+                                        "[%s] real name was: %s\n",
+                    argv[1], argv[2], argv[3], argv[1], argv[5]);
+    return 0;
+}
+
+NUMERIC_CB(rpl_endofwhowas) {
+    if (argc < 2)
+        return IRC_MSG_ERR_ARGS;
+
+    print_to_buffer(route_rpl_end(network),
+                    "[%s] End of WHOWAS.\n", argv[1]);
     return 0;
 }
 
@@ -518,6 +546,7 @@ NUMERIC_CB(generic_echo_rpl) {
         return IRC_MSG_ERR_ARGS;
 
     print_to_buffer(route_rpl_end(network), "%s\n", argv[1]);
+    return 0;
 }
 
 NUMERIC_CB(nick_change_error) {

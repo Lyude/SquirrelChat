@@ -107,6 +107,13 @@ void add_builtin_commands() {
                     "If authentication on your IRC server does not require "
                     "that you provide a plaintext password, you may replace "
                     "the password parameter with a literal '*'.\n");
+    add_irc_command("whowas", cmd_whowas, 0,
+                    "/whowas <nickname> *( \",\" <nickname> ) [ <count> [ <target> ] ]",
+                    "Queries the server for the history of a user (nicknames "
+                    "they used, addresses, etc.). If count is specified, only "
+                    "that many records will be returned. If target is "
+                    "specified, the results will be narrowed down to those "
+                    "from said server.\n");
 }
 
 #define BI_CMD(func_name)                       \
@@ -415,6 +422,15 @@ BI_CMD(cmd_oper) {
         send_to_network(buffer->network, "OPER %s %s\r\n", argv[0], argv[1]);
         claim_response(buffer->network, buffer, NULL, NULL);
     }
+    return 0;
+}
+
+BI_CMD(cmd_whowas) {
+    if (trailing == NULL)
+        return IRC_CMD_SYNTAX_ERR;
+    
+    send_to_network(buffer->network, "WHOWAS %s\r\n", trailing);
+    claim_response(buffer->network, buffer, NULL, NULL);
     return 0;
 }
 
