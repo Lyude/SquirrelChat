@@ -60,6 +60,7 @@ NUMERIC_CB(generic_command_error);
 NUMERIC_CB(generic_channel_error);
 NUMERIC_CB(generic_target_error);
 NUMERIC_CB(generic_user_channel_error);
+NUMERIC_CB(generic_echo_rpl);
 NUMERIC_CB(nick_change_error);
 NUMERIC_CB(err_notregistered);
 

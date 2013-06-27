@@ -513,6 +513,13 @@ NUMERIC_CB(generic_user_channel_error) {
     return 0;
 }
 
+NUMERIC_CB(generic_echo_rpl) {
+    if (argc < 2)
+        return IRC_MSG_ERR_ARGS;
+
+    print_to_buffer(route_rpl_end(network), "%s\n", argv[1]);
+}
+
 NUMERIC_CB(nick_change_error) {
     if (network->claimed_responses == NULL)
         return 0;

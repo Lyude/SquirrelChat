@@ -101,6 +101,12 @@ void add_builtin_commands() {
                     "Queries the server for information on the specified user."
                     "The information can be queried from an alternate server "
                     "if one is specified.\n");
+    add_irc_command("oper", cmd_oper, 2,
+                    "/oper <name> <password>",
+                    "Makes you an IRC operator, a god among men.\n"
+                    "If authentication on your IRC server does not require "
+                    "that you provide a plaintext password, you may replace "
+                    "the password parameter with a literal '*'.\n");
 }
 
 #define BI_CMD(func_name)                       \
@@ -395,6 +401,18 @@ BI_CMD(cmd_whois) {
             send_to_network(buffer->network, "WHOIS %s\r\n", argv[0]);
         else
             send_to_network(buffer->network, "WHOIS %s %s\r\n", argv[0], argv[1]);
+        claim_response(buffer->network, buffer, NULL, NULL);
+    }
+    return 0;
+}
+
+BI_CMD(cmd_oper) {
+    if (buffer->network->status != CONNECTED)
+        print_to_buffer(buffer, "Not connected!\n");
+    else if (argc < 2)
+        return IRC_CMD_SYNTAX_ERR;
+    else {
+        send_to_network(buffer->network, "OPER %s %s\r\n", argv[0], argv[1]);
         claim_response(buffer->network, buffer, NULL, NULL);
     }
     return 0;
