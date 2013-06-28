@@ -38,9 +38,14 @@ struct buffer_info * new_buffer(const char * buffer_name,
 
     // Add a userlist if the buffer is a channel buffer
     if (type == CHANNEL) {
-        buffer->user_list_store =
+        buffer->chan_data = malloc(sizeof(struct __channel_data));
+        buffer->chan_data->user_list_store =
             gtk_list_store_new(3, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_POINTER);
-        buffer->users = trie_new(trie_strtolower);
+        buffer->chan_data->users = trie_new(trie_strtolower);
+    }
+    else if (type == QUERY) {
+        buffer->query_data = malloc(sizeof(struct __query_data));
+        buffer->query_data->away_msg = NULL;
     }
 
     if (type != NETWORK)
@@ -51,7 +56,7 @@ struct buffer_info * new_buffer(const char * buffer_name,
 
 void destroy_buffer(struct buffer_info * buffer) {
     if (buffer->type == CHANNEL)
-        g_object_unref(buffer->user_list_store);
+        g_object_unref(buffer->chan_data->user_list_store);
     g_object_unref(buffer->buffer);
     g_object_unref(buffer->command_box_buffer);
 
@@ -60,6 +65,7 @@ void destroy_buffer(struct buffer_info * buffer) {
 
     free(buffer->buffer_name);
     gtk_tree_row_reference_free(buffer->row);
+    free(buffer->extra_data);
     free(buffer);
 }
 

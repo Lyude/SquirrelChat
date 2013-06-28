@@ -16,6 +16,7 @@
 
 #include "user_list.h"
 #include "chat_window.h"
+#include "buffer.h"
 
 #include <gtk/gtk.h>
 #include <string.h>
@@ -26,10 +27,10 @@ int get_user_row(const struct buffer_info * buffer,
                  GtkTreeIter * user_row) {
     GtkTreeRowReference * user_ref;
 
-    if ((user_ref = trie_get(buffer->users, nickname)) == NULL)
+    if ((user_ref = trie_get(buffer->chan_data->users, nickname)) == NULL)
         return -1;
 
-    gtk_tree_model_get_iter(GTK_TREE_MODEL(buffer->user_list_store),
+    gtk_tree_model_get_iter(GTK_TREE_MODEL(buffer->chan_data->user_list_store),
                             user_row,
                             gtk_tree_row_reference_get_path(user_ref));
     return 0;
@@ -39,8 +40,8 @@ char * get_user_prefixes(const struct buffer_info * buffer,
                          GtkTreeIter * user) {
     GValue value = G_VALUE_INIT;
     char * prefixes;
-    gtk_tree_model_get_value(GTK_TREE_MODEL(buffer->user_list_store),
-                             user, 2, &value);
+    gtk_tree_model_get_value(GTK_TREE_MODEL(buffer->chan_data->user_list_store),
+            user, 2, &value);
     prefixes = g_value_get_pointer(&value);
     g_value_unset(&value);
     return prefixes;
@@ -49,7 +50,8 @@ char * get_user_prefixes(const struct buffer_info * buffer,
 static inline void set_user_prefixes(const struct buffer_info * buffer,
                                      GtkTreeIter * user,
                                      const char * prefixes) {
-    gtk_list_store_set(buffer->user_list_store, user, 2, prefixes, -1);
+    gtk_list_store_set(buffer->chan_data->user_list_store, user, 2, prefixes,
+                       -1);
 }
 
 void create_user_list(struct chat_window * window) {
@@ -82,7 +84,7 @@ void add_user_to_list(struct buffer_info * buffer,
     GtkTreeIter new_user_row;
 
     // Add the user to the user list in the channel
-    gtk_list_store_append(buffer->user_list_store, &new_user_row);
+    gtk_list_store_append(buffer->chan_data->user_list_store, &new_user_row);
 
     if (prefix_str != NULL) {
         char prefix_row_str[2];
@@ -90,24 +92,25 @@ void add_user_to_list(struct buffer_info * buffer,
         prefix_row_str[0] = prefix_str[0];
         prefix_row_str[1] = '\0';
 
-        gtk_list_store_set(buffer->user_list_store, &new_user_row, 0,
-                           &prefix_row_str[0], -1);
+        gtk_list_store_set(buffer->chan_data->user_list_store, &new_user_row,
+                           0, &prefix_row_str[0], -1);
     }
 
     if (buffer->network->multi_prefix)
-        gtk_list_store_set(buffer->user_list_store, &new_user_row, 1,
-                           nickname, 2,
+        gtk_list_store_set(buffer->chan_data->user_list_store, &new_user_row,
+                           1, nickname, 2,
                            prefix_str ? strndup(prefix_str, prefix_len) : NULL,
                            -1);
     else
-        gtk_list_store_set(buffer->user_list_store, &new_user_row, 1,
-                           nickname, -1);
+        gtk_list_store_set(buffer->chan_data->user_list_store, &new_user_row,
+                           1, nickname, -1);
 
-    trie_set(buffer->users, nickname,
+    trie_set(buffer->chan_data->users, nickname,
              gtk_tree_row_reference_new(
-                 GTK_TREE_MODEL(buffer->user_list_store),
+                 GTK_TREE_MODEL(buffer->chan_data->user_list_store),
                  gtk_tree_model_get_path(
-                     GTK_TREE_MODEL(buffer->user_list_store), &new_user_row
+                     GTK_TREE_MODEL(buffer->chan_data->user_list_store),
+                     &new_user_row
                      )
                  )
              );
@@ -118,17 +121,17 @@ int remove_user_from_list(struct buffer_info * buffer,
     GtkTreeRowReference * user_ref;
     GtkTreeIter user_row;
 
-    if ((user_ref = trie_get(buffer->users, nickname)) == NULL)
+    if ((user_ref = trie_get(buffer->chan_data->users, nickname)) == NULL)
         return -1;
 
-    gtk_tree_model_get_iter(GTK_TREE_MODEL(buffer->user_list_store),
+    gtk_tree_model_get_iter(GTK_TREE_MODEL(buffer->chan_data->user_list_store),
                             &user_row,
                             gtk_tree_row_reference_get_path(user_ref));
 
     gtk_tree_row_reference_free(user_ref);
-    trie_del(buffer->users, nickname);
+    trie_del(buffer->chan_data->users, nickname);
     free(get_user_prefixes(buffer, &user_row));
-    gtk_list_store_remove(buffer->user_list_store, &user_row);
+    gtk_list_store_remove(buffer->chan_data->user_list_store, &user_row);
     return 0;
 }
 
@@ -149,7 +152,8 @@ void _set_user_prefix(struct buffer_info * buffer,
     char new_prefix[2];
     new_prefix[0] = prefix;
     new_prefix[1] = '\0';
-    gtk_list_store_set(buffer->user_list_store, user, 0, &new_prefix, -1);
+    gtk_list_store_set(buffer->chan_data->user_list_store, user, 0,
+                       &new_prefix, -1);
 }
 
 int add_prefix_to_user(struct buffer_info * buffer,
@@ -196,8 +200,8 @@ int add_prefix_to_user(struct buffer_info * buffer,
 
     set_user_prefix(buffer, &user_row, current_prefixes[0]);
 
-    gtk_list_store_set(buffer->user_list_store, &user_row, 2, current_prefixes,
-                       -1);
+    gtk_list_store_set(buffer->chan_data->user_list_store, &user_row, 2,
+                       current_prefixes, -1);
     return 0;
 }
 
@@ -233,8 +237,8 @@ int remove_prefix_from_user(struct buffer_info * buffer,
     // Update the user's row
     set_user_prefixes(buffer, &user_row, current_prefixes);
     set_user_prefix(buffer, &user_row, current_prefixes[0]);
-    gtk_list_store_set(buffer->user_list_store, &user_row, 2, current_prefixes,
-                       -1);
+    gtk_list_store_set(buffer->chan_data->user_list_store, &user_row, 2,
+                       current_prefixes, -1);
     return 0;
 }
 

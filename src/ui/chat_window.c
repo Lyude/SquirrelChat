@@ -137,7 +137,7 @@ void change_active_buffer(struct chat_window * window,
 
     if (new_buffer->type == CHANNEL) {
         gtk_tree_view_set_model(GTK_TREE_VIEW(window->user_list),
-                                GTK_TREE_MODEL(new_buffer->user_list_store));
+                GTK_TREE_MODEL(new_buffer->chan_data->user_list_store));
         gtk_widget_show(window->scrolled_window_for_user_list);
     }
     else

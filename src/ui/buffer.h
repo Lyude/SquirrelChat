@@ -32,9 +32,15 @@ enum buffer_type {
     QUERY
 };
 
-/* Contains all the widgets for a buffer, some of these are not always used
- * depending on the type of buffer
- */
+struct __channel_data {
+    GtkListStore * user_list_store;
+    trie * users;
+};
+
+struct __query_data {
+    char * away_msg;
+};
+
 struct buffer_info {
     enum buffer_type type;
     char * buffer_name;
@@ -46,9 +52,11 @@ struct buffer_info {
     double buffer_scroll_pos;
     GtkEntryBuffer * command_box_buffer;
 
-    // Only used for channels
-    GtkListStore * user_list_store;
-    trie * users;
+    union {
+        struct __channel_data * chan_data;
+        struct __query_data * query_data;
+        void * extra_data;
+    };
 };
 
 extern struct buffer_info * new_buffer(const char * buffer_name,

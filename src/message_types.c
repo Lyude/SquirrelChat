@@ -252,23 +252,23 @@ void announce_nick_change(struct buffer_info * buffer,
     GtkTreeRowReference * user;
 
     // Check if the user is in the channel
-    if ((user = trie_get(buffer->users, params->old_nick)) != NULL) {
+    if ((user = trie_get(buffer->chan_data->users, params->old_nick)) != NULL) {
         GtkTreeIter user_entry;
 
         print_to_buffer(buffer, "* %s is now known as %s\n",
                         params->old_nick, params->new_nick);
 
-        gtk_tree_model_get_iter(GTK_TREE_MODEL(buffer->user_list_store),
+        gtk_tree_model_get_iter(GTK_TREE_MODEL(buffer->chan_data->user_list_store),
                                 &user_entry,
                                 gtk_tree_row_reference_get_path(user));
 
         // Change the user's name on the user list
-        gtk_list_store_set(buffer->user_list_store, &user_entry, 1,
+        gtk_list_store_set(buffer->chan_data->user_list_store, &user_entry, 1,
                            params->new_nick, -1);
 
         // Remove the old entry in the user trie and add a new one
-        trie_del(buffer->users, params->old_nick);
-        trie_set(buffer->users, params->new_nick, user);
+        trie_del(buffer->chan_data->users, params->old_nick);
+        trie_set(buffer->chan_data->users, params->new_nick, user);
     }
 }
 
@@ -278,20 +278,21 @@ void announce_our_nick_change(struct buffer_info * buffer,
     if (buffer->type == CHANNEL) {
         GtkTreeRowReference * row_ref;
         // Check if our nickname is listed in the channel
-        if ((row_ref = trie_get(buffer->users, params->old_nick)) != NULL) {
+        if ((row_ref = trie_get(buffer->chan_data->users, params->old_nick))
+            != NULL) {
             GtkTreeIter row;
 
-            gtk_tree_model_get_iter(GTK_TREE_MODEL(buffer->user_list_store),
-                                    &row,
-                                    gtk_tree_row_reference_get_path(row_ref));
+            gtk_tree_model_get_iter(
+                    GTK_TREE_MODEL(buffer->chan_data->user_list_store),
+                    &row, gtk_tree_row_reference_get_path(row_ref));
 
             // Change the user's name on the user list
-            gtk_list_store_set(buffer->user_list_store, &row, 1,
+            gtk_list_store_set(buffer->chan_data->user_list_store, &row, 1,
                                params->new_nick, -1);
 
             // Remove the old entry in the user trie and add a new one
-            trie_del(buffer->users, params->old_nick);
-            trie_set(buffer->users, params->new_nick, row_ref);
+            trie_del(buffer->chan_data->users, params->old_nick);
+            trie_set(buffer->chan_data->users, params->new_nick, row_ref);
         }
     }
 }
