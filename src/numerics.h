@@ -62,6 +62,8 @@ NUMERIC_CB(rpl_localglobalusers);
 NUMERIC_CB(rpl_inviting);
 NUMERIC_CB(rpl_time);
 NUMERIC_CB(rpl_version);
+NUMERIC_CB(rpl_info);
+NUMERIC_CB(rpl_endofinfo);
 NUMERIC_CB(generic_error);
 NUMERIC_CB(generic_network_error);
 NUMERIC_CB(generic_command_error);

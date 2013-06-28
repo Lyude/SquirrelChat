@@ -587,6 +587,19 @@ NUMERIC_CB(rpl_version) {
     return 0;
 }
 
+NUMERIC_CB(rpl_info) {
+    if (argc < 2)
+        return IRC_MSG_ERR_ARGS;
+
+    print_to_buffer(route_rpl(network), "* %s\n", argv[1]);
+    return 0;
+}
+
+NUMERIC_CB(rpl_endofinfo) {
+    print_to_buffer(route_rpl_end(network), "--- End of INFO ---\n");
+    return 0;
+}
+
 NUMERIC_CB(generic_echo_rpl) {
     if (argc < 2)
         return IRC_MSG_ERR_ARGS;

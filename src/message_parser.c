@@ -131,6 +131,9 @@ void init_message_parser() {
 
     numerics[IRC_RPL_VERSION] = rpl_version;
 
+    numerics[IRC_RPL_INFO] = rpl_info;
+    numerics[IRC_RPL_ENDOFINFO] = rpl_endofinfo;
+
     numerics[IRC_ERR_NOTREGISTERED] = err_notregistered;
     numerics[IRC_ERR_NOADMININFO] = generic_error;
     numerics[IRC_ERR_NOSUCHNICK] = generic_target_error;

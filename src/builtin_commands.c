@@ -134,6 +134,14 @@ void add_builtin_commands() {
                     "Prints the version of the ircd software the current "
                     "server is running or if a target is specified, the "
                     "version of the ircd that server is running.\n");
+    add_irc_command("info", cmd_info, 1,
+                    "/info [target]",
+                    "Prints information regarding the software the current "
+                    "server is running, or if a target is specified, the "
+                    "information regarding the software that server is "
+                    "running.\n"
+                    "WARNING: On most servers, this command produces a ton of "
+                    "output.\n");
 }
 
 #define BI_CMD(func_name)                       \
@@ -505,6 +513,24 @@ BI_CMD(cmd_version) {
             send_to_network(buffer->network, "VERSION\r\n");
         else
             send_to_network(buffer->network, "VERSION %s\r\n", argv[0]);
+        claim_response(buffer->network, buffer, NULL, NULL);
+    }
+    return 0;
+}
+
+BI_CMD(cmd_info) {
+    if (buffer->network->status != CONNECTED)
+        print_to_buffer(buffer, "Not connected!\n");
+    else {
+        if (argc == 0) {
+            send_to_network(buffer->network, "INFO\r\n");
+            print_to_buffer(buffer, "--- Showing INFO for %s ---\n",
+                            buffer->network->server_name);
+        }
+        else {
+            send_to_network(buffer->network, "INFO %s\r\n", argv[0]);
+            print_to_buffer(buffer, "--- Showing INFO for %s ---\n", argv[0]);
+        }
         claim_response(buffer->network, buffer, NULL, NULL);
     }
     return 0;

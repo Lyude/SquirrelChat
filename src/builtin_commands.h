@@ -49,6 +49,7 @@ BI_CMD(cmd_lusers);
 BI_CMD(cmd_invite);
 BI_CMD(cmd_time);
 BI_CMD(cmd_version);
+BI_CMD(cmd_info);
 
 #undef BI_CMD
 
