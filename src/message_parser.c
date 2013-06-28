@@ -127,6 +127,8 @@ void init_message_parser() {
 
     numerics[IRC_RPL_INVITING] = rpl_inviting;
 
+    numerics[IRC_RPL_TIME] = rpl_time;
+
     numerics[IRC_ERR_NOTREGISTERED] = err_notregistered;
     numerics[IRC_ERR_NOADMININFO] = generic_error;
     numerics[IRC_ERR_NOSUCHNICK] = generic_target_error;

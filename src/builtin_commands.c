@@ -125,6 +125,10 @@ void add_builtin_commands() {
                     "/invite <user> <channel>",
                     "Sends an invitation to a user to join the channel you "
                     "specify.\n");
+    add_irc_command("time", cmd_time, 1,
+                    "/time [target]",
+                    "Prints the current server's local time or if a target is "
+                    "provided, the specified server's local time.\n");
 }
 
 #define BI_CMD(func_name)                       \
@@ -472,6 +476,19 @@ BI_CMD(cmd_invite) {
 
     send_to_network(buffer->network, "INVITE %s %s\r\n", argv[0], argv[1]);
     claim_response(buffer->network, buffer, NULL, NULL);
+    return 0;
+}
+
+BI_CMD(cmd_time) {
+    if (buffer->network->status != CONNECTED)
+        print_to_buffer(buffer, "Not connected!\n");
+    else {
+        if (argc == 0)
+            send_to_network(buffer->network, "TIME\r\n");
+        else
+            send_to_network(buffer->network, "TIME %s\r\n", argv[0]);
+        claim_response(buffer->network, buffer, NULL, NULL);
+    }
     return 0;
 }
 

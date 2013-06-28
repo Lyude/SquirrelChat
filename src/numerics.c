@@ -568,6 +568,15 @@ NUMERIC_CB(rpl_inviting) {
     return 0;
 }
 
+NUMERIC_CB(rpl_time) {
+    if (argc < 3)
+        return IRC_MSG_ERR_ARGS;
+
+    print_to_buffer(route_rpl_end(network),
+                    "The local time for %s is: %s\n", argv[1], argv[2]);
+    return 0;
+}
+
 NUMERIC_CB(generic_echo_rpl) {
     if (argc < 2)
         return IRC_MSG_ERR_ARGS;
