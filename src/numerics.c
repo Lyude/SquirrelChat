@@ -577,6 +577,16 @@ NUMERIC_CB(rpl_time) {
     return 0;
 }
 
+NUMERIC_CB(rpl_version) {
+    if (argc < 4)
+        return IRC_MSG_ERR_ARGS;
+
+    print_to_buffer(route_rpl_end(network),
+                    "The server %s is running %s: %s\n",
+                    argv[2], argv[1], argv[3]);
+    return 0;
+}
+
 NUMERIC_CB(generic_echo_rpl) {
     if (argc < 2)
         return IRC_MSG_ERR_ARGS;

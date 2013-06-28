@@ -129,6 +129,11 @@ void add_builtin_commands() {
                     "/time [target]",
                     "Prints the current server's local time or if a target is "
                     "provided, the specified server's local time.\n");
+    add_irc_command("version", cmd_version, 1,
+                    "/version [target]",
+                    "Prints the version of the ircd software the current "
+                    "server is running or if a target is specified, the "
+                    "version of the ircd that server is running.\n");
 }
 
 #define BI_CMD(func_name)                       \
@@ -487,6 +492,19 @@ BI_CMD(cmd_time) {
             send_to_network(buffer->network, "TIME\r\n");
         else
             send_to_network(buffer->network, "TIME %s\r\n", argv[0]);
+        claim_response(buffer->network, buffer, NULL, NULL);
+    }
+    return 0;
+}
+
+BI_CMD(cmd_version) {
+    if (buffer->network->status != CONNECTED)
+        print_to_buffer(buffer, "Not connected!\n");
+    else {
+        if (argc == 0)
+            send_to_network(buffer->network, "VERSION\r\n");
+        else
+            send_to_network(buffer->network, "VERSION %s\r\n", argv[0]);
         claim_response(buffer->network, buffer, NULL, NULL);
     }
     return 0;
