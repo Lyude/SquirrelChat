@@ -145,6 +145,7 @@ void disconnect_irc_network(struct irc_network * network,
     network->status = DISCONNECTED;
 
     free(network->version);
+    free(network->server_name);
     free(network->chanmodes);
     free(network->usermodes);
     free(network->chantypes);
@@ -156,6 +157,7 @@ void disconnect_irc_network(struct irc_network * network,
     free(network->prefix_symbols);
 
     network->version = NULL;
+    network->server_name = NULL;
     network->chanmodes = NULL;
     network->usermodes = NULL;
     network->chantypes = NULL;

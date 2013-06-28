@@ -40,6 +40,7 @@ struct irc_network {
 
     // ISUPPORT and CAP info
     char * chantypes;
+    char * server_name;
     char * version;
     char * chanmodes;
     char * usermodes;

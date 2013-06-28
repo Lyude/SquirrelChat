@@ -93,6 +93,7 @@ NUMERIC_CB(rpl_myinfo) {
     if (argc < 5)
         return IRC_MSG_ERR_ARGS;
     else {
+        network->server_name = strdup(argv[1]);
         network->version = strdup(argv[2]);
         network->usermodes = strdup(argv[3]);
         network->chanmodes = strdup(argv[4]);
