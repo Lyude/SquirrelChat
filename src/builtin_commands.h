@@ -45,7 +45,7 @@ BI_CMD(cmd_me);
 BI_CMD(cmd_whois);
 BI_CMD(cmd_oper);
 BI_CMD(cmd_whowas);
-
+BI_CMD(cmd_lusers);
 
 #undef BI_CMD
 

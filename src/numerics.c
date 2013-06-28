@@ -541,7 +541,31 @@ NUMERIC_CB(generic_user_channel_error) {
     return 0;
 }
 
+NUMERIC_CB(generic_lusers_rpl) {
+    if (argc < 3)
+        return IRC_MSG_ERR_ARGS;
+    
+    print_to_buffer(route_rpl(network), "%s %s\n", argv[1], argv[2]);
+    return 0;
+}
+
+NUMERIC_CB(rpl_localglobalusers) {
+    /* There's no standard for which argument contains the string we need, so we
+     * have to just assume it's the last argument (which it should be)
+     */
+    print_to_buffer(route_rpl(network), "%s\n", argv[argc-1]);
+    return 0;
+}
+
 NUMERIC_CB(generic_echo_rpl) {
+    if (argc < 2)
+        return IRC_MSG_ERR_ARGS;
+
+    print_to_buffer(route_rpl(network), "%s\n", argv[1]);
+    return 0;
+}
+
+NUMERIC_CB(generic_echo_rpl_end) {
     if (argc < 2)
         return IRC_MSG_ERR_ARGS;
 

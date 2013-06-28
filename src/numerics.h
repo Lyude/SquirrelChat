@@ -57,6 +57,8 @@ NUMERIC_CB(rpl_whowasuser);
 NUMERIC_CB(rpl_endofwhois);
 NUMERIC_CB(rpl_whoisactually);
 NUMERIC_CB(rpl_endofwhowas);
+NUMERIC_CB(generic_lusers_rpl);
+NUMERIC_CB(rpl_localglobalusers);
 NUMERIC_CB(generic_error);
 NUMERIC_CB(generic_network_error);
 NUMERIC_CB(generic_command_error);
@@ -64,6 +66,7 @@ NUMERIC_CB(generic_channel_error);
 NUMERIC_CB(generic_target_error);
 NUMERIC_CB(generic_user_channel_error);
 NUMERIC_CB(generic_echo_rpl);
+NUMERIC_CB(generic_echo_rpl_end);
 NUMERIC_CB(nick_change_error);
 NUMERIC_CB(err_notregistered);
 

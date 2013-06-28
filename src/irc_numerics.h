@@ -124,6 +124,9 @@
 #define IRC_RPL_LUSERUNKNOWN        253
 #define IRC_RPL_LUSERCHANNELS       254
 #define IRC_RPL_LUSERME             255
+#define IRC_RPL_LOCALUSERS          265
+#define IRC_RPL_GLOBALUSERS         266
+#define IRC_RPL_STATSCONN           250
 
 #define IRC_RPL_ADMINME             256
 #define IRC_RPL_ADMINLOC1           257

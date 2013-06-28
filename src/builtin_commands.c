@@ -114,6 +114,13 @@ void add_builtin_commands() {
                     "that many records will be returned. If target is "
                     "specified, the results will be narrowed down to those "
                     "from said server.\n");
+    add_irc_command("lusers", cmd_lusers, 2,
+                    "/lusers [mask] [target]",
+                    "Queries the server for information on it's size. If mask "
+                    "is targeted, the results will only take into account the "
+                    "users on the servers matching the mask. If target is "
+                    "specified, the lusers command will be forwarded to the "
+                    "target server.\n");
 }
 
 #define BI_CMD(func_name)                       \
@@ -430,6 +437,22 @@ BI_CMD(cmd_whowas) {
         return IRC_CMD_SYNTAX_ERR;
     
     send_to_network(buffer->network, "WHOWAS %s\r\n", trailing);
+    claim_response(buffer->network, buffer, NULL, NULL);
+    return 0;
+}
+
+BI_CMD(cmd_lusers) {
+    if (buffer->network->status != CONNECTED) {
+        print_to_buffer(buffer, "Not connected!\n");
+        return 0;
+    }
+
+    if (argc == 0)
+        send_to_network(buffer->network, "LUSERS\r\n");
+    else if (argc == 1)
+        send_to_network(buffer->network, "LUSERS %s\r\n", argv[0]);
+    else
+        send_to_network(buffer->network, "LUSERS %s %s\r\n", argv[0], argv[1]);
     claim_response(buffer->network, buffer, NULL, NULL);
     return 0;
 }
