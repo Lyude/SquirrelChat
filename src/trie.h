@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2013 Stephen Chandler Paul
  *
  * This file is free software: you may copy it, redistribute it and/or modify it

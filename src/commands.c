@@ -75,7 +75,7 @@ void call_command(struct buffer_info * buffer,
     if (params != NULL) {
         for (argc = 0; argc < info->argc_max; argc++) {
             char * param_end = strpbrk(params, " ");
-            
+
             // Null terminate the parameter and add it to argv
             if (param_end == NULL) {
                 argv[argc++] = params;

@@ -55,7 +55,7 @@ static inline void set_user_prefixes(const struct buffer_info * buffer,
 void create_user_list(struct chat_window * window) {
     GtkCellRenderer * renderer = gtk_cell_renderer_text_new();
 
-    GtkTreeViewColumn * prefix_column = 
+    GtkTreeViewColumn * prefix_column =
         gtk_tree_view_column_new_with_attributes("User prefix", renderer,
                                                  "text", 0, NULL);
     GtkTreeViewColumn * name_column =
@@ -226,7 +226,7 @@ int remove_prefix_from_user(struct buffer_info * buffer,
     // Remove the prefix from the string
     memmove(pos, pos + 1,
             current_prefixes_size - (pos - current_prefixes));
-    
+
     // Trim the string
     current_prefixes = realloc(current_prefixes, current_prefixes_size - 1);
 

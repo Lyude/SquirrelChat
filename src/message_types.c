@@ -48,7 +48,7 @@ void init_message_types() {
 MSG_CB(cap_msg_callback) {
     if (argc < 2)
         return IRC_MSG_ERR_ARGS_FATAL;
-    
+
     if (strcmp(argv[1], "LS") == 0) {
         char cap_str[IRC_MSG_BUF_LEN];
         char * saveptr;
@@ -172,7 +172,7 @@ MSG_CB(part_msg_callback) {
             return IRC_MSG_ERR_MISC_NODUMP;
         }
         if (argc < 2)
-            print_to_buffer(buffer, 
+            print_to_buffer(buffer,
                             "* %s (%s) has left %s.\n",
                             nickname, address, argv[0]);
         else
@@ -191,7 +191,7 @@ MSG_CB(privmsg_msg_callback) {
         char * nickname;
         char * address;
         split_irc_hostmask(hostmask, &nickname, &address);
-        
+
         // Check whether or not the message was meant to be sent to a channel
         if (IRC_IS_CHAN(network, argv[0]))
             print_to_buffer(trie_get(network->buffers, argv[0]),
@@ -213,7 +213,7 @@ MSG_CB(privmsg_msg_callback) {
 MSG_CB(notice_msg_callback) {
     if (argc < 2)
         return IRC_MSG_ERR_ARGS;
-    
+
     if ((argv[1])[0] == CTCP_DELIM)
         process_ctcp(network, hostmask, argv[0], argv[1]);
     else {
@@ -361,7 +361,7 @@ MSG_CB(ping_msg_callback) {
 MSG_CB(topic_msg_callback) {
     if (argc < 1)
         return IRC_MSG_ERR_ARGS;
-    
+
     struct buffer_info * channel;
     char * nickname;
     char * address;
@@ -415,7 +415,7 @@ MSG_CB(mode_msg_callback) {
                                 add_prefix_to_user(channel,
                                     argv[arg_pos++], (char*)(
                                     (long)network->prefix_symbols +
-                                    ((long)mode - 
+                                    ((long)mode -
                                     (long)network->prefix_chars)));
                             }
                         }

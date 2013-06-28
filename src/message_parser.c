@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2013 Stephen Chandler Paul
  *
  * This file is free software: you may copy it, redistribute it and/or modify it
@@ -109,7 +109,7 @@ void init_message_parser() {
     numerics[IRC_RPL_WHOISMODES] = rpl_whois_generic;
     numerics[IRC_RPL_WHOISACTUALLY] = rpl_whoisactually;
     numerics[IRC_RPL_ENDOFWHOIS] = rpl_endofwhois;
-   
+
     numerics[IRC_RPL_WHOWASUSER] = rpl_whowasuser;
     numerics[IRC_RPL_ENDOFWHOWAS] = rpl_endofwhowas;
 
@@ -199,7 +199,7 @@ void process_irc_message(struct irc_network * network, char * msg) {
     short argc;
     for (argc = 0; ; argc++) {
         char * param_end;
-        
+
         /* If there's a ':' at the beginning of the message we need to stop
          * processing spaces
          */
@@ -287,7 +287,7 @@ void process_irc_message(struct irc_network * network, char * msg) {
         print_to_buffer(network->buffer,
                         "Error parsing message: unknown message type: \"%s\"\n",
                         command);
-        dump_msg_to_buffer(network->buffer, hostmask, argc, argv); 
+        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
     }
 }
 

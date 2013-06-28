@@ -80,7 +80,7 @@ void print_to_buffer(struct buffer_info * buffer,
     parsed_message = alloca(parsed_message_len);
     vsnprintf(parsed_message, parsed_message_len + 1, message, args);
     va_end(args);
-    
+
     // Figure out where the end of the buffer is
     gtk_text_buffer_get_end_iter(buffer->buffer, &end_of_buffer);
 

@@ -41,7 +41,7 @@ struct chat_window * create_new_chat_window(struct irc_network * network) {
     new_window->top_vertical_container = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_container_add(GTK_CONTAINER(new_window->window),
                       new_window->top_vertical_container);
-    
+
     create_main_menu_bar(new_window);
     gtk_box_pack_start(GTK_BOX(new_window->top_vertical_container),
                        new_window->main_menu_bar, FALSE, FALSE, 0);
@@ -63,7 +63,7 @@ struct chat_window * create_new_chat_window(struct irc_network * network) {
 
     chat_and_command_box_container =gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     create_chat_viewer(new_window);
-    
+
     new_window->scrolled_window_for_chat_viewer =
         gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_kinetic_scrolling(
@@ -79,7 +79,7 @@ struct chat_window * create_new_chat_window(struct irc_network * network) {
                        TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(chat_and_command_box_container),
                        new_window->command_box, FALSE, FALSE, 0);
-    
+
     gtk_paned_add1(GTK_PANED(new_window->chat_viewer_and_user_list_pane),
                    chat_and_command_box_container);
 
@@ -112,7 +112,7 @@ struct chat_window * create_new_chat_window(struct irc_network * network) {
     g_signal_connect(new_window->window, "destroy", G_CALLBACK(gtk_main_quit),
                      NULL);
 
-    // Show the main window 
+    // Show the main window
     gtk_widget_show_all(new_window->window);
 
     return new_window;

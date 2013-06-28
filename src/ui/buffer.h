@@ -61,5 +61,5 @@ extern void print_to_buffer(struct buffer_info * buffer,
                             const char * message, ...)
     _nonnull(1, 2) _format(printf, 2, 3);
 
-#endif /* __BUFFER_H__ */    
+#endif /* __BUFFER_H__ */
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

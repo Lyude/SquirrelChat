@@ -188,8 +188,8 @@ BI_CMD(cmd_msg) {
     else if (buffer->network->status != CONNECTED)
         print_to_buffer(buffer, "Not connected!\n");
     // TODO: Add support for sending messages > 512 chars
-    else if (strlen(trailing) > IRC_MSG_LEN - 
-                           (strlen(buffer->network->nickname) + 
+    else if (strlen(trailing) > IRC_MSG_LEN -
+                           (strlen(buffer->network->nickname) +
                             sizeof(" :")))
         print_to_buffer(buffer, "Message too long!\n");
     else
@@ -439,7 +439,7 @@ BI_CMD(cmd_oper) {
 BI_CMD(cmd_whowas) {
     if (trailing == NULL)
         return IRC_CMD_SYNTAX_ERR;
-    
+
     send_to_network(buffer->network, "WHOWAS %s\r\n", trailing);
     claim_response(buffer->network, buffer, NULL, NULL);
     return 0;

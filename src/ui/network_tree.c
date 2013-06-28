@@ -64,7 +64,7 @@ void add_network_to_tree(struct chat_window * window,
     gtk_tree_store_set(window->network_tree_store, &network_tree_toplevel,
                        0, "untitled", 1, network->buffer, -1);
 
-    toplevel_path = 
+    toplevel_path =
         gtk_tree_model_get_path(GTK_TREE_MODEL(window->network_tree_store),
                                 &network_tree_toplevel);
 
@@ -133,13 +133,13 @@ void cursor_changed_handler(GtkTreeSelection *treeselection,
     GtkTreeModel * network_list_model =
         gtk_tree_view_get_model(gtk_tree_selection_get_tree_view(treeselection));
     GtkTreeIter selected_row;
-    
+
     gtk_tree_selection_get_selected(treeselection, &network_list_model,
                                     &selected_row);
 
     gtk_tree_model_get(network_list_model, &selected_row,
                        1, &buffer, -1);
-    
+
     change_active_buffer(window, buffer);
 }
 

@@ -17,7 +17,7 @@
  */
 
 #ifndef __IRC_NETWORK_H__
-#define __IRC_NETWORK_H__ 
+#define __IRC_NETWORK_H__
 
 #include "irc_macros.h"
 #include "trie.h"
@@ -65,7 +65,7 @@ struct irc_network {
     int (*casecmp)(const char *, const char *);
 
     int socket;
-    
+
     enum {
         DISCONNECTED,
         CAP,

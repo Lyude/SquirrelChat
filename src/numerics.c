@@ -133,18 +133,18 @@ NUMERIC_CB(rpl_isupport) {
                 }
                 // Eat the first (
                 value++;
-                
+
                 network->prefix_chars = strdup(strtok_r(value, ")", &saveptr2));
                 network->prefix_symbols = strdup(strtok_r(NULL, ")", &saveptr2));
                 break;
             case ISUPPORT_NETWORK:
                 free(network->name);
                 network->name = strdup(value);
-                
+
                 // Update the network name in the network tree
                 {
                     GtkTreeIter network_row;
-                    GtkTreeModel * network_model = 
+                    GtkTreeModel * network_model =
                         gtk_tree_row_reference_get_model(network->row);
 
                     gtk_tree_model_get_iter(network_model, &network_row,
@@ -153,7 +153,7 @@ NUMERIC_CB(rpl_isupport) {
                     gtk_tree_store_set(GTK_TREE_STORE(network_model),
                                        &network_row, 0, network->name, -1);
                 }
-                //TODO: do this 
+                //TODO: do this
                 break;
             case ISUPPORT_CALLERID:
                 network->callerid = true;
@@ -186,7 +186,7 @@ NUMERIC_CB(rpl_isupport) {
 NUMERIC_CB(rpl_namreply) {
     struct buffer_info * channel;
     // The first and second parameter aren't important
-    
+
     // Check if we're in the channel
     if ((channel = trie_get(network->buffers, argv[2])) != NULL) {
         // Add every single person in the reply to the list
@@ -522,7 +522,7 @@ NUMERIC_CB(generic_command_error) {
 NUMERIC_CB(generic_target_error) {
     if (argc < 3)
         return IRC_MSG_ERR_ARGS;
-    
+
     struct buffer_info * output = route_rpl_end(network);
 
     print_to_buffer(output, "Error: %s: %s\n", argv[1], argv[2]);
@@ -544,7 +544,7 @@ NUMERIC_CB(generic_user_channel_error) {
 NUMERIC_CB(generic_lusers_rpl) {
     if (argc < 3)
         return IRC_MSG_ERR_ARGS;
-    
+
     print_to_buffer(route_rpl(network), "%s %s\n", argv[1], argv[2]);
     return 0;
 }
@@ -565,7 +565,7 @@ NUMERIC_CB(rpl_inviting) {
                     "* Invitation for %s to join %s was successfully sent.\n",
                     argv[1], argv[2]);
     return 0;
-}                                        
+}
 
 NUMERIC_CB(generic_echo_rpl) {
     if (argc < 2)

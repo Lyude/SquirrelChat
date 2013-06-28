@@ -29,10 +29,10 @@
 struct chat_window {
     GtkWidget * window;
     GtkWidget * top_vertical_container;
-    
+
     GtkWidget * main_menu_bar;
     GtkWidget * main_menu;
-    GtkWidget * main_menu_item; 
+    GtkWidget * main_menu_item;
     GtkWidget * connect_menu_item;
     GtkWidget * new_server_buffer_menu_item;
     GtkWidget * exit_menu_item;

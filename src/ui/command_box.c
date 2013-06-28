@@ -75,11 +75,11 @@ void command_box_activated_handler(GtkEntry * entry,
             print_to_buffer(window->current_buffer,
                             "Not connected!\n");
         else {
-            send_privmsg(window->current_buffer->network, 
-                         window->current_buffer->buffer_name, 
+            send_privmsg(window->current_buffer->network,
+                         window->current_buffer->buffer_name,
                          input);
-            print_to_buffer(window->current_buffer, "<%s> %s\n", 
-                            window->current_buffer->network->nickname, 
+            print_to_buffer(window->current_buffer, "<%s> %s\n",
+                            window->current_buffer->network->nickname,
                             input);
         }
 	}

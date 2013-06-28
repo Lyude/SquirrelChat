@@ -15,7 +15,7 @@
  */
 
 #ifndef NET_IO_H
-#define NET_IO_H 
+#define NET_IO_H
 
 #include "irc_network.h"
 #include <stdbool.h>

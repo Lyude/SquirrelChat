@@ -25,7 +25,7 @@ trie * ctcp_types;
 
 void init_ctcp() {
     ctcp_types = trie_new(trie_strtoupper);
-    
+
     // Add builtin CTCP types
     add_ctcp_type("ACTION", ctcp_cb_action);
     add_ctcp_type("VERSION", ctcp_cb_version);
