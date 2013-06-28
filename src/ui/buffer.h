@@ -39,6 +39,7 @@ struct __channel_data {
 
 struct __query_data {
     char * away_msg;
+    bool received_away;
 };
 
 struct buffer_info {

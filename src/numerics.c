@@ -23,6 +23,7 @@
 #include "message_parser.h"
 #include "net_io.h"
 #include "ui/user_list.h"
+#include "ui/network_tree.h"
 
 #include <errno.h>
 #include <string.h>
@@ -615,6 +616,27 @@ NUMERIC_CB(rpl_unaway) {
 
     print_to_buffer(route_rpl_end(network), "* %s\n", argv[1]);
     network->away = false;
+    return 0;
+}
+
+// TODO: Add polling and all that good stuff for when a user becomes away
+NUMERIC_CB(rpl_away) {
+    if (argc < 3)
+        return IRC_MSG_ERR_ARGS;
+
+    struct buffer_info * buffer;
+    // If we don't have a buffer open with the user, create one
+    if ((buffer = trie_get(network->buffers, argv[1])) == NULL) {
+        buffer = new_buffer(argv[1], QUERY, network);
+        add_buffer_to_tree(buffer, network);
+        buffer->query_data->away_msg = strdup(argv[2]);
+        print_to_buffer(buffer, "[%s is away: %s]\n", argv[1], argv[2]);
+    }
+    else if (strcmp(buffer->query_data->away_msg, argv[2]) != 0) {
+        free(buffer->query_data->away_msg);
+        buffer->query_data->away_msg = strdup(argv[2]);
+        print_to_buffer(buffer, "[%s is away: %s]\n", argv[1], argv[2]);
+    }
     return 0;
 }
 

@@ -134,6 +134,7 @@ void init_message_parser() {
     numerics[IRC_RPL_INFO] = rpl_info;
     numerics[IRC_RPL_ENDOFINFO] = rpl_endofinfo;
 
+    numerics[IRC_RPL_AWAY] = rpl_away;
     numerics[IRC_RPL_NOWAWAY] = rpl_nowaway;
     numerics[IRC_RPL_UNAWAY] = rpl_unaway;
 

@@ -66,6 +66,7 @@ NUMERIC_CB(rpl_info);
 NUMERIC_CB(rpl_endofinfo);
 NUMERIC_CB(rpl_nowaway);
 NUMERIC_CB(rpl_unaway);
+NUMERIC_CB(rpl_away);
 NUMERIC_CB(generic_error);
 NUMERIC_CB(generic_network_error);
 NUMERIC_CB(generic_command_error);
