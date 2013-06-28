@@ -59,6 +59,7 @@ NUMERIC_CB(rpl_whoisactually);
 NUMERIC_CB(rpl_endofwhowas);
 NUMERIC_CB(generic_lusers_rpl);
 NUMERIC_CB(rpl_localglobalusers);
+NUMERIC_CB(rpl_inviting);
 NUMERIC_CB(generic_error);
 NUMERIC_CB(generic_network_error);
 NUMERIC_CB(generic_command_error);

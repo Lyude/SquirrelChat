@@ -72,6 +72,7 @@ void init_message_parser() {
     trie_set(message_types, "MODE", mode_msg_callback);
     trie_set(message_types, "QUIT", quit_msg_callback);
     trie_set(message_types, "KICK", kick_msg_callback);
+    trie_set(message_types, "INVITE", invite_msg_callback);
 
     init_message_types();
     init_ctcp();
@@ -122,6 +123,8 @@ void init_message_parser() {
     numerics[IRC_RPL_GLOBALUSERS] = rpl_localglobalusers;
     numerics[IRC_RPL_STATSCONN] = generic_echo_rpl;
     numerics[IRC_RPL_LUSERME] = generic_echo_rpl_end;
+
+    numerics[IRC_RPL_INVITING] = rpl_inviting;
 
     numerics[IRC_ERR_NOTREGISTERED] = err_notregistered;
     numerics[IRC_ERR_NOADMININFO] = generic_error;

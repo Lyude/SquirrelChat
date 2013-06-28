@@ -557,6 +557,16 @@ NUMERIC_CB(rpl_localglobalusers) {
     return 0;
 }
 
+NUMERIC_CB(rpl_inviting) {
+    if (argc < 3)
+        return IRC_MSG_ERR_ARGS;
+
+    print_to_buffer(route_rpl_end(network),
+                    "* Invitation for %s to join %s was successfully sent.\n",
+                    argv[1], argv[2]);
+    return 0;
+}                                        
+
 NUMERIC_CB(generic_echo_rpl) {
     if (argc < 2)
         return IRC_MSG_ERR_ARGS;

@@ -561,4 +561,18 @@ MSG_CB(kick_msg_callback) {
     return 0;
 }
 
+MSG_CB(invite_msg_callback) {
+    if (argc < 2)
+        return IRC_MSG_ERR_ARGS;
+
+    char * nickname;
+    char * address;
+    split_irc_hostmask(hostmask, &nickname, &address);
+
+    print_to_buffer(network->window->current_buffer,
+                    "* You have been invited to %s by %s.\n",
+                    argv[1], nickname);
+    return 0;
+}
+
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

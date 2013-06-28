@@ -121,6 +121,10 @@ void add_builtin_commands() {
                     "users on the servers matching the mask. If target is "
                     "specified, the lusers command will be forwarded to the "
                     "target server.\n");
+    add_irc_command("invite", cmd_invite, 2,
+                    "/invite <user> <channel>",
+                    "Sends an invitation to a user to join the channel you "
+                    "specify.\n");
 }
 
 #define BI_CMD(func_name)                       \
@@ -453,6 +457,20 @@ BI_CMD(cmd_lusers) {
         send_to_network(buffer->network, "LUSERS %s\r\n", argv[0]);
     else
         send_to_network(buffer->network, "LUSERS %s %s\r\n", argv[0], argv[1]);
+    claim_response(buffer->network, buffer, NULL, NULL);
+    return 0;
+}
+
+BI_CMD(cmd_invite) {
+    if (argc < 2)
+        return IRC_CMD_SYNTAX_ERR;
+
+    if (buffer->network->status != CONNECTED) {
+        print_to_buffer(buffer, "Not connected!\n");
+        return 0;
+    }
+
+    send_to_network(buffer->network, "INVITE %s %s\r\n", argv[0], argv[1]);
     claim_response(buffer->network, buffer, NULL, NULL);
     return 0;
 }
