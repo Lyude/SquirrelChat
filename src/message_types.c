@@ -575,4 +575,12 @@ MSG_CB(invite_msg_callback) {
     return 0;
 }
 
+MSG_CB(error_msg_callback) {
+    if (argc < 1)
+        return IRC_MSG_ERR_ARGS;
+
+    print_to_buffer(network->buffer, "Connection error: %s\n", argv[0]);
+    return 0;
+}
+
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
