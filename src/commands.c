@@ -18,6 +18,7 @@
 #include "trie.h"
 #include "ui/chat_window.h"
 #include "ui/buffer.h"
+#include "net_io.h"
 
 #include <string.h>
 #include <ctype.h>
@@ -62,7 +63,11 @@ void call_command(struct buffer_info * buffer,
 
     // Make sure the command exists
     if (info == NULL) {
-        print_to_buffer(buffer, "Error: Unknown command \"%s\"\n", command);
+        // If it doesn't exist, send the command to the server if possible
+        if (buffer->network->status != DISCONNECTED)
+            send_to_network(buffer->network, "%s %s\r\n", command, params);
+        else
+            print_to_buffer(buffer, "Error: Unknown command \"%s\"\n", command);
         return;
     }
 
