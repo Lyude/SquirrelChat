@@ -600,6 +600,24 @@ NUMERIC_CB(rpl_endofinfo) {
     return 0;
 }
 
+NUMERIC_CB(rpl_nowaway) {
+    if (argc < 2)
+        return IRC_MSG_ERR_ARGS;
+
+    print_to_buffer(route_rpl_end(network), "* %s\n", argv[1]);
+    network->away = true;
+    return 0;
+}
+
+NUMERIC_CB(rpl_unaway) {
+    if (argc < 2)
+        return IRC_MSG_ERR_ARGS;
+
+    print_to_buffer(route_rpl_end(network), "* %s\n", argv[1]);
+    network->away = false;
+    return 0;
+}
+
 NUMERIC_CB(generic_echo_rpl) {
     if (argc < 2)
         return IRC_MSG_ERR_ARGS;

@@ -50,6 +50,8 @@ BI_CMD(cmd_invite);
 BI_CMD(cmd_time);
 BI_CMD(cmd_version);
 BI_CMD(cmd_info);
+BI_CMD(cmd_away);
+BI_CMD(cmd_back);
 
 #undef BI_CMD
 

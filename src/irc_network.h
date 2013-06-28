@@ -37,6 +37,7 @@ struct irc_network {
     char * nickname;
     char * username;
     char * real_name;
+    bool away;
 
     // ISUPPORT and CAP info
     char * chantypes;

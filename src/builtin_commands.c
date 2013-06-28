@@ -29,6 +29,8 @@
 #include "cmd_responses.h"
 #include "ctcp.h"
 
+#define DEFAULT_AWAY_MSG "I am not here right now."
+
 void add_builtin_commands() {
     add_irc_command("help", cmd_help, 1,
                     "/help <command>",
@@ -142,6 +144,16 @@ void add_builtin_commands() {
                     "running.\n"
                     "WARNING: On most servers, this command produces a ton of "
                     "output.\n");
+    add_irc_command("away", cmd_away, 0,
+                    "/away [message]",
+                    "Sets your status as away with an optional message "
+                    "accompanying it, so you can let people know you're not "
+                    "at the computer when they send you a message.\n"
+                    "If no message is specified, the default message "
+                    "\"" DEFAULT_AWAY_MSG "\" will be used.\n");
+    add_irc_command("back", cmd_back, 0,
+                    "/back",
+                    "Unsets your away status, if one is set.\n");
 }
 
 #define BI_CMD(func_name)                       \
@@ -531,6 +543,27 @@ BI_CMD(cmd_info) {
             send_to_network(buffer->network, "INFO %s\r\n", argv[0]);
             print_to_buffer(buffer, "--- Showing INFO for %s ---\n", argv[0]);
         }
+        claim_response(buffer->network, buffer, NULL, NULL);
+    }
+    return 0;
+}
+
+BI_CMD(cmd_away) {
+    if (buffer->network->status != CONNECTED)
+        print_to_buffer(buffer, "Not connected!\n");
+    else {
+        send_to_network(buffer->network, "AWAY %s\r\n",
+                        trailing ? trailing : DEFAULT_AWAY_MSG);
+        claim_response(buffer->network, buffer, NULL, NULL);
+    }
+    return 0;
+}
+
+BI_CMD(cmd_back) {
+    if (buffer->network->status != CONNECTED)
+        print_to_buffer(buffer, "Not connected!\n");
+    else {
+        send_to_network(buffer->network, "AWAY\r\n");
         claim_response(buffer->network, buffer, NULL, NULL);
     }
     return 0;
