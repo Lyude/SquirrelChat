@@ -57,6 +57,8 @@ struct trie {
 };
 
 extern trie *trie_new(void (*canonize)());
+extern void trie_free(trie * trie, void (*cb)(), void * priv)
+    _nonnull(1);
 extern void trie_set(trie * trie, const char * key, void * val)
     _nonnull(1, 2, 3);
 extern void *trie_get(trie * trie, const char * key)

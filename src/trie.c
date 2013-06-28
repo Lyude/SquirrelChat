@@ -16,18 +16,18 @@
  * This file incorporates work covered by the following copyright and permission
  * notice:
  *
- * 	Copyright (C) 2013 Alex Iadicicco
+ *  Copyright (C) 2013 Alex Iadicicco
  *
- *	Redistribution and use in source and binary forms are permitted provided
- *	that the above copyright notice and this paragraph are duplicated in all
- *	such forms and that any documentation, advertising materials, and any
- *	other materials related to such distribution and use acknowledge that
- *	the software was developed by Alexander Iadicicco. The name of Alexander
- *	Iadicicco may not be used to endorse or promote products derived from
- *	this software without specific prior written permission. THIS SOFTWARE
- *	IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES,
- *	INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY
- *	AND FITNESS FOR A PARTICULAR PURPOSE.
+ *  Redistribution and use in source and binary forms are permitted provided
+ *  that the above copyright notice and this paragraph are duplicated in all
+ *  such forms and that any documentation, advertising materials, and any
+ *  other materials related to such distribution and use acknowledge that
+ *  the software was developed by Alexander Iadicicco. The name of Alexander
+ *  Iadicicco may not be used to endorse or promote products derived from
+ *  this software without specific prior written permission. THIS SOFTWARE
+ *  IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES,
+ *  INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+ *  AND FITNESS FOR A PARTICULAR PURPOSE.
  *
  * The project the incorporated work originates from may be found here:
  * <https://github.com/aji/ircd-micro>
@@ -74,6 +74,26 @@ trie *trie_new(void (*canonize)())
         trie->n.n[i] = 0;
 
     return trie;
+}
+
+static void free_real(trie_e * e, void (*cb)(), void * priv)
+{
+    int i;
+
+    for (i = 0; i < 16; i++) {
+        if (!e->n[i])
+            continue;
+        free_real(e->n[i], cb, priv);
+        trie_e_del(e->n[i]);
+    }
+    if (cb && e->val)
+        cb(e->val, priv);
+}
+
+void trie_free(trie * trie, void (*cb)(), void * priv)
+{
+    free_real(&trie->n, cb, priv);
+    free(trie);
 }
 
 static char nibble(char * s, int i)
@@ -192,3 +212,4 @@ void trie_rfc1459_strtolower(char * s) {
     for (int i = 0; s[i] != '\0'; i++)
         s[i] = rfc1459_tolower(s[i]);
 }
+// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

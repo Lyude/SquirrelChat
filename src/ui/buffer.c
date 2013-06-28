@@ -18,6 +18,7 @@
 #include "../irc_network.h"
 #include "chat_window.h"
 #include "../commands.h"
+#include "user_list.h"
 
 #include <gtk/gtk.h>
 #include <stdlib.h>
@@ -54,9 +55,23 @@ struct buffer_info * new_buffer(const char * buffer_name,
     return buffer;
 }
 
+static void destroy_users(GtkTreeRowReference * user,
+                          struct buffer_info * buffer) {
+    if (buffer->network->multi_prefix) {
+        GtkTreeIter user_row;
+        gtk_tree_model_get_iter(GTK_TREE_MODEL(buffer->chan_data->user_list_store),
+                                &user_row,
+                                gtk_tree_row_reference_get_path(user));
+        free(get_user_prefixes(buffer, &user_row));
+    }
+    gtk_tree_row_reference_free(user);
+}
+
 void destroy_buffer(struct buffer_info * buffer) {
-    if (buffer->type == CHANNEL)
+    if (buffer->type == CHANNEL) {
         g_object_unref(buffer->chan_data->user_list_store);
+        trie_free(buffer->chan_data->users, destroy_users, buffer);
+    }
     g_object_unref(buffer->buffer);
     g_object_unref(buffer->command_box_buffer);
 
