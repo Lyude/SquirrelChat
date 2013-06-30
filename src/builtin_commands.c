@@ -154,6 +154,11 @@ void add_builtin_commands() {
     add_irc_command("back", cmd_back, 0,
                     "/back",
                     "Unsets your away status, if one is set.\n");
+    add_irc_command("who", cmd_who, 2,
+                    "/who <target> [o]",
+                    "Gets information on a single user, or all the users in a "
+                    "channel. If o is specified, the command filters it's "
+                    "results to only include operators.\n");
 }
 
 #define BI_CMD(func_name)                       \
@@ -564,6 +569,25 @@ BI_CMD(cmd_back) {
         print_to_buffer(buffer, "Not connected!\n");
     else {
         send_to_network(buffer->network, "AWAY\r\n");
+        claim_response(buffer->network, buffer, NULL, NULL);
+    }
+    return 0;
+}
+
+BI_CMD(cmd_who) {
+    if (argc < 1)
+        return IRC_CMD_SYNTAX_ERR;
+    if (buffer->network->status != CONNECTED)
+        print_to_buffer(buffer, "Not connected!\n");
+    else {
+        if (argc == 1)
+            send_to_network(buffer->network, "WHO %s\r\n", argv[0]);
+        else
+            send_to_network(buffer->network, "WHO %s %s\r\n", argv[0], argv[1]);
+
+        if (IRC_IS_CHAN(buffer->network, argv[0]))
+            print_to_buffer(buffer,
+                            "--- Beginning of WHO for %s ---\n", argv[0]);
         claim_response(buffer->network, buffer, NULL, NULL);
     }
     return 0;

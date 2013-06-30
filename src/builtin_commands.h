@@ -52,6 +52,7 @@ BI_CMD(cmd_version);
 BI_CMD(cmd_info);
 BI_CMD(cmd_away);
 BI_CMD(cmd_back);
+BI_CMD(cmd_who);
 
 #undef BI_CMD
 

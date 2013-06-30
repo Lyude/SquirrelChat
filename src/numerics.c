@@ -640,6 +640,31 @@ NUMERIC_CB(rpl_away) {
     return 0;
 }
 
+NUMERIC_CB(rpl_whoreply) {
+    if (argc < 8)
+        return IRC_MSG_ERR_ARGS;
+
+    // TODO: Check if the claim was made by the client, or the user
+    if (network->claimed_responses)
+        print_to_buffer(network->claimed_responses->buffer,
+                        "[WHO %s] %s: %s%s (%s@%s) on %s: %s\n",
+                        argv[1], (argv[6][0] == 'H') ? "Here" : "Gone",
+                        (argv[6][1]) ? &argv[6][1] : "",
+                        argv[5], argv[2], argv[3], argv[4], argv[7]);
+    // TODO:Add an else here.
+    return 0;
+}
+
+NUMERIC_CB(rpl_endofwho) {
+    if (argc < 2)
+        return IRC_MSG_ERR_ARGS;
+
+    if (IRC_IS_CHAN(network, argv[1]))
+            print_to_buffer(route_rpl_end(network),
+                            "--- End of WHO for %s ---\n", argv[1]);
+    return 0;
+}
+
 NUMERIC_CB(generic_echo_rpl) {
     if (argc < 2)
         return IRC_MSG_ERR_ARGS;
