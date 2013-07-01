@@ -54,6 +54,7 @@ BI_CMD(cmd_away);
 BI_CMD(cmd_back);
 BI_CMD(cmd_who);
 BI_CMD(cmd_links);
+BI_CMD(cmd_list);
 
 #undef BI_CMD
 

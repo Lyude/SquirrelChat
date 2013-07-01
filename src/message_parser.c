@@ -144,6 +144,10 @@ void init_message_parser() {
     numerics[IRC_RPL_LINKS] = rpl_links;
     numerics[IRC_RPL_ENDOFLINKS] = rpl_endoflinks;
 
+    numerics[IRC_RPL_LISTSTART] = rpl_liststart;
+    numerics[IRC_RPL_LIST] = rpl_list;
+    numerics[IRC_RPL_LISTEND] = rpl_listend;
+
     numerics[IRC_ERR_NOTREGISTERED] = err_notregistered;
     numerics[IRC_ERR_NOADMININFO] = generic_error;
     numerics[IRC_ERR_NOSUCHNICK] = generic_target_error;

@@ -48,6 +48,7 @@
 #define IRC_RPL_WHOWASUSER          314
 #define IRC_RPL_ENDOFWHOWAS         369
 
+#define IRC_RPL_LISTSTART           321
 #define IRC_RPL_LIST                322
 #define IRC_RPL_LISTEND             323
 

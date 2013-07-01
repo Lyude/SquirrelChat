@@ -167,6 +167,12 @@ void add_builtin_commands() {
                     "given along with [server mask], the command s forwarded "
                     "to the first server matching [remote server] and "
                     "filtered to only include servers matching the mask.\n");
+    add_irc_command("list", cmd_list, 2,
+                    "/lists <channels> <server>",
+                    "Shows the list of channels on the current server or the "
+                    "specified server. If the channels argument is used, the "
+                    "output of the command is limited to only showing the "
+                    "information on those specific channels.\n");
 }
 
 #define BI_CMD(func_name)                       \
@@ -619,6 +625,23 @@ BI_CMD(cmd_links) {
             print_to_buffer(buffer, "--- Showing LINKS for %s ---\n", argv[0]);
             send_to_network(buffer->network, "LINKS %s %s\r\n", argv[0], argv[1]);
         }
+        claim_response(buffer->network, buffer, NULL, NULL);
+    }
+    return 0;
+}
+
+// TODO: Display a physical window for the LIST command
+BI_CMD(cmd_list) {
+    if (buffer->network->status != CONNECTED)
+        print_to_buffer(buffer, "Not connected!\n");
+    else {
+        if (argc == 0)
+            send_to_network(buffer->network, "LIST\r\n");
+        else if (argc == 1)
+            send_to_network(buffer->network, "LIST %s\r\n", argv[0]);
+        else
+            send_to_network(buffer->network, "LIST %s %s\r\n",
+                            argv[0], argv[1]);
         claim_response(buffer->network, buffer, NULL, NULL);
     }
     return 0;
