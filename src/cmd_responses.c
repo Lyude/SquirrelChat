@@ -46,4 +46,25 @@ void remove_last_response_claim(struct irc_network * network) {
     network->claimed_responses = next;
 }
 
+/* These define the two different output behaviors many response handlers
+ * follow; one for responses that check for response claims but can't satisfy
+ * them, and one for responses that do the same but can satisfy claims.
+ */
+struct buffer_info * route_rpl(const struct irc_network * network) {
+    if (network->claimed_responses != NULL)
+        return network->claimed_responses->buffer;
+    else
+        return network->window->current_buffer;
+}
+
+struct buffer_info * route_rpl_end(struct irc_network * network) {
+    if (network->claimed_responses != NULL) {
+        struct buffer_info * output = network->claimed_responses->buffer;
+        remove_last_response_claim(network);
+        return output;
+    }
+    else
+        return network->window->current_buffer;
+}
+
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

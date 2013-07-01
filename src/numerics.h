@@ -20,11 +20,6 @@
 
 extern void init_numerics();
 
-extern struct buffer_info * route_rpl(const struct irc_network * network)
-    _nonnull(1);
-extern struct buffer_info * route_rpl_end(struct irc_network * network)
-    _nonnull(1);
-
 #define NUMERIC_CB(name)                            \
     extern short name(struct irc_network * network, \
                       char * hostmask,              \

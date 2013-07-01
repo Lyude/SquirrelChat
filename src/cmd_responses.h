@@ -38,5 +38,10 @@ extern void claim_response(struct irc_network * network,
 extern void remove_last_response_claim(struct irc_network * network)
     _nonnull(1);
 
+extern struct buffer_info * route_rpl(const struct irc_network * network)
+    _nonnull(1);
+extern struct buffer_info * route_rpl_end(struct irc_network * network)
+    _nonnull(1);
+
 #endif // __CMD_RESPONSES_H__
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
