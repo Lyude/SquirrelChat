@@ -514,6 +514,8 @@ MSG_CB(quit_msg_callback) {
     params.quit_msg = (argc >= 1) ? argv[0] : NULL;
 
     trie_each(network->buffers, announce_quit, &params);
+    if (network->claimed_responses)
+        remove_last_response_claim(network);
     return 0;
 }
 

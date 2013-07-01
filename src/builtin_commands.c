@@ -178,6 +178,12 @@ void add_builtin_commands() {
                     "Kicks a user from the specified channel (or the current "
                     "channel, if none is specified), with the option of "
                     "providing a reason for the kick.\n");
+    add_irc_command("kill", cmd_kill, 1,
+                    "/kill <user> <reason>",
+                    "Forcefully disconnects a user from the server you are "
+                    "connected to with the reason you specify.\n"
+                    "On most networks, this will only work if you are an IRC "
+                    "operator on the network.\n");
 }
 
 #define BI_CMD(func_name)                       \
@@ -690,6 +696,19 @@ BI_CMD(cmd_kick) {
 
     claim_response(buffer->network, buffer, NULL, NULL);
 
+    return 0;
+}
+
+BI_CMD(cmd_kill) {
+    if (argc < 1 || trailing == NULL)
+        return IRC_CMD_SYNTAX_ERR;
+    if (buffer->network->status != CONNECTED) {
+        print_to_buffer(buffer, "Not connected!\n");
+        return 0;
+    }
+
+    send_to_network(buffer->network, "KILL %s :%s\r\n", argv[0], trailing);
+    claim_response(buffer->network, buffer, NULL, NULL);
     return 0;
 }
 

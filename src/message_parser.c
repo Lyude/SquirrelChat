@@ -191,6 +191,7 @@ void init_message_parser() {
     numerics[IRC_ERR_NOOPERHOST] = generic_error;
     numerics[IRC_ERR_UMODEUNKNOWNFLAG] = generic_error;
     numerics[IRC_ERR_USERSDONTMATCH] = generic_error;
+    numerics[IRC_ERR_NOPRIVILEGES] = generic_error;
 }
 
 void process_irc_message(struct irc_network * network, char * msg) {
