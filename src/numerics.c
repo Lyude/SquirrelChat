@@ -478,6 +478,7 @@ NUMERIC_CB(rpl_endofwhowas) {
     return 0;
 }
 
+
 // Used for generic errors with only an error message
 NUMERIC_CB(generic_error) {
     struct buffer_info * output = route_rpl_end(network);
@@ -488,7 +489,7 @@ NUMERIC_CB(generic_error) {
 
 // Used for errors that can potentially affect the status of the connection
 NUMERIC_CB(generic_network_error) {
-    print_to_buffer(network->buffer, "Error: %s\n", argv[0]);
+    print_to_buffer(network->buffer, "Error: %s\n", argv[1]);
     return 0;
 }
 
