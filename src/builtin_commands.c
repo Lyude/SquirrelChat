@@ -604,19 +604,22 @@ BI_CMD(cmd_who) {
 BI_CMD(cmd_links) {
     if (buffer->network->status != CONNECTED)
         print_to_buffer(buffer, "Not connected!\n");
-    else if (argc == 0) {
-        print_to_buffer(buffer, "--- Showing LINKS for %s ---\n",
-                        buffer->network->server_name);
-        send_to_network(buffer->network, "LINKS\r\n");
-    }
-    else if (argc == 1) {
-        print_to_buffer(buffer, "--- Showing LINKS for %s ---\n",
-                        buffer->network->server_name);
-        send_to_network(buffer->network, "LINKS %s\r\n", argv[0]);
-    }
     else {
-        print_to_buffer(buffer, "--- Showing LINKS for %s ---\n", argv[0]);
-        send_to_network(buffer->network, "LINKS %s %s\r\n", argv[0], argv[1]);
+        if (argc == 0) {
+            print_to_buffer(buffer, "--- Showing LINKS for %s ---\n",
+                            buffer->network->server_name);
+            send_to_network(buffer->network, "LINKS\r\n");
+        }
+        else if (argc == 1) {
+            print_to_buffer(buffer, "--- Showing LINKS for %s ---\n",
+                            buffer->network->server_name);
+            send_to_network(buffer->network, "LINKS %s\r\n", argv[0]);
+        }
+        else {
+            print_to_buffer(buffer, "--- Showing LINKS for %s ---\n", argv[0]);
+            send_to_network(buffer->network, "LINKS %s %s\r\n", argv[0], argv[1]);
+        }
+        claim_response(buffer->network, buffer, NULL, NULL);
     }
     return 0;
 }
