@@ -53,6 +53,7 @@ BI_CMD(cmd_info);
 BI_CMD(cmd_away);
 BI_CMD(cmd_back);
 BI_CMD(cmd_who);
+BI_CMD(cmd_links);
 
 #undef BI_CMD
 

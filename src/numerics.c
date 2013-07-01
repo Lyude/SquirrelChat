@@ -665,6 +665,26 @@ NUMERIC_CB(rpl_endofwho) {
     return 0;
 }
 
+// TODO: Convert the RPL_LINKS input into a tree
+NUMERIC_CB(rpl_links) {
+    if (argc < 4)
+        return IRC_MSG_ERR_ARGS;
+    
+    print_to_buffer(route_rpl(network),
+                    "* %s %s :%s\n", argv[1], argv[2], argv[3]);
+    return 0;
+}
+
+NUMERIC_CB(rpl_endoflinks) {
+    if (argc < 2)
+        return IRC_MSG_ERR_ARGS;
+
+    print_to_buffer(route_rpl_end(network),
+                    "--- End of LINKS for %s ---\n",
+                    (argv[1][0] == '*') ? network->server_name : argv[1]);
+    return 0;
+}
+
 NUMERIC_CB(generic_echo_rpl) {
     if (argc < 2)
         return IRC_MSG_ERR_ARGS;

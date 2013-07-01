@@ -159,6 +159,14 @@ void add_builtin_commands() {
                     "Gets information on a single user, or all the users in a "
                     "channel. If o is specified, the command filters it's "
                     "results to only include operators.\n");
+    add_irc_command("links", cmd_links, 2,
+                    "/links [remote server] [server mask]",
+                    "Lists all the servers linked up the current server. If "
+                    "[server mask] is specified, the results are filtered to "
+                    "servers matching the mask. If [remote server] is "
+                    "given along with [server mask], the command s forwarded "
+                    "to the first server matching [remote server] and "
+                    "filtered to only include servers matching the mask.\n");
 }
 
 #define BI_CMD(func_name)                       \
@@ -589,6 +597,26 @@ BI_CMD(cmd_who) {
             print_to_buffer(buffer,
                             "--- Beginning of WHO for %s ---\n", argv[0]);
         claim_response(buffer->network, buffer, NULL, NULL);
+    }
+    return 0;
+}
+
+BI_CMD(cmd_links) {
+    if (buffer->network->status != CONNECTED)
+        print_to_buffer(buffer, "Not connected!\n");
+    else if (argc == 0) {
+        print_to_buffer(buffer, "--- Showing LINKS for %s ---\n",
+                        buffer->network->server_name);
+        send_to_network(buffer->network, "LINKS\r\n");
+    }
+    else if (argc == 1) {
+        print_to_buffer(buffer, "--- Showing LINKS for %s ---\n",
+                        buffer->network->server_name);
+        send_to_network(buffer->network, "LINKS %s\r\n", argv[0]);
+    }
+    else {
+        print_to_buffer(buffer, "--- Showing LINKS for %s ---\n", argv[0]);
+        send_to_network(buffer->network, "LINKS %s %s\r\n", argv[0], argv[1]);
     }
     return 0;
 }
