@@ -168,7 +168,7 @@ void add_builtin_commands() {
                     "to the first server matching [remote server] and "
                     "filtered to only include servers matching the mask.\n");
     add_irc_command("list", cmd_list, 2,
-                    "/lists <channels> <server>",
+                    "/list [channels] [server]",
                     "Shows the list of channels on the current server or the "
                     "specified server. If the channels argument is used, the "
                     "output of the command is limited to only showing the "
