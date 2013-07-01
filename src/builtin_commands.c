@@ -184,6 +184,10 @@ void add_builtin_commands() {
                     "connected to with the reason you specify.\n"
                     "On most networks, this will only work if you are an IRC "
                     "operator on the network.\n");
+    add_irc_command("wallops", cmd_wallops, 0,
+                    "/wallops <message>",
+                    "Sends a message to all online IRC operators. On most "
+                    "networks this requires IRC operator privileges.\n");
 }
 
 #define BI_CMD(func_name)                       \
@@ -708,6 +712,19 @@ BI_CMD(cmd_kill) {
     }
 
     send_to_network(buffer->network, "KILL %s :%s\r\n", argv[0], trailing);
+    claim_response(buffer->network, buffer, NULL, NULL);
+    return 0;
+}
+
+BI_CMD(cmd_wallops) {
+    if (trailing == NULL)
+        return IRC_CMD_SYNTAX_ERR;
+    if (buffer->network->status != CONNECTED) {
+        print_to_buffer(buffer, "Not connected!\n");
+        return 0;
+    }
+
+    send_to_network(buffer->network, "WALLOPS :%s\r\n", trailing);
     claim_response(buffer->network, buffer, NULL, NULL);
     return 0;
 }

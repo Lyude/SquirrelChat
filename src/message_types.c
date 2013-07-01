@@ -588,4 +588,17 @@ MSG_CB(error_msg_callback) {
     return 0;
 }
 
+MSG_CB(wallops_msg_callback) {
+    if (argc < 1)
+        return IRC_MSG_ERR_ARGS;
+    
+    char * nickname;
+    char * address;
+    split_irc_hostmask(hostmask, &nickname, &address);
+
+    print_to_buffer(route_rpl_end(network), "-%s/WALLOPS- %s\n",
+                    nickname, argv[0]);
+    return 0;
+}
+
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

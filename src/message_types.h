@@ -39,6 +39,7 @@ MSG_CB(quit_msg_callback);
 MSG_CB(kick_msg_callback);
 MSG_CB(invite_msg_callback);
 MSG_CB(error_msg_callback);
+MSG_CB(wallops_msg_callback);
 
 #undef MSG_CB
 
