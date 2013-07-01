@@ -74,6 +74,7 @@ NUMERIC_CB(rpl_endoflinks);
 NUMERIC_CB(rpl_liststart);
 NUMERIC_CB(rpl_list);
 NUMERIC_CB(rpl_listend);
+NUMERIC_CB(rpl_hosthidden);
 NUMERIC_CB(generic_error);
 NUMERIC_CB(generic_network_error);
 NUMERIC_CB(generic_command_error);

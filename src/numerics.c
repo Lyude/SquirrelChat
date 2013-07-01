@@ -478,7 +478,6 @@ NUMERIC_CB(rpl_endofwhowas) {
     return 0;
 }
 
-
 // Used for generic errors with only an error message
 NUMERIC_CB(generic_error) {
     struct buffer_info * output = route_rpl_end(network);
@@ -714,6 +713,13 @@ NUMERIC_CB(rpl_list) {
 
 NUMERIC_CB(rpl_listend) {
     print_to_buffer(route_rpl_end(network), "--- End of channel listing ---\n");
+    return 0;
+}
+
+NUMERIC_CB(rpl_hosthidden) {
+    if (argc < 3)
+        return IRC_MSG_ERR_ARGS;
+    print_to_buffer(network->buffer, "%s %s\n", argv[1], argv[2]);
     return 0;
 }
 

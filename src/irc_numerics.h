@@ -136,6 +136,8 @@
 
 #define IRC_RPL_TRYAGAIN            263
 
+#define IRC_RPL_HOSTHIDDEN          396
+
 #define IRC_ERR_NOSUCHNICK          401
 #define IRC_ERR_NOSUCHSERVER        402
 #define IRC_ERR_NOSUCHCHANNEL       403
