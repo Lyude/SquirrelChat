@@ -173,6 +173,11 @@ void add_builtin_commands() {
                     "specified server. If the channels argument is used, the "
                     "output of the command is limited to only showing the "
                     "information on those specific channels.\n");
+    add_irc_command("kick", cmd_kick, 1,
+                    "/kick [channel] <user> [reason]",
+                    "Kicks a user from the specified channel (or the current "
+                    "channel, if none is specified), with the option of "
+                    "providing a reason for the kick.\n");
 }
 
 #define BI_CMD(func_name)                       \
@@ -644,6 +649,47 @@ BI_CMD(cmd_list) {
                             argv[0], argv[1]);
         claim_response(buffer->network, buffer, NULL, NULL);
     }
+    return 0;
+}
+
+BI_CMD(cmd_kick) {
+    if (buffer->network->status != CONNECTED) {
+        print_to_buffer(buffer, "Not connected!\n");
+        return 0;
+    }
+    if (argc < 1)
+        return IRC_CMD_SYNTAX_ERR;
+    
+    if (trailing == NULL) {
+        if (buffer->type != CHANNEL)
+            return IRC_CMD_SYNTAX_ERR;
+
+        send_to_network(buffer->network, "KICK %s %s\r\n",
+                        buffer->buffer_name, argv[0]);
+    }
+    else {
+        // Check if the first argument was a username or a channel
+        if (IRC_IS_CHAN(buffer->network, argv[0])) {
+            char * saveptr;
+            char * arg2 = strtok_r(trailing, " ", &saveptr);
+            if (arg2 == NULL)
+                send_to_network(buffer->network, "KICK %s %s\r\n",
+                                argv[0], trailing);
+            else
+                send_to_network(buffer->network, "KICK %s %s :%s\r\n",
+                                argv[0], arg2, saveptr + strspn(saveptr, " "));
+        }
+        else {
+            if (buffer->type != CHANNEL)
+                return IRC_CMD_SYNTAX_ERR;
+
+            send_to_network(buffer->network, "KICK %s %s :%s\r\n",
+                            buffer->buffer_name, argv[0], trailing);
+        }
+    }
+
+    claim_response(buffer->network, buffer, NULL, NULL);
+
     return 0;
 }
 

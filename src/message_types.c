@@ -558,6 +558,8 @@ MSG_CB(kick_msg_callback) {
         else
             print_to_buffer(channel, "* %s has kicked %s from %s (%s).\n",
                             nickname, argv[1], argv[0], argv[2]);
+        if (network->claimed_responses)
+            remove_last_response_claim(network);
     }
     return 0;
 }
