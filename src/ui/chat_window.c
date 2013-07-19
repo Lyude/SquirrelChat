@@ -53,13 +53,26 @@ struct chat_window * create_new_chat_window(struct irc_network * network) {
                        TRUE, TRUE, 0);
 
     create_network_tree(new_window);
+    new_window->scrolled_window_for_network_tree =
+        gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_kinetic_scrolling(
+            GTK_SCROLLED_WINDOW(new_window->scrolled_window_for_network_tree),
+            TRUE);
+    gtk_container_add(GTK_CONTAINER(new_window->scrolled_window_for_network_tree),
+                      new_window->network_tree);
     gtk_paned_add1(GTK_PANED(new_window->network_tree_and_buffer_pane),
-                   new_window->network_tree);
+                   new_window->scrolled_window_for_network_tree);
 
     new_window->chat_viewer_and_user_list_pane
         = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
     gtk_paned_add2(GTK_PANED(new_window->network_tree_and_buffer_pane),
                    new_window->chat_viewer_and_user_list_pane);
+
+    /* Set the default position of the divider between the network tree and
+     * buffer
+     */
+    gtk_paned_set_position(GTK_PANED(new_window->network_tree_and_buffer_pane),
+                           125);
 
     chat_and_command_box_container =gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     create_chat_viewer(new_window);

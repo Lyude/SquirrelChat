@@ -43,6 +43,7 @@ struct chat_window {
 
     GtkWidget * network_tree_and_buffer_pane;
 
+    GtkWidget * scrolled_window_for_network_tree;
     GtkWidget * network_tree;
     GtkTreeStore * network_tree_store;
     GtkTreeIter network_tree_toplevel;
