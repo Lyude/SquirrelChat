@@ -53,6 +53,8 @@ void create_network_tree(struct chat_window * window) {
     gtk_tree_selection_set_mode(gtk_tree_view_get_selection(
                                 GTK_TREE_VIEW(window->network_tree)),
                                 GTK_SELECTION_SINGLE);
+    gtk_tree_view_set_enable_search(GTK_TREE_VIEW(window->network_tree),
+                                    FALSE); // Temporary fix for segfault
 }
 
 // Adds an empty network buffer to the network tree
