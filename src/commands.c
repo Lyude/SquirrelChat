@@ -64,8 +64,12 @@ void call_command(struct buffer_info * buffer,
     // Make sure the command exists
     if (info == NULL) {
         // If it doesn't exist, send the command to the server if possible
-        if (buffer->network->status != DISCONNECTED)
-            send_to_network(buffer->network, "%s %s\r\n", command, params);
+        if (buffer->network->status != DISCONNECTED) {
+            if (params == NULL)
+                send_to_network(buffer->network, "%s\r\n", command);
+            else
+                send_to_network(buffer->network, "%s %s\r\n", command, params);
+        }
         else
             print_to_buffer(buffer, "Error: Unknown command \"%s\"\n", command);
         return;

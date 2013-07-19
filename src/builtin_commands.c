@@ -188,6 +188,12 @@ void add_builtin_commands() {
                     "/wallops <message>",
                     "Sends a message to all online IRC operators. On most "
                     "networks this requires IRC operator privileges.\n");
+    add_irc_command("trace", cmd_trace, 0,
+                    "/trace [server]",
+                    "Shows a list of all the nodes connected to a server. "
+                    "This includes users, leafs, etc. The output of this "
+                    "command usually depends on your privileges on the "
+                    "server.\n");
 }
 
 #define BI_CMD(func_name)                       \
@@ -725,6 +731,23 @@ BI_CMD(cmd_wallops) {
     }
 
     send_to_network(buffer->network, "WALLOPS :%s\r\n", trailing);
+    claim_response(buffer->network, buffer, NULL, NULL);
+    return 0;
+}
+
+BI_CMD(cmd_trace) {
+    if (buffer->network->status != CONNECTED) {
+        print_to_buffer(buffer, "Not connected!\n");
+        return 0;
+    }
+
+    if (argc == 0)
+        send_to_network(buffer->network, "TRACE\r\n");
+    else
+        send_to_network(buffer->network, "TRACE %s\r\n", argv[0]);
+
+    print_to_buffer(buffer, "--- Start of TRACE ---\n");
+
     claim_response(buffer->network, buffer, NULL, NULL);
     return 0;
 }

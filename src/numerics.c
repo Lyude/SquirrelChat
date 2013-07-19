@@ -701,6 +701,66 @@ NUMERIC_CB(rpl_hosthidden) {
     return 0;
 }
 
+NUMERIC_CB(generic_rpl_trace) {
+    if (argc < 4)
+        return IRC_MSG_ERR_ARGS;
+
+    print_to_buffer(route_rpl(network), "%s %s %s\n",
+                    argv[1], argv[2], argv[3]);
+    return 0;
+}
+
+NUMERIC_CB(rpl_traceoperator) {
+    if (argc < 4)
+        return IRC_MSG_ERR_ARGS;
+
+    print_to_buffer(route_rpl(network), "%s is logged in as an operator\n",
+                    argv[3]);
+    return 0;
+}
+
+NUMERIC_CB(rpl_traceuser) {
+    if (argc < 4)
+        return IRC_MSG_ERR_ARGS;
+
+    print_to_buffer(route_rpl(network), "%s is logged in as a normal user\n",
+                    argv[3]);
+    return 0;
+}
+
+NUMERIC_CB(rpl_tracelink) {
+    if (argc < 5)
+        return IRC_MSG_ERR_ARGS;
+
+    print_to_buffer(route_rpl(network), "%s %s %s %s\n",
+                    argv[1], argv[2], argv[3], argv[4]);
+    return 0;
+}
+
+NUMERIC_CB(rpl_traceserver) {
+    if (argc < 7)
+        return IRC_MSG_ERR_ARGS;
+
+    print_to_buffer(route_rpl(network), "%s %s %s %s %s %s\n",
+                    argv[1], argv[2], argv[3], argv[4], argv[5], argv[6]);
+
+    return 0;
+}
+
+NUMERIC_CB(rpl_traceservice) {
+    if (argc < 5)
+        return IRC_MSG_ERR_ARGS;
+
+    print_to_buffer(route_rpl(network), "%s %s %s %s\n",
+                    argv[1], argv[2], argv[3], argv[4]);
+    return 0;
+}
+
+NUMERIC_CB(rpl_traceend) {
+    print_to_buffer(route_rpl_end(network), "--- End of TRACE ---\n");
+    return 0;
+}
+
 NUMERIC_CB(generic_echo_rpl) {
     if (argc < 2)
         return IRC_MSG_ERR_ARGS;

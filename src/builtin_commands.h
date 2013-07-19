@@ -58,6 +58,7 @@ BI_CMD(cmd_list);
 BI_CMD(cmd_kick);
 BI_CMD(cmd_kill);
 BI_CMD(cmd_wallops);
+BI_CMD(cmd_trace);
 
 #undef BI_CMD
 

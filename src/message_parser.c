@@ -151,6 +151,17 @@ void init_message_parser() {
 
     numerics[IRC_RPL_HOSTHIDDEN] = rpl_hosthidden;
 
+    numerics[IRC_RPL_TRACELINK] = rpl_tracelink;
+    numerics[IRC_RPL_TRACECONNECTING] = generic_rpl_trace;
+    numerics[IRC_RPL_TRACEHANDSHAKE] = generic_rpl_trace;
+    numerics[IRC_RPL_TRACEUNKNOWN] = generic_rpl_trace;
+    numerics[IRC_RPL_TRACEOPERATOR] = rpl_traceoperator;
+    numerics[IRC_RPL_TRACEUSER] = rpl_traceuser;
+    numerics[IRC_RPL_TRACESERVER] = rpl_traceserver;
+    numerics[IRC_RPL_TRACESERVICE] = rpl_traceservice;
+    numerics[IRC_RPL_TRACECLASS] = generic_rpl_trace;
+    numerics[IRC_RPL_TRACEEND] = rpl_traceend;
+
     numerics[IRC_ERR_NOTREGISTERED] = err_notregistered;
     numerics[IRC_ERR_NOADMININFO] = generic_error;
     numerics[IRC_ERR_NOSUCHNICK] = generic_target_error;
