@@ -24,6 +24,7 @@
 #define IRC_RPL_CREATED             003
 #define IRC_RPL_MYINFO              004
 #define IRC_RPL_ISUPPORT            005
+#define IRC_RPL_SNOMASK               8
 #define IRC_RPL_USERHOST            302
 #define IRC_RPL_ISON                303
 

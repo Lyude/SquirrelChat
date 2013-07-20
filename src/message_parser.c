@@ -97,6 +97,7 @@ void init_message_parser() {
     numerics[IRC_RPL_TOPICWHOTIME] = rpl_topicwhotime;
     numerics[IRC_RPL_CHANNELMODEIS] = rpl_channelmodeis;
     numerics[IRC_RPL_CREATIONTIME] = rpl_creationtime;
+    numerics[IRC_RPL_SNOMASK] = rpl_snomask;
 
     numerics[IRC_RPL_WHOISUSER] = rpl_whoisuser;
     numerics[IRC_RPL_WHOISSERVER] = rpl_whoisserver;

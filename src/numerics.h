@@ -77,6 +77,7 @@ NUMERIC_CB(rpl_traceservice);
 NUMERIC_CB(rpl_traceoperator);
 NUMERIC_CB(rpl_traceuser);
 NUMERIC_CB(rpl_traceend);
+NUMERIC_CB(rpl_snomask);
 NUMERIC_CB(generic_error);
 NUMERIC_CB(generic_network_error);
 NUMERIC_CB(generic_command_error);

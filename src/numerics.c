@@ -761,6 +761,14 @@ NUMERIC_CB(rpl_traceend) {
     return 0;
 }
 
+NUMERIC_CB(rpl_snomask) {
+    if (argc < 3)
+        return IRC_MSG_ERR_ARGS;
+
+    print_to_buffer(network->buffer, "%s %s\r\n", argv[2], argv[1]);
+    return 0;
+}
+
 NUMERIC_CB(generic_echo_rpl) {
     if (argc < 2)
         return IRC_MSG_ERR_ARGS;
