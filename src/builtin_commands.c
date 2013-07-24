@@ -194,6 +194,22 @@ void add_builtin_commands() {
                     "This includes users, leafs, etc. The output of this "
                     "command usually depends on your privileges on the "
                     "server.\n");
+    add_irc_command("username", cmd_username, 1,
+                    "/username <username>",
+                    "Changes your default username for the current network.\n"
+                    "NOTE: Your username can only be set once per connection, "
+                    "so using this command mid-connection will not affect the "
+                    "current connection. Some servers do however, have a "
+                    "command to change your username without having to "
+                    "reconnect.\n");
+    add_irc_command("realname", cmd_realname, 1,
+                    "/realname <real name>",
+                    "Changes your default real name for the current network.\n"
+                    "NOTE: Your real name can only be set once per connection, "
+                    "so using this command mid-connection will not affect the "
+                    "current connection. Some servers do however, have a "
+                    "command to change your real name without having to "
+                    "reconnect.\n");
 }
 
 #define BI_CMD(func_name)                       \
@@ -749,6 +765,32 @@ BI_CMD(cmd_trace) {
     print_to_buffer(buffer, "--- Start of TRACE ---\n");
 
     claim_response(buffer->network, buffer, NULL, NULL);
+    return 0;
+}
+
+BI_CMD(cmd_username) {
+    if (argc < 1)
+        return IRC_CMD_SYNTAX_ERR;
+
+    free(buffer->network->username);
+    buffer->network->username = strdup(argv[0]);
+    print_to_buffer(buffer, "Your default username for this network is now "
+                            "'%s'.\n",
+                    argv[0]);
+
+    return 0;
+}
+
+BI_CMD(cmd_realname) {
+    if (argc < 1)
+        return IRC_CMD_SYNTAX_ERR;
+
+    free(buffer->network->real_name);
+    buffer->network->real_name = strdup(argv[0]);
+    print_to_buffer(buffer, "Your default real name for this network is now "
+                            "'%s'.\n",
+                    argv[0]);
+
     return 0;
 }
 

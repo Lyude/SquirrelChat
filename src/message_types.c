@@ -74,7 +74,7 @@ MSG_CB(cap_msg_callback) {
         if (features_found)
             send_to_network(network, "%s\r\n", (char*)&cap_str);
         else
-            send_to_network(network, "CAP END\r\n");
+            goto cap_end;
     }
 
     else if (strcmp(argv[1], "ACK") == 0) {
@@ -93,6 +93,7 @@ MSG_CB(cap_msg_callback) {
         }
 
         if (network->status == CAP) {
+cap_end:
             // Finish the capability negotiation and begin registration
             print_to_buffer(network->buffer,
                             "Finished CAP negotiation.\n"

@@ -39,8 +39,8 @@ struct irc_network * new_irc_network() {
     memset(network, 0, sizeof(struct irc_network));
 
     //XXX: Added just for testing purposes
-    network->username = "SquirrelChat";
-    network->real_name = "SquirrelChat";
+    network->username = strdup("SquirrelChat");
+    network->real_name = strdup("SquirrelChat");
 
     network->buffer = new_buffer(NULL, NETWORK, network);
 
