@@ -37,7 +37,6 @@ struct irc_network {
     char * nickname;
     char * username;
     char * real_name;
-    bool away;
 
     // ISUPPORT and CAP info
     char * chantypes;
@@ -45,6 +44,15 @@ struct irc_network {
     char * version;
     char * chanmodes;
     char * usermodes;
+    char * chanmodes_a; // See http://www.irc.org/tech_docs/005.html for info
+    char * chanmodes_b;
+    char * chanmodes_c;
+    char * chanmodes_d;
+    char * prefix_chars;
+    char * prefix_symbols;
+    void (*casemap_lower)(char *);
+    void (*casemap_upper)(char *);
+    int (*casecmp)(const char *, const char *);
     bool excepts                        : 1;
     bool invex                          : 1;
     bool callerid                       : 1;
@@ -55,16 +63,9 @@ struct irc_network {
     bool elist_topic_search_supported   : 1;
     bool multi_prefix                   : 1;
     bool sasl                           : 1;
+
+    bool away                           : 1;
     bool                                : 0;
-    char * chanmodes_a; // See http://www.irc.org/tech_docs/005.html for info
-    char * chanmodes_b;
-    char * chanmodes_c;
-    char * chanmodes_d;
-    char * prefix_chars;
-    char * prefix_symbols;
-    void (*casemap_lower)(char *);
-    void (*casemap_upper)(char *);
-    int (*casecmp)(const char *, const char *);
 
     int socket;
 
