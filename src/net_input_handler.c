@@ -75,7 +75,6 @@ char * check_for_messages(struct irc_network * network) {
     return output;
 }
 
-
 gboolean net_input_handler(GIOChannel *source,
                            GIOCondition condition,
                            struct irc_network * network) {

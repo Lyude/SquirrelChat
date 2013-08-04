@@ -799,16 +799,12 @@ NUMERIC_CB(nick_change_error) {
 NUMERIC_CB(err_notregistered) {
     /* The only time our client could ever get this is during the CAP
      * negotiation, which means that the server does not support IRCv3 and
-     * inherently does not support CAP
+     * inherently does not recongnize the CAP command
      */
     print_to_buffer(network->buffer,
-                    "CAP negotiation failed: Server does not support CAP.\n"
-                    "Sending registration information.\n");
-    send_to_network(network,
-                    "NICK %s\r\n"
-                    "USER %s X X %s\r\n",
-                    network->nickname, network->username, network->real_name);
-    network->status = CONNECTED;
+                    "Server does not understand CAP, capability negotiation "
+                    "impossible. Continuing connection.\n");
+    begin_registration(network);
     return 0;
 }
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

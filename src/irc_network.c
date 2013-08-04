@@ -123,11 +123,6 @@ int connect_irc_network(struct irc_network * network) {
         return -1;
     }
 
-    print_to_buffer(network->buffer,
-                    "Connected! Beginning CAP negotiation...\n");
-    send_to_network(network, "CAP LS\r\n");
-
-    network->status = CAP;
     network->input_channel = g_io_channel_unix_new(network->socket);
     g_io_channel_set_encoding(network->input_channel, NULL, NULL);
     g_io_channel_set_buffered(network->input_channel, FALSE);
@@ -136,7 +131,26 @@ int connect_irc_network(struct irc_network * network) {
                         (GIOFunc)net_input_handler, network, NULL);
 
     freeaddrinfo(results);
+
+    begin_cap(network);
+
     return 0;
+}
+
+void begin_cap(struct irc_network * network) {
+    print_to_buffer(network->buffer,
+                    "Negotiating server capabilities (CAP)...\n");
+    send_to_network(network, "CAP LS\r\n");
+    network->status = CAP;
+}
+
+void begin_registration(struct irc_network * network) {
+    print_to_buffer(network->buffer,
+                    "Sending our registration information.\n");
+    send_to_network(network, "NICK %s\r\n"
+                             "USER %s * * %s\r\n",
+                    network->nickname, network->username, network->real_name);
+    network->status = CONNECTED;
 }
 
 void disconnect_irc_network(struct irc_network * network,

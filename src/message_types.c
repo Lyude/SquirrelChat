@@ -95,16 +95,11 @@ MSG_CB(cap_msg_callback) {
         if (network->status == CAP) {
 cap_end:
             // Finish the capability negotiation and begin registration
+            send_to_network(network, "CAP END\r\n");
             print_to_buffer(network->buffer,
-                            "Finished CAP negotiation.\n"
-                            "Sending registration information.\n");
-            send_to_network(network,
-                            "CAP END\r\n"
-                            "NICK %s\r\n"
-                            "USER %s X X %s\r\n",
-                            network->nickname, network->username,
-                            network->real_name);
-            network->status = CONNECTED;
+                            "Finished negotiating capabilities.\n");
+
+            begin_registration(network);
         }
     }
     return 0;
