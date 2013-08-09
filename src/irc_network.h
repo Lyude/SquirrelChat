@@ -26,6 +26,7 @@
 #include <glib.h>
 #include <netdb.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include <gnutls/gnutls.h>
 

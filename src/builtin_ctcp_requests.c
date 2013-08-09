@@ -1,4 +1,4 @@
-/* Callbacks for the built-in CTCP types
+/* Callbacks for handling CTCP requests
  * Copyright (C) 2013 Stephen Chandler Paul
  *
  * This file is free software: you may copy it, redistribute it and/or modify it
@@ -15,26 +15,26 @@
  */
 
 #include "ctcp.h"
-#include "builtin_ctcp.h"
 #include "irc_network.h"
-#include "cmd_responses.h"
-#include "message_parser.h"
-#include "net_io.h"
+#include "builtin_ctcp_requests.h"
 #include "ui/buffer.h"
 #include "ui/network_tree.h"
 
-#include <string.h>
-#include <stdlib.h>
-#include <time.h>
-#include <errno.h>
+#define CTCP_REQ_HANDLER(func_name)                     \
+    void func_name(struct irc_network * network,        \
+                   char * hostmask,                     \
+                   char * target,                       \
+                   char * msg)                          \
 
-#define BUILTIN_CTCP(func_name)                 \
-    void func_name(struct irc_network * network,\
-                   char * hostmask,             \
-                   char * target,               \
-                   char * msg)
+CTCP_REQ_HANDLER(ctcp_version_req_handler) {
+    char * address;
+    char * nickname;
+    split_irc_hostmask(hostmask, &nickname, &address);
+    
+    sendf_ctcp_reply(network, nickname, "VERSION", "%s", "SquirrelChat");
+}
 
-BUILTIN_CTCP(ctcp_cb_action) {
+CTCP_REQ_HANDLER(ctcp_action_req_handler) {
     char * nickname;
     char * address;
     split_irc_hostmask(hostmask, &nickname, &address);
@@ -62,38 +62,15 @@ BUILTIN_CTCP(ctcp_cb_action) {
     }
 }
 
-BUILTIN_CTCP(ctcp_cb_version) {
+CTCP_REQ_HANDLER(ctcp_ping_req_handler) {
     char * nickname;
     char * address;
     split_irc_hostmask(hostmask, &nickname, &address);
 
-    if (*msg == '\0')
-        sendf_ctcp(network, nickname, "VERSION", "%s", "SquirrelChat");
-    else {
-        print_to_buffer(network->window->current_buffer,
-                        "[%s VERSION] %s\n", nickname, msg);
-    }
-}
-
-BUILTIN_CTCP(ctcp_cb_ping) {
-    char * nickname;
-    char * address;
-    split_irc_hostmask(hostmask, &nickname, &address);
-    struct timespec current_time;
-    long response_time;
-
-    clock_gettime(CLOCK_REALTIME, &current_time);
-
-    errno = 0;
-    response_time = strtol(msg, NULL, 10);
-
-    if (errno == 0)
-            print_to_buffer(network->window->current_buffer,
-                            "* Received PING from %s, response time: %.2lfms.\n",
-                            nickname,
-                            ((current_time.tv_sec * 1000000000 +
-                              current_time.tv_nsec) - response_time) * 1.0e-6);
+    if (msg == NULL)
+        send_ctcp_reply(network, nickname, "PING");
     else
-        sendf_ctcp(network, nickname, "PING", "%s", msg);
+        sendf_ctcp_reply(network, nickname, "PING", "%s", msg);
 }
+
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

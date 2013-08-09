@@ -182,7 +182,7 @@ MSG_CB(part_msg_callback) {
 MSG_CB(privmsg_msg_callback) {
     // Check if the message being sent is a CTCP
     if ((argv[1])[0] == CTCP_DELIM)
-        process_ctcp(network, hostmask, argv[0], argv[1]);
+        process_ctcp(network, REQUEST, hostmask, argv[0], argv[1]);
     else {
         char * nickname;
         char * address;
@@ -211,7 +211,7 @@ MSG_CB(notice_msg_callback) {
         return IRC_MSG_ERR_ARGS;
 
     if ((argv[1])[0] == CTCP_DELIM)
-        process_ctcp(network, hostmask, argv[0], argv[1]);
+        process_ctcp(network, RESPONSE, hostmask, argv[0], argv[1]);
     else {
         char * nickname;
         char * address;

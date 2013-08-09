@@ -15,34 +15,46 @@
  */
 
 #include "trie.h"
-#include "builtin_ctcp.h"
+#include "builtin_ctcp_requests.h"
+#include "builtin_ctcp_responses.h"
 #include "ui/buffer.h"
 #include "net_io.h"
 
 #include <string.h>
 
-trie * ctcp_types;
+trie * ctcp_request_types;
+trie * ctcp_response_types;
 
 void init_ctcp() {
-    ctcp_types = trie_new(trie_strtoupper);
+    ctcp_request_types = trie_new(trie_strtoupper);
+    ctcp_response_types = trie_new(trie_strtoupper);
 
     // Add builtin CTCP types
-    add_ctcp_type("ACTION", ctcp_cb_action);
-    add_ctcp_type("VERSION", ctcp_cb_version);
-    add_ctcp_type("PING", ctcp_cb_ping);
+    add_ctcp_request("ACTION", ctcp_action_req_handler);
+    add_ctcp_request("VERSION", ctcp_version_req_handler);
+    add_ctcp_request("PING", ctcp_ping_req_handler);
+    add_ctcp_response("PING", ctcp_ping_resp_handler);
+    add_ctcp_response("VERSION", ctcp_version_resp_handler);
 }
 
-void add_ctcp_type(const char * type, ctcp_callback cb) {
-    trie_set(ctcp_types, type, cb);
+void add_ctcp_request(const char * type, ctcp_callback cb) {
+    trie_set(ctcp_request_types, type, cb);
+}
+
+void add_ctcp_response(const char * type, ctcp_callback cb) {
+    trie_set(ctcp_response_types, type, cb);
 }
 
 void process_ctcp(struct irc_network * network,
+                  enum _ctcp_type ctcp_type,
                   char * hostmask,
                   char * target,
                   char * msg) {
     char * saveptr;
     char * type;
     ctcp_callback cb;
+    trie * trie = (ctcp_type == REQUEST) ? ctcp_request_types
+                                         : ctcp_response_types;
 
     // Extract the CTCP info from the message
     msg = strtok_r(msg, CTCP_DELIM_STR, &saveptr);
@@ -50,7 +62,7 @@ void process_ctcp(struct irc_network * network,
     msg = saveptr;
 
     // Check if we have a callback for this CTCP
-    if ((cb = trie_get(ctcp_types, type)) != NULL)
+    if ((cb = trie_get(trie, type)) != NULL)
         cb(network, hostmask, target, msg);
     else
         print_to_buffer(network->buffer,

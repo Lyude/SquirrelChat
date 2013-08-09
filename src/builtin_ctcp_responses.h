@@ -13,23 +13,22 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef __BUILTIN_CTCP_H__
-#define __BUILTIN_CTCP_H__
+#ifndef __BUILTIN_CTCP_RESPONSES_H__
+#define __BUILTIN_CTCP_RESPONSES_H__
 #include "ctcp.h"
 
-#define BUILTIN_CTCP(func_name)                         \
+#define BUILTIN_CTCP_RESP(func_name)                    \
     extern void func_name(struct irc_network * network, \
                           char * hostmask,              \
                           char * target,                \
                           char * msg)                   \
     _nonnull(1, 2)
 
-BUILTIN_CTCP(ctcp_cb_action);
-BUILTIN_CTCP(ctcp_cb_version);
-BUILTIN_CTCP(ctcp_cb_ping);
+BUILTIN_CTCP_RESP(ctcp_version_resp_handler);
+BUILTIN_CTCP_RESP(ctcp_ping_resp_handler);
 
-#undef BUILTIN_CTCP
+#undef BUILTIN_CTCP_RESP
 
-#endif // __BUILTIN_CTCP_H__
+#endif // __BUILTIN_CTCP_RESPONSES_H__
 
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

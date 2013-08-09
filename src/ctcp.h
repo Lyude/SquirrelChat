@@ -17,6 +17,8 @@
 #define __CTCP_H__
 
 #include "irc_network.h"
+#include "net_io.h"
+#include "message_parser.h"
 
 #define CTCP_DELIM '\001'
 #define CTCP_DELIM_STR "\001"
@@ -28,14 +30,23 @@ typedef void (*ctcp_callback)(struct irc_network * network,
 
 extern void init_ctcp();
 
-extern void add_ctcp_type(const char * type, ctcp_callback cb)
+extern void add_ctcp_request(const char * type, ctcp_callback cb)
     _nonnull(1, 2);
 
+extern void add_ctcp_response(const char * type, ctcp_callback cb)
+    _nonnull(1, 2);
+
+enum _ctcp_type {
+    REQUEST,
+    RESPONSE
+};
+
 extern void process_ctcp(struct irc_network * network,
+                         enum _ctcp_type type,
                          char * hostmask,
                          char * target,
                          char * msg)
-    _nonnull(1, 2, 3, 4);
+    _nonnull(1, 3, 4, 5);
 
 #define send_ctcp(_network, _target, _type)                                 \
     send_to_network(_network,                                               \
@@ -45,6 +56,16 @@ extern void process_ctcp(struct irc_network * network,
 #define sendf_ctcp(_network, _target, _type, _msg, ...)                     \
     send_to_network(_network,                                               \
                     "PRIVMSG %s :" CTCP_DELIM_STR "%s " _msg CTCP_DELIM_STR \
+                    "\r\n", _target, _type, __VA_ARGS__)
+
+#define send_ctcp_reply(_network, _target, _type)                           \
+    send_to_network(_network,                                               \
+                    "NOTICE %s :" CTCP_DELIM_STR "%s " CTCP_DELIM_STR       \
+                    "\r\n", _target, _type)
+
+#define sendf_ctcp_reply(_network, _target, _type, _msg, ...)               \
+    send_to_network(_network,                                               \
+                    "NOTICE %s :" CTCP_DELIM_STR "%s " _msg CTCP_DELIM_STR  \
                     "\r\n", _target, _type, __VA_ARGS__)
 
 #endif // __CTCP_H__
