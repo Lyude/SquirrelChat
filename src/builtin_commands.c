@@ -258,7 +258,21 @@ BI_CMD(cmd_server) {
     free(buffer->network->address);
     free(buffer->network->port);
     buffer->network->address = strdup(address);
-    buffer->network->port = strdup(port ? port : "6667");
+
+    if (port != NULL) {
+        if (port[0] == '+') {
+            port++;
+            buffer->network->ssl = true;
+        }
+        else
+            buffer->network->ssl = false;
+
+        buffer->network->port = strdup(port);
+    }
+    else {
+        buffer->network->ssl = false;
+        buffer->network->port = strdup("6667");
+    }
 
     print_to_buffer(buffer, "Server set to %s:%s\n",
                     buffer->network->address,

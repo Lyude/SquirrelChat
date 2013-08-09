@@ -18,7 +18,21 @@ project(SquirrelChat C)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
 
-add_definitions("-imacros ${CMAKE_SOURCE_DIR}/src/attributes.h -D_POSIX_C_SOURCE=200809L") # Let's not be discriminate :)
+option (WITH_SSL            "Enable SSL support" ON)
+option (GNUTLS_DEBUG_LEVEL  "Set the debug level for GnuTLS" 0)
+option (CAFILE_PATH         "Set the path for the list of trusted CAs")
+
+set(CAFILE_PATH "/etc/ssl/certs/ca-certificates.crt")
+
+if (WITH_SSL)
+    find_package(GnuTLS REQUIRED)
+endif()
+
+configure_file(src/config.h.cmake src/config.h)
+
+add_definitions("-imacros ${CMAKE_SOURCE_DIR}/src/attributes.h
+                 -D_POSIX_C_SOURCE=200809L -Wno-int-to-pointer-cast
+                 -include ${CMAKE_SOURCE_DIR}/src/config.h")
 
 # C11 is only partially supported in gcc versions 4.3 and up, and fully
 # supported in versions 4.8 and up. So we need to account for this.

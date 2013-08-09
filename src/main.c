@@ -20,16 +20,28 @@
 #include <errno.h>
 #include <string.h>
 
+#include <gnutls/gnutls.h>
+
 #include "commands.h"
 #include "message_parser.h"
 #include "ui/chat_window.h"
 #include "numerics.h"
+#include "errors.h"
 
 int main(int argc, char *argv[]) {
 
     init_irc_commands();
     init_message_parser();
     init_numerics();
+#ifdef WITH_SSL
+    gnutls_global_init();
+
+#if GNUTLS_DEBUG_LEVEL > 0
+    gnutls_global_set_log_level(GNUTLS_DEBUG_LEVEL);
+    gnutls_global_set_log_function(_gnutls_debug_log);
+#endif
+
+#endif
 
     gtk_init(&argc, &argv);
 

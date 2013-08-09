@@ -29,6 +29,8 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include <gnutls/gnutls.h>
+
 // Sends a message to a currently connected IRC network
 void send_to_network(struct irc_network * buffer,
                      const char * msg, ...) {
@@ -40,7 +42,14 @@ void send_to_network(struct irc_network * buffer,
     msg_len = vsnprintf(&send_buffer[0], IRC_MSG_LEN, msg, args);
     va_end(args);
 
+#ifdef WITH_SSL
+    if (buffer->ssl)
+        gnutls_write(buffer->ssl_session, &send_buffer, msg_len);
+    else
+        send(buffer->socket, &send_buffer, msg_len, 0);
+#else
     send(buffer->socket, &send_buffer, msg_len, 0);
+#endif
 }
 
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

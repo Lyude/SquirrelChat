@@ -27,6 +27,8 @@
 #include <netdb.h>
 #include <stdbool.h>
 
+#include <gnutls/gnutls.h>
+
 struct irc_network {
     // Network information
     char * name;
@@ -65,14 +67,20 @@ struct irc_network {
     bool sasl                           : 1;
 
     bool away                           : 1;
+
+    bool ssl                            : 1;
     bool                                : 0;
 
+    gnutls_session_t ssl_session;
+    gnutls_certificate_credentials_t ssl_cred;
     int socket;
 
     enum {
         DISCONNECTED,
+        HANDSHAKE,
         CAP,
-        CONNECTED
+        CONNECTED,
+        REHANDSHAKE
     } status;
 
     char recv_buffer[IRC_MSG_BUF_LEN];

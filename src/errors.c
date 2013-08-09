@@ -30,4 +30,11 @@ void dump_msg_to_buffer(struct buffer_info * buffer,
     print_to_buffer(buffer, " ]\n");
 }
 
+#if GNUTLS_DEBUG_LEVEL > 0
+void _gnutls_debug_log(int level, const char * msg) {
+    printf("*** GnuTLS Debug (%i): %s",
+           level, msg);
+}
+#endif
+
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
