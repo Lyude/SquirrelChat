@@ -118,7 +118,7 @@ void print_command_help(struct buffer_info * buffer,
         print_to_buffer(buffer, "Unknown command: %s\n", command);
     else {
         print_command_syntax(buffer, command);
-        print_to_buffer(buffer, info->help_msg);
+        print_to_buffer(buffer, "%s", info->help_msg);
     }
 }
 
