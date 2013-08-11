@@ -173,6 +173,8 @@ int connect_irc_network(struct irc_network * network) {
                             "Connection aborted.\n", err);
             freeaddrinfo(results);
             close(network->socket);
+            gnutls_deinit(network->ssl_session);
+            gnutls_certificate_free_credentials(network->ssl_cred);
             return -1;
         }
 
@@ -192,6 +194,8 @@ int connect_irc_network(struct irc_network * network) {
                                              "Connection aborted.\n",
                             gnutls_strerror(ret));
             freeaddrinfo(results);
+            gnutls_deinit(network->ssl_session);
+            gnutls_certificate_free_credentials(network->ssl_cred);
             close(network->socket);
             return -1;
         }
