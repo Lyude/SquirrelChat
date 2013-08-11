@@ -227,6 +227,9 @@ void begin_registration(struct irc_network * network) {
     send_to_network(network, "NICK %s\r\n"
                              "USER %s * * %s\r\n",
                     network->nickname, network->username, network->real_name);
+    if (network->password != NULL)
+        send_to_network(network, "PASS :%s\r\n", network->password);
+
     print_to_buffer(network->buffer,
                     "Attempting to negotiate capabilities with server (CAP)...\n");
     send_to_network(network, "CAP LS\r\n");

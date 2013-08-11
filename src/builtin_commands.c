@@ -39,7 +39,7 @@ void add_builtin_commands() {
                     "/nick <new_nickname>",
                     "Changes your nickname.\n");
     add_irc_command("server", cmd_server, 1,
-                    "/server <address>[:[+]<port>]",
+                    "/server <address>[:[+]<port>] [password]",
                     "Sets the server for the current buffer.\n"
                     "A + in the port number indicates the server uses SSL.\n");
     add_irc_command("msg", cmd_msg, 1,
@@ -257,6 +257,7 @@ BI_CMD(cmd_server) {
 
     free(buffer->network->address);
     free(buffer->network->port);
+    free(buffer->network->password);
     buffer->network->address = strdup(address);
 
     if (port != NULL) {
@@ -273,6 +274,11 @@ BI_CMD(cmd_server) {
         buffer->network->ssl = false;
         buffer->network->port = strdup("6667");
     }
+
+    if (trailing != NULL)
+        buffer->network->password = strdup(trailing);
+    else
+        buffer->network->password = NULL;
 
     print_to_buffer(buffer, "Server set to %s:%s\n",
                     buffer->network->address,

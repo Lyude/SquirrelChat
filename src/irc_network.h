@@ -35,6 +35,7 @@ struct irc_network {
     char * name;
     char * address;
     char * port;
+    char * password;
     // TODO: Add flags here
 
     char * nickname;
