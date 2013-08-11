@@ -79,7 +79,6 @@ struct irc_network {
     enum {
         DISCONNECTED,
         HANDSHAKE,
-        CAP,
         CONNECTED,
         REHANDSHAKE
     } status;

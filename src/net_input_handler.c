@@ -86,7 +86,7 @@ gboolean net_input_handler(GIOChannel *source,
     errno = 0;
 #ifdef WITH_SSL
     if (network->ssl) {
-        if (network->status == CONNECTED || network->status == CAP) {
+        if (network->status == CONNECTED) {
             do {
                 // Try reading from the network
                 result =
