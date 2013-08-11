@@ -87,7 +87,6 @@ NUMERIC_CB(generic_user_channel_error);
 NUMERIC_CB(generic_echo_rpl);
 NUMERIC_CB(generic_echo_rpl_end);
 NUMERIC_CB(nick_change_error);
-NUMERIC_CB(err_notregistered);
 
 #undef NUMERIC_CB
 #endif

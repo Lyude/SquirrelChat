@@ -107,8 +107,6 @@ extern int connect_irc_network(struct irc_network * network)
 extern void disconnect_irc_network(struct irc_network * network,
                                    const char * msg)
     _nonnull(1);
-extern void begin_cap(struct irc_network * network)
-    _nonnull(1);
 extern void begin_registration(struct irc_network * network)
     _nonnull(1);
 

@@ -795,16 +795,4 @@ NUMERIC_CB(nick_change_error) {
     remove_last_response_claim(network);
     return 0;
 }
-
-NUMERIC_CB(err_notregistered) {
-    /* The only time our client could ever get this is during the CAP
-     * negotiation, which means that the server does not support IRCv3 and
-     * inherently does not recongnize the CAP command
-     */
-    print_to_buffer(network->buffer,
-                    "Server does not understand CAP, capability negotiation "
-                    "impossible. Continuing connection.\n");
-    begin_registration(network);
-    return 0;
-}
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

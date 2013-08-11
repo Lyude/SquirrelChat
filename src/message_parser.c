@@ -163,7 +163,6 @@ void init_message_parser() {
     numerics[IRC_RPL_TRACECLASS] = generic_rpl_trace;
     numerics[IRC_RPL_TRACEEND] = rpl_traceend;
 
-    numerics[IRC_ERR_NOTREGISTERED] = err_notregistered;
     numerics[IRC_ERR_NOADMININFO] = generic_error;
     numerics[IRC_ERR_NOSUCHNICK] = generic_target_error;
     numerics[IRC_ERR_NOSUCHSERVER] = generic_target_error;

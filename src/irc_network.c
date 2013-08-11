@@ -185,7 +185,7 @@ int connect_irc_network(struct irc_network * network) {
         if ((ret = gnutls_handshake(network->ssl_session)) == GNUTLS_E_SUCCESS) {
             print_to_buffer(network->buffer,
                             "Handshake complete!\n");
-            begin_cap(network);
+            begin_registration(network);
         }
         else if (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN)
             network->status = HANDSHAKE;
@@ -202,11 +202,11 @@ int connect_irc_network(struct irc_network * network) {
     }
     else {
         print_to_buffer(network->buffer, "Connection established.\n");
-        begin_cap(network);
+        begin_registration(network);
     }
 #else
     print_to_buffer(network->buffer, "Connection established.\n");
-    begin_cap(network);
+    begin_registration(network);
 #endif
 
     network->input_channel = g_io_channel_unix_new(network->socket);
@@ -221,19 +221,15 @@ int connect_irc_network(struct irc_network * network) {
     return 0;
 }
 
-void begin_cap(struct irc_network * network) {
-    print_to_buffer(network->buffer,
-                    "Negotiating server capabilities (CAP)...\n");
-    send_to_network(network, "CAP LS\r\n");
-    network->status = CAP;
-}
-
 void begin_registration(struct irc_network * network) {
     print_to_buffer(network->buffer,
                     "Sending our registration information.\n");
     send_to_network(network, "NICK %s\r\n"
                              "USER %s * * %s\r\n",
                     network->nickname, network->username, network->real_name);
+    print_to_buffer(network->buffer,
+                    "Attempting to negotiate capabilities with server (CAP)...\n");
+    send_to_network(network, "CAP LS\r\n");
     network->status = CONNECTED;
 }
 

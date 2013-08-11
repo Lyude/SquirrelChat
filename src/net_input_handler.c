@@ -175,7 +175,7 @@ gboolean net_input_handler(GIOChannel *source,
                 if (network->status == HANDSHAKE) {
                     print_to_buffer(network->buffer,
                                     "Handshake complete.\n");
-                    begin_cap(network);
+                    begin_registration(network);
                 }
                 else {
                     print_to_buffer(network->buffer,
