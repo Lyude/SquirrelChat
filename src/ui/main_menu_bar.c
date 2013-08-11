@@ -21,6 +21,7 @@
 #include "../irc_network.h"
 #include "network_tree.h"
 #include "main_menu_bar.h"
+#include "settings_dialog.h"
 
 void create_main_menu_bar(struct chat_window * window) {
     /* Menu items and submenus that don't need to be referenced outside of this
@@ -35,6 +36,10 @@ void create_main_menu_bar(struct chat_window * window) {
     window->new_server_buffer_menu_item =
         gtk_menu_item_new_with_label("New Network Tab");
     window->exit_menu_item = gtk_menu_item_new_with_label("Exit");
+
+    window->tools_menu = gtk_menu_new();
+    window->tools_menu_item = gtk_menu_item_new_with_label("Tools");
+    window->preferences_menu_item = gtk_menu_item_new_with_label("Preferences");
 
     window->help_menu = gtk_menu_new();
     window->help_menu_item = gtk_menu_item_new_with_label("Help");
@@ -51,6 +56,13 @@ void create_main_menu_bar(struct chat_window * window) {
                           window->exit_menu_item);
     gtk_menu_shell_append(GTK_MENU_SHELL(window->main_menu_bar),
                           window->main_menu_item);
+
+    gtk_menu_item_set_submenu(GTK_MENU_ITEM(window->tools_menu_item),
+                              window->tools_menu);
+    gtk_menu_shell_append(GTK_MENU_SHELL(window->tools_menu),
+                          window->preferences_menu_item);
+    gtk_menu_shell_append(GTK_MENU_SHELL(window->main_menu_bar),
+                          window->tools_menu_item);
 
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(window->help_menu_item),
                               window->help_menu);
@@ -91,6 +103,11 @@ void connect_current_network(GtkMenuItem * menuitem,
     connect_irc_network(window->current_buffer->network);
 }
 
+static void preferences_menu_item_cb(GtkMenuItem * menuitem,
+                                     struct chat_window * parent) {
+    open_settings_dialog(parent);
+}
+
 // Connects all the signals for the items in the menu bar
 void connect_main_menu_bar_signals(struct chat_window * window) {
     g_signal_connect(window->connect_menu_item, "activate",
@@ -99,6 +116,9 @@ void connect_main_menu_bar_signals(struct chat_window * window) {
                      G_CALLBACK(new_network_menu_item_callback), window);
     g_signal_connect(window->exit_menu_item, "activate", G_CALLBACK(gtk_main_quit),
                      NULL);
+
+    g_signal_connect(window->preferences_menu_item, "activate",
+                     G_CALLBACK(preferences_menu_item_cb), window);
 
     g_signal_connect(window->about_menu_item, "activate",
                      G_CALLBACK(about_menu_item_callback), window);

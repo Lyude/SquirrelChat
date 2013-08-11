@@ -13,44 +13,20 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
+#ifndef __SQUIRRELCHAT_SETTINGS_H__
+#define __SQUIRRELCHAT_SETTINGS_H__
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gtk/gtk.h>
-#include <errno.h>
-#include <string.h>
+#include <libconfig.h>
 
-#include <gnutls/gnutls.h>
+extern config_t global_config;
+extern config_setting_t * global_config_root;
+extern char * sq_config_dir;
 
-#include "commands.h"
-#include "message_parser.h"
-#include "ui/chat_window.h"
-#include "numerics.h"
-#include "errors.h"
-#include "settings.h"
+extern void init_settings();
 
-int main(int argc, char *argv[]) {
-
-    init_irc_commands();
-    init_message_parser();
-    init_numerics();
-#ifdef WITH_SSL
-    gnutls_global_init();
-
-#if GNUTLS_DEBUG_LEVEL > 0
-    gnutls_global_set_log_level(GNUTLS_DEBUG_LEVEL);
-    gnutls_global_set_log_function(_gnutls_debug_log);
-#endif
+extern config_setting_t * sq_default_nick;
+extern config_setting_t * sq_default_username;
+extern config_setting_t * sq_default_real_name;
 
 #endif
-
-    gtk_init(&argc, &argv);
-    init_settings();
-
-    struct chat_window * window = create_new_chat_window(NULL);
-
-    gtk_main();
-
-    return 0;
-}
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

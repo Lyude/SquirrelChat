@@ -37,6 +37,10 @@ struct chat_window {
     GtkWidget * new_server_buffer_menu_item;
     GtkWidget * exit_menu_item;
 
+    GtkWidget * tools_menu;
+    GtkWidget * tools_menu_item;
+    GtkWidget * preferences_menu_item;
+
     GtkWidget * help_menu_item;
     GtkWidget * help_menu;
     GtkWidget * about_menu_item;

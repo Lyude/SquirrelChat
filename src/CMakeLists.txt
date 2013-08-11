@@ -14,8 +14,10 @@
 
 cmake_minimum_required(VERSION 2.6)
 
-include_directories(${GTK3_INCLUDE_DIRS} ${GNUTLS_INCLUDE_DIRS})
-link_directories(${GTK3_LIBRARY_DIRS} ${GNUTLS_LIBRARY_DIRS})
+include_directories(${GTK3_INCLUDE_DIRS} ${GNUTLS_INCLUDE_DIRS}
+                    ${LIBCONFIG_INCLUDE_DIRS})
+link_directories(${GTK3_LIBRARY_DIRS} ${GNUTLS_LIBRARY_DIRS}
+                 ${LIBCONFIG_LIBRARY_DIRS})
 add_definitions(${GTK3_CFLAG_OTHER})
 
 add_executable(squirrelchat
@@ -36,14 +38,17 @@ add_executable(squirrelchat
                ctcp.c
                builtin_ctcp_requests.c
                builtin_ctcp_responses.c
+               settings.c
                ui/chat_window.c
                ui/network_tree.c
                ui/buffer.c
                ui/main_menu_bar.c
                ui/command_box.c
                ui/chat_viewer.c
-               ui/user_list.c)
+               ui/user_list.c
+               ui/settings_dialog.c)
 
-target_link_libraries(squirrelchat ${GTK3_LIBRARIES} ${GNUTLS_LIBRARIES})
+target_link_libraries(squirrelchat ${GTK3_LIBRARIES} ${GNUTLS_LIBRARIES}
+                      ${LIBCONFIG_LIBRARIES})
 
 # vim: expandtab:tabstop=4:shiftwidth=4:softtabstop=4:tw=80

@@ -18,6 +18,7 @@
 #include "ui/buffer.h"
 #include "net_io.h"
 #include "net_input_handler.h"
+#include "settings.h"
 
 #include <gtk/gtk.h>
 #include <glib.h>
@@ -45,9 +46,9 @@ struct irc_network * new_irc_network() {
     struct irc_network * network = malloc(sizeof(struct irc_network));
     memset(network, 0, sizeof(struct irc_network));
 
-    //XXX: Added just for testing purposes
-    network->username = strdup("SquirrelChat");
-    network->real_name = strdup("SquirrelChat");
+    network->nickname = strdup(config_setting_get_string(sq_default_nick));
+    network->username = strdup(config_setting_get_string(sq_default_username));
+    network->real_name = strdup(config_setting_get_string(sq_default_real_name));
 
     network->buffer = new_buffer(NULL, NETWORK, network);
 
@@ -87,10 +88,6 @@ int connect_irc_network(struct irc_network * network) {
         print_to_buffer(network->buffer, "You forgot to set a server!\n");
         return -1;
     }
-
-    // Set a default nickname when the user does not set one
-    if (network->nickname == NULL)
-        network->nickname = strdup(getlogin());
 
     print_to_buffer(network->buffer, "Attempting to connect to %s:%s...\n",
                     network->address, network->port);
