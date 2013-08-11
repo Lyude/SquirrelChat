@@ -16,7 +16,6 @@ cmake_minimum_required(VERSION 2.6)
 
 include_directories(${GTK3_INCLUDE_DIRS} ${GNUTLS_INCLUDE_DIRS})
 link_directories(${GTK3_LIBRARY_DIRS} ${GNUTLS_LIBRARY_DIRS})
-message(STATUS ${GNUTLS_LIBRARY_DIRS})
 add_definitions(${GTK3_CFLAG_OTHER})
 
 add_executable(squirrelchat
