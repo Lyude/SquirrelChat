@@ -32,7 +32,6 @@
 #include "settings.h"
 
 int main(int argc, char *argv[]) {
-
     init_irc_commands();
     init_message_parser();
     init_numerics();
