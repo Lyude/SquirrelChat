@@ -193,6 +193,7 @@ static void create_main_settings_file() {
             strerror(errno));
         gtk_window_set_title(GTK_WINDOW(dialog), "SquirrelChat Error");
         gtk_dialog_run(GTK_DIALOG(dialog));
+        gtk_widget_destroy(dialog);
     }
 }
 
