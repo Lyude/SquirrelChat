@@ -20,7 +20,9 @@
 #include <errno.h>
 #include <string.h>
 
+#ifdef WITH_SSL
 #include <gnutls/gnutls.h>
+#endif
 
 #include "commands.h"
 #include "message_parser.h"
