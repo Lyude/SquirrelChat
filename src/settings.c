@@ -175,6 +175,8 @@ static void set_default_settings() {
 }
 
 static void create_main_settings_file() {
+    set_default_settings();
+
     // Write all the settings to a new file
     char filename_buf[strlen(sq_config_dir) + sizeof("/squirrelchat.conf")];
     sprintf(&filename_buf[0], "%s/squirrelchat.conf", sq_config_dir);
