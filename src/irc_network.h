@@ -102,7 +102,7 @@ extern void free_irc_network(struct irc_network * network,
                              GtkTreeStore * network_tree_store)
     _nonnull(1, 2);
 
-extern int connect_irc_network(struct irc_network * network)
+extern void connect_irc_network(struct irc_network * network)
     _nonnull(1);
 extern void disconnect_irc_network(struct irc_network * network,
                                    const char * msg)

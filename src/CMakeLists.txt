@@ -39,6 +39,7 @@ add_executable(squirrelchat
                builtin_ctcp_requests.c
                builtin_ctcp_responses.c
                settings.c
+               ssl.c
                ui/chat_window.c
                ui/network_tree.c
                ui/buffer.c
