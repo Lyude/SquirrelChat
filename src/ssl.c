@@ -17,6 +17,7 @@
 
 #include "ssl.h"
 #include "irc_network.h"
+#include "connection_setup.h"
 #include "ui/buffer.h"
 
 #include <stdlib.h>

@@ -22,6 +22,7 @@
 #include "irc_network.h"
 #include "net_io.h"
 #include "message_parser.h"
+#include "connection_setup.h"
 
 #include <glib.h>
 #include <string.h>
@@ -86,7 +87,12 @@ gboolean net_input_handler(GIOChannel *source,
     errno = 0;
 #ifdef WITH_SSL
     if (network->ssl) {
-        if (network->status == CONNECTED) {
+        if (network->status == DISCONNECTED) {
+            print_to_buffer(network->buffer->window->current_buffer,
+                            "* Disconnected\n");
+            return false;
+        }
+        else if (network->status == CONNECTED) {
             do {
                 // Try reading from the network
                 result =

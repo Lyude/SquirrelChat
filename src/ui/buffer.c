@@ -20,9 +20,13 @@
 #include "../commands.h"
 #include "user_list.h"
 
+#include <pthread.h>
 #include <gtk/gtk.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
+
+static gboolean flush_buffer_output(struct buffer_info * buffer);
 
 struct buffer_info * new_buffer(const char * buffer_name,
                                 enum buffer_type type,
@@ -36,6 +40,9 @@ struct buffer_info * new_buffer(const char * buffer_name,
     buffer->buffer_scroll_pos = 0;
     buffer->buffer = gtk_text_buffer_new(NULL);
     buffer->command_box_buffer = gtk_entry_buffer_new(NULL, -1);
+    buffer->out_queue_size = 0;
+    buffer->out_queue = NULL;
+    pthread_mutex_init(&buffer->output_mutex, NULL);
 
     // Add a userlist if the buffer is a channel buffer
     if (type == CHANNEL) {
@@ -67,6 +74,13 @@ static void destroy_users(GtkTreeRowReference * user,
     gtk_tree_row_reference_free(user);
 }
 
+/* NOTE: This should only ever be called from the main thread, behavior when
+ * called in other threads is undefined. In addition, checking to see if any
+ * other threads are accessing the buffer is too much of a pain, so please make
+ * sure any other threads that have a chance of using the print_to_buffer()
+ * function sometime during their life time have been terminated before calling
+ * destroy_buffer()
+ */
 void destroy_buffer(struct buffer_info * buffer) {
     if (buffer->type == CHANNEL) {
         g_object_unref(buffer->chan_data->user_list_store);
@@ -81,33 +95,80 @@ void destroy_buffer(struct buffer_info * buffer) {
     free(buffer->buffer_name);
     gtk_tree_row_reference_free(buffer->row);
     free(buffer->extra_data);
+
+    pthread_mutex_destroy(&buffer->output_mutex);
+
+    // If there was still data waiting to be outputted, destroy it
+    if (g_idle_remove_by_data(buffer)) {
+        struct __queued_output * n;
+        for (struct __queued_output * c = buffer->out_queue;
+             c != NULL;
+             c = n) {
+            free(c->msg);
+            n = c->next;
+            free(c);
+        }
+    }
+
     free(buffer);
 }
 
 void print_to_buffer(struct buffer_info * buffer,
-                     const char * message, ...) {
+                     const char * msg, ...) {
     va_list args;
-    char * parsed_message;
-    size_t parsed_message_len;
+    size_t parsed_msg_len;
+    struct __queued_output * parsed_msg = malloc(sizeof(struct __queued_output));
+
+    parsed_msg->next = NULL;
+
+    // Create the string
+    va_start(args, msg);
+    parsed_msg_len = vsnprintf(NULL, 0, msg, args);
+
+    va_start(args, msg);
+    parsed_msg->msg = malloc(parsed_msg_len + 1);
+    vsprintf(parsed_msg->msg, msg, args);
+    va_end(args);
+
+    // Add the message to the end of the queue and update the end pointer
+    pthread_mutex_lock(&buffer->output_mutex);
+    if (buffer->out_queue == NULL) {
+        g_idle_add((GSourceFunc)flush_buffer_output, buffer);
+        buffer->out_queue = parsed_msg;
+        buffer->out_queue_end = parsed_msg;
+    }
+    else {
+        buffer->out_queue_end->next = parsed_msg;
+        buffer->out_queue_end = parsed_msg;
+    }
+    buffer->out_queue_size += parsed_msg_len;
+    parsed_msg->msg_len = parsed_msg_len;
+    pthread_mutex_unlock(&buffer->output_mutex);
+}
+
+static gboolean flush_buffer_output(struct buffer_info * buffer) {
+    pthread_mutex_lock(&buffer->output_mutex);
+
+    char output_dump[buffer->out_queue_size + 1];
+    char * dump_pos = &output_dump[0];
     GtkTextIter end_of_buffer;
     GtkAdjustment * scroll_adjustment =
         gtk_scrollable_get_vadjustment(GTK_SCROLLABLE(buffer->window->chat_viewer));
 
-    // Parse the message passed to this function
-    va_start(args, message);
-    parsed_message_len = vsnprintf(NULL, 0, message, args);
-
-    va_start(args, message);
-    parsed_message = alloca(parsed_message_len);
-    vsnprintf(parsed_message, parsed_message_len + 1, message, args);
-    va_end(args);
+    struct __queued_output * n;
+    // Concatenate all the messages in the queue and clear it
+    for (struct __queued_output * c = buffer->out_queue;
+         c != NULL;
+         c = n) {
+        strcpy(dump_pos, c->msg);
+        dump_pos += c->msg_len;
+        n = c->next;
+        free(c->msg);
+        free(c);
+    }
 
     // Figure out where the end of the buffer is
     gtk_text_buffer_get_end_iter(buffer->buffer, &end_of_buffer);
-
-    /* TODO: Add in code to maintain the line limit for the buffer whenever
-     * anything is printed to the buffer
-     */
 
     /* If the user has manually scrolled, don't adjust the scroll position,
      * otherwise scroll to the bottom when printing the message
@@ -116,16 +177,21 @@ void print_to_buffer(struct buffer_info * buffer,
         gtk_adjustment_get_upper(scroll_adjustment) -
         gtk_adjustment_get_page_size(scroll_adjustment) - 1e-12 &&
         buffer == buffer->window->current_buffer) {
-        gtk_text_buffer_insert(buffer->buffer, &end_of_buffer, parsed_message,
-                       parsed_message_len);
+        gtk_text_buffer_insert(buffer->buffer, &end_of_buffer, &output_dump[0],
+                               buffer->out_queue_size);
         gtk_text_view_scroll_to_mark(GTK_TEXT_VIEW(buffer->window->chat_viewer),
                                      gtk_text_buffer_get_mark(buffer->buffer,
                                                               "insert"),
                                      0.0, false, 0.0, 0.0);
     }
     else
-        gtk_text_buffer_insert(buffer->buffer, &end_of_buffer, parsed_message,
-                               parsed_message_len);
+        gtk_text_buffer_insert(buffer->buffer, &end_of_buffer, &output_dump[0],
+                               buffer->out_queue_size);
+
+    buffer->out_queue = NULL;
+    buffer->out_queue_size = 0;
+    pthread_mutex_unlock(&buffer->output_mutex);
+    return false;
 }
 
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

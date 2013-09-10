@@ -19,6 +19,7 @@
 #include "net_io.h"
 #include "net_input_handler.h"
 #include "settings.h"
+#include "connection_setup.h"
 
 #include <gtk/gtk.h>
 #include <glib.h>
@@ -76,10 +77,6 @@ void connect_irc_network(struct irc_network * network) {
     }
 #endif
 
-    struct addrinfo hints; // For specifying the type of host we want
-    struct addrinfo * results; // Stores the result list from getaddrinfo
-    int func_result;
-
     // Make sure the server is set
     if (network->address == NULL) {
         print_to_buffer(network->buffer, "You forgot to set a server!\n");
@@ -87,86 +84,8 @@ void connect_irc_network(struct irc_network * network) {
     }
 
     print_to_buffer(network->buffer, "Attempting to connect to %s:%s...\n",
-                    network->address, network->port);
-
-    // Try to get the addrinfo for the server
-    memset(&hints, 0, sizeof(struct addrinfo));
-    hints.ai_family = AF_UNSPEC;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_flags = 0;
-    hints.ai_protocol = 0;
-
-    func_result = getaddrinfo(network->address, network->port, &hints, &results);
-    if (func_result != 0) {
-        print_to_buffer(network->buffer, "CONNECTION ERROR: %s\n",
-                        gai_strerror(func_result));
-        return;
-    }
-
-    // Try to connect to each address structure returned by getaddrinfo
-    /* FIXME: Instead of returning function, retry connection attempt and print
-     * messages
-     */
-    struct addrinfo * rp;
-    for (rp = results; rp != NULL; rp = rp->ai_next) {
-        // Try to create a socket
-        network->socket = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
-        if (network->socket == -1)
-            continue;
-
-        // Set the socket as non-blocking
-        fcntl(network->socket, F_SETFD, O_NONBLOCK);
-
-        // Try to connect to the created socket
-        if (connect(network->socket, rp->ai_addr, rp->ai_addrlen) != -1)
-            break;
-
-        // The connection failed, so close the socket
-        close(network->socket);
-    }
-
-    // Check if we successfully connected, if not return an error
-    if (rp == NULL) {
-        print_to_buffer(network->buffer, "CONNECTION ERROR: %s\n",
-                        strerror(errno));
-        freeaddrinfo(results);
-        return;
-    }
-
-    freeaddrinfo(results);
-
-#ifdef WITH_SSL
-    if (network->ssl)
-        begin_ssl_handshake(network);
-    else {
-#endif
-        print_to_buffer(network->buffer, "Connection established.\n");
-        begin_registration(network);
-#ifdef WITH_SSL
-    }
-#endif
-
-    network->input_channel = g_io_channel_unix_new(network->socket);
-    g_io_channel_set_encoding(network->input_channel, NULL, NULL);
-    g_io_channel_set_buffered(network->input_channel, FALSE);
-
-    g_io_add_watch_full(network->input_channel, G_PRIORITY_DEFAULT, G_IO_IN,
-                        (GIOFunc)net_input_handler, network, NULL);
-}
-
-void begin_registration(struct irc_network * network) {
-    print_to_buffer(network->buffer,
-                    "Sending our registration information.\n");
-    send_to_network(network, "NICK %s\r\n"
-                             "USER %s * * %s\r\n",
-                    network->nickname, network->username, network->real_name);
-    if (network->password != NULL)
-        send_to_network(network, "PASS :%s\r\n", network->password);
-
-    print_to_buffer(network->buffer,
-                    "Attempting to negotiate capabilities with server (CAP)...\n");
-    send_to_network(network, "CAP LS\r\n");
-    network->status = CONNECTED;
+                    network->address, network->port); 
+    begin_connection(network);
 }
 
 void disconnect_irc_network(struct irc_network * network,
@@ -201,7 +120,6 @@ void disconnect_irc_network(struct irc_network * network,
 
 #ifdef WITH_SSL
     if (network->ssl) {
-        gnutls_certificate_free_credentials(network->ssl_cred);
         gnutls_bye(network->ssl_session, GNUTLS_SHUT_WR);
 
         network->ssl_cred = NULL;

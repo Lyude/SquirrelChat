@@ -27,6 +27,7 @@
 #include <netdb.h>
 #include <stdbool.h>
 #include <string.h>
+#include <pthread.h>
 
 #include <gnutls/gnutls.h>
 
@@ -76,9 +77,11 @@ struct irc_network {
     gnutls_session_t ssl_session;
     gnutls_certificate_credentials_t ssl_cred;
     int socket;
+    pthread_t addr_res_thread;
 
     enum {
         DISCONNECTED,
+        ADDR_RES,
         HANDSHAKE,
         CONNECTED,
         REHANDSHAKE
@@ -106,8 +109,6 @@ extern void connect_irc_network(struct irc_network * network)
     _nonnull(1);
 extern void disconnect_irc_network(struct irc_network * network,
                                    const char * msg)
-    _nonnull(1);
-extern void begin_registration(struct irc_network * network)
     _nonnull(1);
 
 extern void network_tree_cursor_changed_handler(GtkTreeSelection *treeselection,

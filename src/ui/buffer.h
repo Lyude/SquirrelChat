@@ -21,6 +21,7 @@
 #include "chat_window.h"
 #include "../trie.h"
 
+#include <pthread.h>
 #include <gtk/gtk.h>
 
 /* TODO: Make a typeless buffer object, and make children buffer objects for
@@ -42,10 +43,21 @@ struct __query_data {
     bool received_away;
 };
 
+struct __queued_output {
+    char * msg;
+    size_t msg_len;
+    struct __queued_output * next;
+};
+
 struct buffer_info {
     enum buffer_type type;
     char * buffer_name;
     GtkTreeRowReference * row;
+
+    pthread_mutex_t output_mutex;
+    struct __queued_output * out_queue;
+    struct __queued_output * out_queue_end;
+    size_t out_queue_size;
 
     struct irc_network * network;
     struct chat_window * window;
@@ -67,7 +79,7 @@ extern void destroy_buffer(struct buffer_info * buffer)
     _nonnull(1);
 
 extern void print_to_buffer(struct buffer_info * buffer,
-                            const char * message, ...)
+                            const char * msg, ...)
     _nonnull(1, 2) _format(printf, 2, 3);
 
 #endif /* __BUFFER_H__ */
