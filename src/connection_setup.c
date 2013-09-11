@@ -32,6 +32,7 @@
 #include <pthread.h>
 
 static void connection_setup_thread(struct irc_network * network);
+static gboolean connection_final_setup_phase(struct irc_network * network);
 
 // Starts a thread to resolve the hostname given and connects to the given host
 void begin_connection(struct irc_network * network) {
@@ -94,6 +95,14 @@ static void connection_setup_thread(struct irc_network * network) {
 
     print_to_buffer(network->buffer, "Connection successful!\n");
 
+    /* We've completed the basic connection portion, now for simplicity sake we
+     * pass the rest of the work for setting up the connection back to the main
+     * thread
+     */
+    g_idle_add((GSourceFunc) connection_final_setup_phase, network);
+}
+
+static gboolean connection_final_setup_phase(struct irc_network * network) {
 #ifdef WITH_SSL
     if (network->ssl)
         begin_ssl_handshake(network);
@@ -107,6 +116,7 @@ static void connection_setup_thread(struct irc_network * network) {
 
     g_io_add_watch_full(network->input_channel, G_PRIORITY_DEFAULT, G_IO_IN,
                         (GIOFunc)net_input_handler, network, NULL);
+    return false;
 }
 
 void begin_registration(struct irc_network * network) {
