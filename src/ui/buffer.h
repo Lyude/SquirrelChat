@@ -22,6 +22,7 @@
 #include "../trie.h"
 
 #include <pthread.h>
+#include <iconv.h>
 #include <gtk/gtk.h>
 
 /* TODO: Make a typeless buffer object, and make children buffer objects for
@@ -64,6 +65,7 @@ struct buffer_info {
     GtkTextBuffer * buffer;
     double buffer_scroll_pos;
     GtkEntryBuffer * command_box_buffer;
+    iconv_t locale_conv;
 
     union {
         struct __channel_data * chan_data;

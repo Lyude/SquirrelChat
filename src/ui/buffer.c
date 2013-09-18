@@ -22,6 +22,7 @@
 
 #include <pthread.h>
 #include <gtk/gtk.h>
+#include <iconv.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
@@ -42,6 +43,10 @@ struct buffer_info * new_buffer(const char * buffer_name,
     buffer->command_box_buffer = gtk_entry_buffer_new(NULL, -1);
     buffer->out_queue_size = 0;
     buffer->out_queue = NULL;
+    /* TODO: Add an option to change the encoding used per channel, or
+     * per-network
+     */
+    buffer->locale_conv = iconv_open("UTF-8", "ISO_8859-1");
     pthread_mutex_init(&buffer->output_mutex, NULL);
 
     // Add a userlist if the buffer is a channel buffer
@@ -71,6 +76,7 @@ static void destroy_users(GtkTreeRowReference * user,
                                 gtk_tree_row_reference_get_path(user));
         free(get_user_prefixes(buffer, &user_row));
     }
+    iconv_close(buffer->locale_conv);
     gtk_tree_row_reference_free(user);
 }
 
@@ -126,7 +132,7 @@ void print_to_buffer(struct buffer_info * buffer,
     parsed_msg_len = vsnprintf(NULL, 0, msg, args);
 
     va_start(args, msg);
-    parsed_msg->msg = malloc(parsed_msg_len + 1);
+    parsed_msg->msg = malloc((parsed_msg_len + 1));
     vsprintf(parsed_msg->msg, msg, args);
     va_end(args);
 
@@ -149,11 +155,18 @@ void print_to_buffer(struct buffer_info * buffer,
 static gboolean flush_buffer_output(struct buffer_info * buffer) {
     pthread_mutex_lock(&buffer->output_mutex);
 
-    char output_dump[buffer->out_queue_size + 1];
-    char * dump_pos = &output_dump[0];
+    char * output_dump_utf8;
+    size_t utf8_len;
+    char * output_dump = alloca(buffer->out_queue_size + 1);
+    char * dump_pos = output_dump;
     GtkTextIter end_of_buffer;
     GtkAdjustment * scroll_adjustment =
         gtk_scrollable_get_vadjustment(GTK_SCROLLABLE(buffer->window->chat_viewer));
+
+    char * inbufpos;
+    size_t conv_len;
+    char * outbufpos;
+    size_t avail;
 
     struct __queued_output * n;
     // Concatenate all the messages in the queue and clear it
@@ -170,6 +183,15 @@ static gboolean flush_buffer_output(struct buffer_info * buffer) {
     // Figure out where the end of the buffer is
     gtk_text_buffer_get_end_iter(buffer->buffer, &end_of_buffer);
 
+    // Ensure the text being printed is pure UTF-8
+    output_dump_utf8 = alloca(buffer->out_queue_size * 2);
+    inbufpos = output_dump;
+    outbufpos = output_dump_utf8;
+    conv_len = buffer->out_queue_size + 1;
+    avail = buffer->out_queue_size * 2 + 1;
+    
+    iconv(buffer->locale_conv, &inbufpos, &conv_len, &outbufpos, &avail);
+
     /* If the user has manually scrolled, don't adjust the scroll position,
      * otherwise scroll to the bottom when printing the message
      */
@@ -177,16 +199,16 @@ static gboolean flush_buffer_output(struct buffer_info * buffer) {
         gtk_adjustment_get_upper(scroll_adjustment) -
         gtk_adjustment_get_page_size(scroll_adjustment) - 1e-12 &&
         buffer == buffer->window->current_buffer) {
-        gtk_text_buffer_insert(buffer->buffer, &end_of_buffer, &output_dump[0],
-                               buffer->out_queue_size);
+        gtk_text_buffer_insert(buffer->buffer, &end_of_buffer, output_dump_utf8,
+                               utf8_len);
         gtk_text_view_scroll_to_mark(GTK_TEXT_VIEW(buffer->window->chat_viewer),
                                      gtk_text_buffer_get_mark(buffer->buffer,
                                                               "insert"),
                                      0.0, false, 0.0, 0.0);
     }
     else
-        gtk_text_buffer_insert(buffer->buffer, &end_of_buffer, &output_dump[0],
-                               buffer->out_queue_size);
+        gtk_text_buffer_insert(buffer->buffer, &end_of_buffer,
+                               output_dump_utf8, -1);
 
     buffer->out_queue = NULL;
     buffer->out_queue_size = 0;
