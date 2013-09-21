@@ -178,7 +178,7 @@ static void set_default_settings() {
     config_setting_set_string(sq_default_nick, getlogin());
     config_setting_set_string(sq_default_username, getlogin());
     config_setting_set_string(sq_default_real_name, getlogin());
-    config_setting_set_string(sq_default_fallback_encoding, "ISO-8895-1");
+    config_setting_set_string(sq_default_fallback_encoding, "WINDOWS-1252");
 }
 
 static void create_main_settings_file() {
