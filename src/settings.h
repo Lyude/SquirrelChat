@@ -27,6 +27,7 @@ extern void init_settings();
 extern config_setting_t * sq_default_nick;
 extern config_setting_t * sq_default_username;
 extern config_setting_t * sq_default_real_name;
+extern config_setting_t * sq_default_fallback_encoding;
 
 #endif
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

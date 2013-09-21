@@ -35,6 +35,7 @@ char * sq_config_dir;
 config_setting_t * sq_default_nick;
 config_setting_t * sq_default_username;
 config_setting_t * sq_default_real_name;
+config_setting_t * sq_default_fallback_encoding;
 
 static void create_main_settings_file();
 static void set_default_settings();
@@ -155,6 +156,9 @@ void init_settings() {
                                                         "default_username");
         sq_default_real_name = config_setting_get_member(global_config_root,
                                                          "default_real_name");
+        sq_default_fallback_encoding =
+            config_setting_get_member(global_config_root,
+                                      "default_fallback_encoding");
     }
 }
 
@@ -167,11 +171,14 @@ static void set_default_settings() {
     sq_default_real_name =
         config_setting_add(global_config_root, "default_real_name",
                            CONFIG_TYPE_STRING);
+    sq_default_fallback_encoding =
+        config_setting_add(global_config_root, "default_fallback_encoding",
+                           CONFIG_TYPE_STRING);
 
     config_setting_set_string(sq_default_nick, getlogin());
     config_setting_set_string(sq_default_username, getlogin());
     config_setting_set_string(sq_default_real_name, getlogin());
-
+    config_setting_set_string(sq_default_fallback_encoding, "ISO-8895-1");
 }
 
 static void create_main_settings_file() {

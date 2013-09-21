@@ -23,10 +23,12 @@
 #include "net_io.h"
 #include "message_parser.h"
 #include "connection_setup.h"
+#include "settings.h"
 
 #include <glib.h>
 #include <string.h>
 #include <errno.h>
+#include <stdlib.h>
 
 #include <gnutls/gnutls.h>
 
@@ -75,7 +77,17 @@ char * check_for_messages(struct irc_network * network) {
         network->buffer_cursor = 0;
         return NULL;
     }
-    return output;
+    // Make sure that the string is encoded in UTF-8 before handing it off
+    if (g_utf8_validate(output, -1, NULL))
+        return strdup(output);
+    else {
+        char * output_utf8;
+        output_utf8 =
+            g_convert_with_fallback(output, -1, "UTF-8",
+                                    config_setting_get_string(sq_default_fallback_encoding),
+                                    "�", NULL, NULL, NULL);
+        return output_utf8;
+    }
 }
 
 gboolean net_input_handler(GIOChannel *source,
@@ -166,8 +178,10 @@ gboolean net_input_handler(GIOChannel *source,
 
                 network->buffer_fill_len += result;
 
-                while ((msg = check_for_messages(network)) != NULL)
+                while ((msg = check_for_messages(network)) != NULL) {
                     process_irc_message(network, msg);
+                    free(msg);
+                }
             } while (gnutls_record_check_pending(network->ssl_session));
         }
         /* If we're not in CONNECTED or CAP mode, we must be (re)initiating a
@@ -226,8 +240,10 @@ gboolean net_input_handler(GIOChannel *source,
         }
 
         network->buffer_fill_len += result;
-        while ((msg = check_for_messages(network)) != NULL)
+        while ((msg = check_for_messages(network)) != NULL) {
             process_irc_message(network, msg);
+            free(msg);
+        }
 #ifdef WITH_SSL
     }
 #endif
