@@ -19,7 +19,7 @@
 #ifdef __GNUC__
 #define _nonnull(...)               __attribute__((nonnull(__VA_ARGS__)))
 #define _format(type, str, start)   __attribute__((format(type, str, start)))
-#elif
+#else
 #define _nonnull(...)
 #define _format(type, str, start)
 #endif

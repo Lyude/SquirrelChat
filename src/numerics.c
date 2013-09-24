@@ -791,7 +791,7 @@ NUMERIC_CB(nick_change_error) {
 
     print_to_buffer(network->claimed_responses->buffer,
                     "Could not change nickname to %s: %s\n",
-                    network->claimed_responses->data, argv[2]);
+                    (char*)network->claimed_responses->data, argv[2]);
     remove_last_response_claim(network);
     return 0;
 }

@@ -33,7 +33,13 @@ configure_file(src/config.h.cmake src/config.h)
 
 add_definitions("-imacros ${CMAKE_SOURCE_DIR}/src/attributes.h
                  -D_POSIX_C_SOURCE=200809L -Wno-int-to-pointer-cast
+                 -Wno-pointer-to-int-cast
                  -include ${CMAKE_SOURCE_DIR}/src/config.h")
+# Although complete in clang, gcc's C11 support is still missing some features,
+# specifically _Generic support. Until this changes, the required header files
+# for using the P99_GENERIC macro to emulate _Generic on gcc will be bundled
+# with this project.
+include_directories("${CMAKE_SOURCE_DIR}/p99")
 
 # C11 is only partially supported in gcc versions 4.3 and up, and fully
 # supported in versions 4.8 and up. So we need to account for this.

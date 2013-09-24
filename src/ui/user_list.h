@@ -19,6 +19,8 @@
 
 #include "chat_window.h"
 
+#include <p99_generic.h>
+
 extern void create_user_list(struct chat_window * window)
     _nonnull(1);
 
@@ -55,10 +57,9 @@ extern char * get_user_prefixes(const struct buffer_info * buffer,
                                 GtkTreeIter * user)
     _nonnull(1, 2);
 
-#define set_user_prefix(_buffer, _user, _prefix)            \
-        _Generic((_user), GtkTreeIter*: _set_user_prefix,   \
-                          default: _set_user_prefix_by_nick \
-                )(_buffer, _user, _prefix)
+#define set_user_prefix(_buffer, _user, _prefix)                        \
+        P99_GENERIC((_user), _set_user_prefix_by_nick,                  \
+                             (GtkTreeIter*, _set_user_prefix_by_nick))
 
 #endif // __USER_LIST_H__
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
