@@ -17,6 +17,7 @@
 #include "p99_for.h"
 #include "p99_typenames.h"
 #include "p99_c99.h"
+#include "p99_enum.h"
 
 /**
  ** @file
