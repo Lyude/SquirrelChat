@@ -20,7 +20,7 @@
 #include "chat_window.h"
 
 #ifndef __clang__
-#include <p99.h>
+#include <p99_generic.h>
 #endif
 
 extern void create_user_list(struct chat_window * window)
