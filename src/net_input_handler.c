@@ -51,7 +51,7 @@ char * check_for_messages(struct irc_network * network) {
                                       &network->recv_buffer[0]) + 2;
 
         // Check if there's potentially another message in the buffer
-        if (network->buffer_cursor + 1 >= network->buffer_fill_len) {
+        if (network->buffer_cursor >= network->buffer_fill_len) {
             network->buffer_cursor = 0;
             network->buffer_fill_len = 0;
         }
@@ -62,7 +62,7 @@ char * check_for_messages(struct irc_network * network) {
          * after the position of the cursor. Make sure there is space for the
          * rest of the message to be received
          */
-        if (network->buffer_cursor < network->buffer_fill_len) {
+        if (network->buffer_cursor <= network->buffer_fill_len) {
             network->buffer_fill_len -= network->buffer_cursor;
             memmove(&network->recv_buffer[0],
                     &network->recv_buffer[network->buffer_cursor],
