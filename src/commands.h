@@ -19,40 +19,39 @@
 #include "ui/buffer.h"
 #include "ui/chat_window.h"
 
-// irc_command_callback(current buffer, argv, argc, trailing)
-typedef short (*irc_command_callback)(struct buffer_info *,
-                                      unsigned short,
-                                      char*[],
-                                      char*);
+// sqchat_command_callback(current buffer, argv, argc, trailing)
+typedef short (*sqchat_command_callback)(struct sqchat_buffer *,
+                                         unsigned short,
+                                         char*[],
+                                         char*);
 
-struct irc_command_info {
+struct sqchat_command_info {
     unsigned short argc_max; // Specifies max size of argv
     char * syntax_msg;
     char * help_msg;
-    irc_command_callback callback;
+    sqchat_command_callback callback;
 };
-#define IRC_CMD_ARGC_MAX USHRT_MAX
-#define IRC_CMD_SYNTAX_ERR -1
+#define SQCHAT_CMD_SYNTAX_ERR -1
 
-extern void init_irc_commands();
+extern void sqchat_init_irc_commands();
 
-extern void add_irc_command(char * command,
-                            irc_command_callback callback,
-                            unsigned short argc_max,
-                            char * syntax_msg,
-                            char * help_msg)
+extern void sqchat_add_irc_command(char * command,
+                                   sqchat_command_callback callback,
+                                   unsigned short argc_max,
+                                   char * syntax_msg,
+                                   char * help_msg)
     _nonnull(1, 2, 4, 5);
-extern void del_irc_command(char * command)
+extern void sqchat_del_irc_command(char * command)
     _nonnull(1);
-extern void call_command(struct buffer_info * buffer,
-                         char * command,
-                         char * params)
+extern void sqchat_call_command(struct sqchat_buffer * buffer,
+                                char * command,
+                                char * params)
     _nonnull(1, 2);
-extern void print_command_syntax(struct buffer_info * buffer,
-                                 char * command)
+extern void sqchat_print_command_syntax(struct sqchat_buffer * buffer,
+                                        char * command)
     _nonnull(1, 2);
-extern void print_command_help(struct buffer_info * buffer,
-                               char * command)
+extern void sqchat_print_command_help(struct sqchat_buffer * buffer,
+                                      char * command)
     _nonnull(1, 2);
 
 #endif // __COMMANDS_H__

@@ -18,17 +18,17 @@
 
 #include "irc_network.h"
 
-#define CTCP_REQ_HANDLER(func_name)                     \
-    extern void func_name(struct irc_network * network, \
-                          char * hostmask,              \
-                          char * target,                \
-                          char * msg)                   \
+#define CTCP_REQ_HANDLER(func_name)                             \
+    extern void func_name(struct sqchat_network * network,      \
+                          char * hostmask,                      \
+                          char * target,                        \
+                          char * msg)                           \
     _nonnull(1, 2)
 
-CTCP_REQ_HANDLER(ctcp_version_req_handler);
-CTCP_REQ_HANDLER(ctcp_action_req_handler);
-CTCP_REQ_HANDLER(ctcp_ping_req_handler);
+CTCP_REQ_HANDLER(sqchat_ctcp_version_req_handler);
+CTCP_REQ_HANDLER(sqchat_ctcp_action_req_handler);
+CTCP_REQ_HANDLER(sqchat_ctcp_ping_req_handler);
 
 #undef CTCP_REQ_HANDLER
-#endif
+#endif // __BUILTIN_CTCP_REQUESTS_H__
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

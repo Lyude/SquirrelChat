@@ -39,18 +39,18 @@
  * NOTE: The struct is automatically sanitized by this function, so there is no
  * need to do it yourself
  */
-struct irc_network * new_irc_network() {
+struct sqchat_network * sqchat_new_irc_network() {
     // Allocate and sanitize the structure
-    struct irc_network * network = malloc(sizeof(struct irc_network));
-    memset(network, 0, sizeof(struct irc_network));
+    struct sqchat_network * network = malloc(sizeof(struct sqchat_network));
+    memset(network, 0, sizeof(struct sqchat_network));
 
-    network->nickname = strdup(config_setting_get_string(sq_default_nick));
-    network->username = strdup(config_setting_get_string(sq_default_username));
-    network->real_name = strdup(config_setting_get_string(sq_default_real_name));
+    network->nickname = strdup(config_setting_get_string(sqchat_default_nick));
+    network->username = strdup(config_setting_get_string(sqchat_default_username));
+    network->real_name = strdup(config_setting_get_string(sqchat_default_real_name));
 
-    network->buffer = new_buffer(NULL, NETWORK, network);
+    network->buffer = sqchat_buffer_new(NULL, NETWORK, network);
 
-    network->buffers = trie_new(trie_strtolower);
+    network->buffers = sqchat_trie_new(sqchat_trie_strtolower);
 
     return network;
 }
@@ -58,39 +58,39 @@ struct irc_network * new_irc_network() {
 /* TODO: Switch the tab when freeing a network to ensure all references to the
  * text buffer are removed
  */
-void free_irc_network(struct irc_network * network,
-                      GtkTreeStore * network_tree_store) {
-    destroy_buffer(network->buffer);
+void sqchat_free_network(struct sqchat_network * network,
+                         GtkTreeStore * network_tree_store) {
+    sqchat_buffer_destroy(network->buffer);
     free(network->name);
     free(network->nickname);
 
     free(network);
 }
 
-void connect_irc_network(struct irc_network * network) {
+void sqchat_connect_network(struct sqchat_network * network) {
 #ifndef WITH_SSL
     if (network->ssl) {
-        print_to_buffer(network->buffer,
-                        "SSL support was not included in this version of "
-                        "Squirrelchat, therefore SSL cannot be enabled.\n");
+        sqchat_buffer_print(network->buffer,
+                            "SSL support was not included in this version of "
+                            "Squirrelchat, therefore SSL cannot be enabled.\n");
         return;
     }
 #endif
 
     // Make sure the server is set
     if (network->address == NULL) {
-        print_to_buffer(network->buffer, "You forgot to set a server!\n");
+        sqchat_buffer_print(network->buffer, "You forgot to set a server!\n");
         return;
     }
 
-    print_to_buffer(network->buffer, "Attempting to connect to %s:%s...\n",
-                    network->address, network->port); 
-    begin_connection(network);
+    sqchat_buffer_print(network->buffer, "Attempting to connect to %s:%s...\n",
+                        network->address, network->port); 
+    sqchat_begin_connection(network);
 }
 
-void disconnect_irc_network(struct irc_network * network,
+void sqchat_disconnect_network(struct sqchat_network * network,
                             const char * msg) {
-    send_to_network(network, "QUIT :%s\r\n", msg ? msg : "");
+    sqchat_network_send(network, "QUIT :%s\r\n", msg ? msg : "");
     network->status = DISCONNECTED;
 
     free(network->version);

@@ -18,49 +18,49 @@
 
 #include "ui/buffer.h"
 
-extern void add_builtin_commands();
+extern void sqchat_add_builtin_commands();
 
-#define BI_CMD(func_name)                               \
-    extern short func_name(struct buffer_info * buffer, \
-                           unsigned short argc,         \
-                           char * argv[],               \
-                           char * trailing)             \
+#define BI_CMD(func_name)                                   \
+    extern short func_name(struct sqchat_buffer * buffer,   \
+                           unsigned short argc,             \
+                           char * argv[],                   \
+                           char * trailing)                 \
     _nonnull(1)
 
-BI_CMD(cmd_help);
-BI_CMD(cmd_nick);
-BI_CMD(cmd_server);
-BI_CMD(cmd_msg);
-BI_CMD(cmd_join);
-BI_CMD(cmd_part);
-BI_CMD(cmd_connect);
-BI_CMD(cmd_quit);
-BI_CMD(cmd_quote);
-BI_CMD(cmd_motd);
-BI_CMD(cmd_topic);
-BI_CMD(cmd_notice);
-BI_CMD(cmd_mode);
-BI_CMD(cmd_ctcp);
-BI_CMD(cmd_me);
-BI_CMD(cmd_whois);
-BI_CMD(cmd_oper);
-BI_CMD(cmd_whowas);
-BI_CMD(cmd_lusers);
-BI_CMD(cmd_invite);
-BI_CMD(cmd_time);
-BI_CMD(cmd_version);
-BI_CMD(cmd_info);
-BI_CMD(cmd_away);
-BI_CMD(cmd_back);
-BI_CMD(cmd_who);
-BI_CMD(cmd_links);
-BI_CMD(cmd_list);
-BI_CMD(cmd_kick);
-BI_CMD(cmd_kill);
-BI_CMD(cmd_wallops);
-BI_CMD(cmd_trace);
-BI_CMD(cmd_username);
-BI_CMD(cmd_realname);
+BI_CMD(sqchat_cmd_help);
+BI_CMD(sqchat_cmd_nick);
+BI_CMD(sqchat_cmd_server);
+BI_CMD(sqchat_cmd_msg);
+BI_CMD(sqchat_cmd_join);
+BI_CMD(sqchat_cmd_part);
+BI_CMD(sqchat_cmd_connect);
+BI_CMD(sqchat_cmd_quit);
+BI_CMD(sqchat_cmd_quote);
+BI_CMD(sqchat_cmd_motd);
+BI_CMD(sqchat_cmd_topic);
+BI_CMD(sqchat_cmd_notice);
+BI_CMD(sqchat_cmd_mode);
+BI_CMD(sqchat_cmd_ctcp);
+BI_CMD(sqchat_cmd_me);
+BI_CMD(sqchat_cmd_whois);
+BI_CMD(sqchat_cmd_oper);
+BI_CMD(sqchat_cmd_whowas);
+BI_CMD(sqchat_cmd_lusers);
+BI_CMD(sqchat_cmd_invite);
+BI_CMD(sqchat_cmd_time);
+BI_CMD(sqchat_cmd_version);
+BI_CMD(sqchat_cmd_info);
+BI_CMD(sqchat_cmd_away);
+BI_CMD(sqchat_cmd_back);
+BI_CMD(sqchat_cmd_who);
+BI_CMD(sqchat_cmd_links);
+BI_CMD(sqchat_cmd_list);
+BI_CMD(sqchat_cmd_kick);
+BI_CMD(sqchat_cmd_kill);
+BI_CMD(sqchat_cmd_wallops);
+BI_CMD(sqchat_cmd_trace);
+BI_CMD(sqchat_cmd_username);
+BI_CMD(sqchat_cmd_realname);
 
 #undef BI_CMD
 

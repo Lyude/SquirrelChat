@@ -17,9 +17,9 @@
 #ifndef __CASEMAP_H__
 #define __CASEMAP_H__
 
-extern char rfc1459_tolower(const char c);
-extern char rfc1459_toupper(const char c);
-extern int rfc1459_strcasecmp(const char * s1, const char * s2)
+extern char sqchat_rfc1459_tolower(const char c);
+extern char sqchat_rfc1459_toupper(const char c);
+extern int sqchat_rfc1459_strcasecmp(const char * s1, const char * s2)
     _nonnull(1, 2);
 
 #endif // __CASEMAP_H__

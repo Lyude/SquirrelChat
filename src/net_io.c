@@ -32,14 +32,14 @@
 #include <gnutls/gnutls.h>
 
 // Sends a message to a currently connected IRC network
-void send_to_network(struct irc_network * buffer,
-                     const char * msg, ...) {
+void sqchat_network_send(struct sqchat_network * buffer,
+                         const char * msg, ...) {
     va_list args;
     size_t msg_len;
-    char send_buffer[IRC_MSG_BUF_LEN];
+    char send_buffer[SQCHAT_MSG_BUF_LEN];
 
     va_start(args, msg);
-    msg_len = vsnprintf(&send_buffer[0], IRC_MSG_LEN, msg, args);
+    msg_len = vsnprintf(&send_buffer[0], SQCHAT_IRC_MSG_LEN, msg, args);
     va_end(args);
 
 #ifdef WITH_SSL

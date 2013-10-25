@@ -31,7 +31,7 @@
 
 #include <gnutls/gnutls.h>
 
-struct irc_network {
+struct sqchat_network {
     // Network information
     char * name;
     char * address;
@@ -87,7 +87,7 @@ struct irc_network {
         REHANDSHAKE
     } status;
 
-    char recv_buffer[IRC_MSG_BUF_LEN];
+    char recv_buffer[SQCHAT_MSG_BUF_LEN];
     int buffer_cursor;
     size_t buffer_fill_len;
     GIOChannel * input_channel;
@@ -95,27 +95,23 @@ struct irc_network {
     GtkTreeRowReference * row;
     struct chat_window * window;
 
-    struct buffer_info * buffer;
-    trie * buffers;
-    struct cmd_response_claim * claimed_responses;
+    struct sqchat_buffer * buffer;
+    sqchat_trie * buffers;
+    struct sqchat_cmd_response_claim * claimed_responses;
 };
 
-extern struct irc_network * new_irc_network();
-extern void free_irc_network(struct irc_network * network,
-                             GtkTreeStore * network_tree_store)
+extern struct sqchat_network * sqchat_new_irc_network();
+extern void sqchat_free_network(struct sqchat_network * network,
+                                GtkTreeStore * network_tree_store)
     _nonnull(1, 2);
 
-extern void connect_irc_network(struct irc_network * network)
+extern void sqchat_connect_network(struct sqchat_network * network)
     _nonnull(1);
-extern void disconnect_irc_network(struct irc_network * network,
-                                   const char * msg)
+extern void sqchat_disconnect_network(struct sqchat_network * network,
+                                      const char * msg)
     _nonnull(1);
 
-extern void network_tree_cursor_changed_handler(GtkTreeSelection *treeselection,
-                                                GtkTextView *chat_viewer)
-    _nonnull(1, 2);
+#define SQCHAT_IS_CHAN(_network, _str) (strchr((_network)->chantypes, *(_str)))
 
-#define IRC_IS_CHAN(_network, _str) (strchr((_network)->chantypes, *(_str)))
-
-#endif /* BUFFERS_H */
+#endif /* __IRC_NETWORK_H__ */
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

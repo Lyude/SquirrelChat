@@ -14,6 +14,11 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*
+ * Because these are just generic macros for all of the numeric replies used in
+ * IRC, they are not prefixed with SQCHAT_
+ */
+
 #ifndef __IRC_NUMERICS_H__
 #define __IRC_NUMERICS_H__
 

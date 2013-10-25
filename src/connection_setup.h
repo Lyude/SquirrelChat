@@ -19,10 +19,10 @@
 
 #include "irc_network.h"
 
-extern void begin_connection(struct irc_network * network)
+extern void sqchat_begin_connection(struct sqchat_network * network)
     _nonnull(1);
 
-extern void begin_registration(struct irc_network * network)
+extern void sqchat_begin_registration(struct sqchat_network * network)
     _nonnull(1);
 
 #endif // __CONNECTION_SETUP_H__

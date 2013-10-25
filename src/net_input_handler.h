@@ -14,17 +14,17 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NET_INPUT_HANDLER_H
-#define NET_INPUT_HANDLER_H
+#ifndef __NET_INPUT_HANDLER__
+#define __NET_INPUT_HANDLER__
 
 #include "irc_network.h"
 
 #include <glib.h>
 
-extern gboolean net_input_handler(GIOChannel *source,
-                                  GIOCondition condition,
-                                  struct irc_network * buffer)
+extern gboolean sqchat_net_input_handler(GIOChannel *source,
+                                         GIOCondition condition,
+                                         struct sqchat_network * buffer)
     _nonnull(3);
 
-#endif // NET_INPUT_HANDLER_H
+#endif // __NET_INPUT_HANDLER__
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

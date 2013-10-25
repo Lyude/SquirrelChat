@@ -24,7 +24,7 @@
 GtkTreeIter network_tree_toplevel;
 
 // Sets up the network tree
-void create_network_tree(struct chat_window * window) {
+void sqchat_network_tree_init(struct chat_window * window) {
     GtkCellRenderer * network_tree_renderer;
 
     GtkTreeViewColumn *network_tree_title_column;
@@ -58,8 +58,8 @@ void create_network_tree(struct chat_window * window) {
 }
 
 // Adds an empty network buffer to the network tree
-void add_network_to_tree(struct chat_window * window,
-                         struct irc_network * network) {
+void sqchat_network_tree_network_add(struct chat_window * window,
+                                     struct sqchat_network * network) {
     GtkTreePath * toplevel_path;
     gtk_tree_store_append(window->network_tree_store,
                           &network_tree_toplevel, NULL);
@@ -78,9 +78,9 @@ void add_network_to_tree(struct chat_window * window,
 }
 
 // Get's the currently selected network in the network tree
-struct irc_network * get_current_network(struct chat_window * window) {
+struct sqchat_network * sqchat_network_tree_get_current(struct chat_window * window) {
     GtkTreeIter selected_row;
-    struct irc_network * network;
+    struct sqchat_network * network;
     gtk_tree_selection_get_selected(
             gtk_tree_view_get_selection(GTK_TREE_VIEW(window->network_tree)),
             &window->network_tree_store, &selected_row);
@@ -89,8 +89,8 @@ struct irc_network * get_current_network(struct chat_window * window) {
     return network;
 }
 
-void add_buffer_to_tree(struct buffer_info * buffer,
-                        struct irc_network * network) {
+void sqchat_network_tree_buffer_add(struct sqchat_buffer * buffer,
+                                    struct sqchat_network * network) {
     GtkTreeIter network_row;
     GtkTreeIter buffer_row;
     GtkTreeRowReference * buffer_ref;
@@ -105,7 +105,7 @@ void add_buffer_to_tree(struct buffer_info * buffer,
     gtk_tree_store_set(GTK_TREE_STORE(tree_model), &buffer_row, 0,
                        buffer->buffer_name, 1, buffer, -1);
 
-    // Store a reference in the network's trie and in the buffer
+    // Store a reference in the network's sqchat_trie and in the buffer
     buffer_ref = gtk_tree_row_reference_new(tree_model,
                                             gtk_tree_model_get_path(tree_model,
                                                                     &buffer_row)
@@ -114,7 +114,7 @@ void add_buffer_to_tree(struct buffer_info * buffer,
     buffer->window = network->window;
 }
 
-void remove_buffer_from_tree(struct buffer_info * buffer) {
+void sqchat_network_tree_buffer_remove(struct sqchat_buffer * buffer) {
     GtkTreeModel * network_tree_model;
     GtkTreeIter buffer_row;
     network_tree_model = gtk_tree_row_reference_get_model(buffer->row);
@@ -131,7 +131,7 @@ void remove_buffer_from_tree(struct buffer_info * buffer) {
  */
 void cursor_changed_handler(GtkTreeSelection *treeselection,
                             struct chat_window * window) {
-    struct buffer_info * buffer;
+    struct sqchat_buffer * buffer;
     GtkTreeModel * network_list_model =
         gtk_tree_view_get_model(gtk_tree_selection_get_tree_view(treeselection));
     GtkTreeIter selected_row;
@@ -149,7 +149,7 @@ void cursor_changed_handler(GtkTreeSelection *treeselection,
  * (done as a seperate function because we cannot connect all of the signals
  * until all of the widgets for the window are created
  */
-void connect_network_tree_signals(struct chat_window * window) {
+void sqchat_network_tree_connect_signals(struct chat_window * window) {
     g_signal_connect(gtk_tree_view_get_selection(GTK_TREE_VIEW(window->network_tree)),
                      "changed", G_CALLBACK(cursor_changed_handler), window);
 }

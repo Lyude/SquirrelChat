@@ -24,62 +24,59 @@
 #include <pthread.h>
 #include <gtk/gtk.h>
 
-/* TODO: Make a typeless buffer object, and make children buffer objects for
- * all other types of buffers
- */
-enum buffer_type {
+enum sqchat_buffer_type {
     NETWORK,
     CHANNEL,
     QUERY
 };
 
-struct __channel_data {
+struct __sqchat_channel_data {
     GtkListStore * user_list_store;
-    trie * users;
+    sqchat_trie * users;
 };
 
-struct __query_data {
+struct __sqchat_query_data {
     char * away_msg;
     bool received_away;
 };
 
-struct __queued_output {
+struct __sqchat_queued_output {
     char * msg;
     size_t msg_len;
-    struct __queued_output * next;
+    struct __sqchat_queued_output * next;
 };
 
-struct buffer_info {
-    enum buffer_type type;
+struct sqchat_buffer {
+    enum sqchat_buffer_type type;
     char * buffer_name;
     GtkTreeRowReference * row;
 
     pthread_mutex_t output_mutex;
-    struct __queued_output * out_queue;
-    struct __queued_output * out_queue_end;
+    struct __sqchat_queued_output * out_queue;
+    struct __sqchat_queued_output * out_queue_end;
     size_t out_queue_size;
 
-    struct irc_network * network;
+    struct sqchat_network * network;
     struct chat_window * window;
     GtkTextBuffer * buffer;
     double buffer_scroll_pos;
     GtkEntryBuffer * command_box_buffer;
 
     union {
-        struct __channel_data * chan_data;
-        struct __query_data * query_data;
+        struct __sqchat_channel_data * chan_data;
+        struct __sqchat_query_data * query_data;
         void * extra_data;
     };
 };
 
-extern struct buffer_info * new_buffer(const char * buffer_name,
-                                       enum buffer_type type,
-                                       struct irc_network * network);
-extern void destroy_buffer(struct buffer_info * buffer)
+extern struct sqchat_buffer * sqchat_buffer_new(const char * buffer_name,
+                                                enum sqchat_buffer_type type,
+                                                struct sqchat_network * network);
+extern void sqchat_buffer_destroy(struct sqchat_buffer * buffer)
     _nonnull(1);
 
-extern void print_to_buffer(struct buffer_info * buffer,
-                            const char * msg, ...)
+extern void sqchat_buffer_print(struct sqchat_buffer * buffer,
+                                const char * msg, ...)
     _nonnull(1, 2) _format(printf, 2, 3);
 
 #endif /* __BUFFER_H__ */

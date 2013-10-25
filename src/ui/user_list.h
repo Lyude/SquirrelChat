@@ -23,53 +23,55 @@
 #include <p99_generic.h>
 #endif
 
-extern void create_user_list(struct chat_window * window)
+extern void sqchat_user_list_new(struct chat_window * window)
     _nonnull(1);
 
-extern void add_user_to_list(struct buffer_info * buffer,
-                             const char * nickname,
-                             const char * prefix_str,
-                             size_t prefix_len)
+extern void sqchat_user_list_user_add(struct sqchat_buffer * buffer,
+                                      const char * nickname,
+                                      const char * prefix_str,
+                                      size_t prefix_len)
     _nonnull(1, 2);
-extern int remove_user_from_list(struct buffer_info * buffer,
-                                 const char * nickname)
-    _nonnull(1, 2);
-extern void _set_user_prefix(struct buffer_info * buffer,
-                             GtkTreeIter * user_row,
-                             char prefix)
-    _nonnull(1, 2);
-extern int _set_user_prefix_by_nick(struct buffer_info * buffer,
-                                    const char * nickname,
-                                    char prefix)
-    _nonnull(1, 2);
-extern int add_prefix_to_user(struct buffer_info * buffer,
-                              const char * nickname,
-                              const char * prefix)
-    _nonnull(1, 2, 3);
-extern int remove_prefix_from_user(struct buffer_info * buffer,
-                                   const char * nickname,
-                                   char prefix)
+extern int sqchat_user_list_user_remove(struct sqchat_buffer * buffer,
+                                        const char * nickname)
     _nonnull(1, 2);
 
-extern int get_user_row(const struct buffer_info * buffer,
-                        const char * nickname,
-                        GtkTreeIter * user_row)
+extern int sqchat_user_list_user_prefix_add(struct sqchat_buffer * buffer,
+                                            const char * nickname,
+                                            const char * prefix)
     _nonnull(1, 2, 3);
-extern char * get_user_prefixes(const struct buffer_info * buffer,
-                                GtkTreeIter * user)
+extern int sqchat_user_list_user_prefix_subtract(struct sqchat_buffer * buffer,
+                                                 const char * nickname,
+                                                 char prefix)
+    _nonnull(1, 2);
+
+extern int sqchat_user_list_user_row_find(const struct sqchat_buffer * buffer,
+                                          const char * nickname,
+                                          GtkTreeIter * user_row)
+    _nonnull(1, 2, 3);
+extern char * sqchat_user_list_user_get_prefixes(const struct sqchat_buffer * buffer,
+                                                 GtkTreeIter * user)
+    _nonnull(1, 2);
+
+extern void _sqchat_user_list_user_set_visible_prefix(struct sqchat_buffer * buffer,
+                                                      GtkTreeIter * user_row,
+                                                      char prefix)
+    _nonnull(1, 2);
+extern int _sqchat_user_list_user_set_visible_prefix_by_nick(struct sqchat_buffer * buffer,
+                                                             const char * nickname,
+                                                             char prefix)
     _nonnull(1, 2);
 
 /* P99 doesn't seem to work with clang for some reason, so let's avoid it's use
  * here
  */
 #ifdef __clang__
-#define set_user_prefix(_buffer, _user, _prefix)                    \
-        _Generic((_user), default: _set_user_prefix_by_nick,        \
-                          GtkTreeIter*: _set_user_prefix_by_nick)
+#define sqchat_user_list_user_set_visible_prefix(_buffer, _user, _prefix)               \
+        _Generic((_user), default: _sqchat_user_list_user_set_visible_prefix_by_nick,   \
+                          GtkTreeIter*: _sqchat_user_list_user_set_visible_prefix)
 #else
-#define set_user_prefix(_buffer, _user, _prefix)                        \
-        P99_GENERIC((_user), _set_user_prefix_by_nick,                  \
-                             (GtkTreeIter*, _set_user_prefix_by_nick))
+#define sqchat_user_list_user_set_visible_prefix(_buffer, _user, _prefix)       \
+        P99_GENERIC((_user), _sqchat_user_list_user_set_visible_prefix_by_nick, \
+                             (GtkTreeIter*, _sqchat_user_list_user_set_visible_prefix))
 #endif
 
 #endif // __USER_LIST_H__

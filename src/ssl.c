@@ -26,7 +26,7 @@
 
 static int verify_certificate_cb(gnutls_session_t session);
 
-void begin_ssl_handshake(struct irc_network * network) {
+void sqchat_begin_ssl_handshake(struct sqchat_network * network) {
     int ret;
     const char * err;
 
@@ -51,27 +51,28 @@ void begin_ssl_handshake(struct irc_network * network) {
 
     ret = gnutls_priority_set_direct(network->ssl_session, "NORMAL", &err);
     if (ret < 0) {
-        print_to_buffer(network->buffer,
-                        "GnuTLS error: %s\n"
-                        "Connection aborted.\n", err);
+        sqchat_buffer_print(network->buffer,
+                            "GnuTLS error: %s\n"
+                            "Connection aborted.\n", err);
         goto ssl_handshake_error;
     }
 
     gnutls_transport_set_ptr(network->ssl_session,
                              (gnutls_transport_ptr_t)network->socket);
-    print_to_buffer(network->buffer,
-                    "Performing SSL handshake...\n");
+    sqchat_buffer_print(network->buffer,
+                        "Performing SSL handshake...\n");
     if ((ret = gnutls_handshake(network->ssl_session)) == GNUTLS_E_SUCCESS) {
-        print_to_buffer(network->buffer,
-                        "Handshake complete!\n");
-        begin_registration(network);
+        sqchat_buffer_print(network->buffer,
+                            "Handshake complete!\n");
+        sqchat_begin_registration(network);
     }
     else if (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN)
         network->status = HANDSHAKE;
     else {
-        print_to_buffer(network->buffer, "GnuTLS error: %s\n"
-                                         "Connection aborted.\n",
-                        gnutls_strerror(ret));
+        sqchat_buffer_print(network->buffer,
+                            "GnuTLS error: %s\n"
+                            "Connection aborted.\n",
+                            gnutls_strerror(ret));
         goto ssl_handshake_error;
     }
     return;
@@ -88,7 +89,7 @@ static int verify_certificate_cb(gnutls_session_t session) {
     int ret;
     time_t expiration_time;
     struct timespec current_time;
-    struct irc_network * network = gnutls_session_get_ptr(session);
+    struct sqchat_network * network = gnutls_session_get_ptr(session);
     unsigned int chain_size;
     const gnutls_datum_t * chain;
     gnutls_x509_crt_t * cert;
@@ -144,30 +145,30 @@ verification_error:
         gnutls_x509_crt_get_issuer_dn(cert[0], NULL, &dn_issuer_buf_size);
         dn_issuer_buf = alloca(dn_issuer_buf_size);
 
-        print_to_buffer(network->buffer, "--- Certificate info ---\n");
+        sqchat_buffer_print(network->buffer, "--- Certificate info ---\n");
 
         // Print the name of the peer's certificate
         gnutls_x509_crt_get_dn(cert[0], dn_subject_buf, &dn_subject_buf_size);
-        print_to_buffer(network->buffer, "Subject:\n");
+        sqchat_buffer_print(network->buffer, "Subject:\n");
         for (char * c = strtok_r(dn_subject_buf, ",", &dn_strptr);
              c != NULL;
              c = strtok_r(NULL, ",", &dn_strptr))
-            print_to_buffer(network->buffer, "\t%s\n", c);
+            sqchat_buffer_print(network->buffer, "\t%s\n", c);
 
         // Print the issuer information
         gnutls_x509_crt_get_issuer_dn(cert[0], dn_issuer_buf,
                                       &dn_issuer_buf_size);
-        print_to_buffer(network->buffer, "Issuer:\n");
+        sqchat_buffer_print(network->buffer, "Issuer:\n");
         for (char * c = strtok_r(dn_issuer_buf, ",", &dn_strptr);
              c != NULL;
              c = strtok_r(NULL, ",", &dn_strptr))
-            print_to_buffer(network->buffer, "\t%s\n", c);
+            sqchat_buffer_print(network->buffer, "\t%s\n", c);
 
         // Get the rest of the information
         expiration_time = gnutls_x509_crt_get_expiration_time(cert[0]);
-        print_to_buffer(network->buffer,
-                        "Subject's certificate expires on %s",
-                        ctime(&expiration_time));
+        sqchat_buffer_print(network->buffer,
+                            "Subject's certificate expires on %s",
+                            ctime(&expiration_time));
     }
 
     if (status != 0) {
@@ -176,9 +177,9 @@ verification_error:
             status & GNUTLS_CERT_SIGNER_NOT_CA) {
             gnutls_x509_crt_t subject, issuer;
             // TODO: Check if the certificate is self-signed
-            print_to_buffer(network->buffer,
-                            "A trusted issuer was not found in the "
-                            "certificate.");
+            sqchat_buffer_print(network->buffer,
+                                "A trusted issuer was not found in the "
+                                "certificate.");
             GtkWidget * dialog;
             dialog = gtk_message_dialog_new(GTK_WINDOW(network->window->window),
                                             GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -194,17 +195,17 @@ verification_error:
                 "in which case it is recommended you update your computer.\n"
                 "Are you sure you wish to continue connecting?");
             if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_YES)
-                print_to_buffer(network->buffer, " Ignoring by request of user.\n");
+                sqchat_buffer_print(network->buffer, " Ignoring by request of user.\n");
             else {
                 fatal = true;
-                print_to_buffer(network->buffer, "\n");
+                sqchat_buffer_print(network->buffer, "\n");
             }
             gtk_widget_destroy(dialog);
         }
         if (status & GNUTLS_CERT_NOT_ACTIVATED) {
             if (!fatal) {
-                print_to_buffer(network->buffer,
-                                "The certificate has not been activated yet.");
+                sqchat_buffer_print(network->buffer,
+                                    "The certificate has not been activated yet.");
                 GtkWidget * dialog;
                 dialog = gtk_message_dialog_new(GTK_WINDOW(network->window->window),
                                                 GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -218,26 +219,26 @@ verification_error:
                     "from you.\n"
                     "Are you sure you wish to continue connecting?");
                 if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_YES)
-                    print_to_buffer(network->buffer,
-                                    " Ignoring by request of user.\n");
+                    sqchat_buffer_print(network->buffer,
+                                        " Ignoring by request of user.\n");
                 else {
                     fatal = true;
-                    print_to_buffer(network->buffer, "\n");
+                    sqchat_buffer_print(network->buffer, "\n");
                 }
                 gtk_widget_destroy(dialog);
             }
             else
-                print_to_buffer(network->buffer,
-                                "The certificate has not been activated "
-                                "yet.\n");
+                sqchat_buffer_print(network->buffer,
+                                    "The certificate has not been activated "
+                                    "yet.\n");
         }
         else if (status & GNUTLS_CERT_EXPIRED) {
             /* If we've already determined the connection should not continue,
              * don't bother asking
              */
             if (!fatal) {
-                print_to_buffer(network->buffer,
-                                "The certificate is expired.");
+                sqchat_buffer_print(network->buffer,
+                                    "The certificate is expired.");
                 // Ask the user if they want to continue connecting or not
                 GtkWidget * dialog;
                 dialog = gtk_message_dialog_new(GTK_WINDOW(network->window->window),
@@ -249,23 +250,23 @@ verification_error:
                     "in an attempt to steal sensitive information from you.\n"
                     "Are you sure you wish to continue connecting?");
                 if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_YES)
-                    print_to_buffer(network->buffer,
-                                    " Ignoring by request of user.\n");
+                    sqchat_buffer_print(network->buffer,
+                                        " Ignoring by request of user.\n");
                 else {
                     fatal = true;
-                    print_to_buffer(network->buffer, "\n");
+                    sqchat_buffer_print(network->buffer, "\n");
                 }
                 gtk_widget_destroy(dialog);
             }
             else
-                print_to_buffer(network->buffer,
-                                "The certificate is expired.\n");
+                sqchat_buffer_print(network->buffer,
+                                    "The certificate is expired.\n");
         }
 
         if (fatal) {
             for (int i = 0; i < chain_size; i++)
                 gnutls_x509_crt_deinit(cert[i]);
-            disconnect_irc_network(network, "SSL error");
+            sqchat_disconnect_network(network, "SSL error");
             return GNUTLS_E_CERTIFICATE_ERROR;
         }
     }

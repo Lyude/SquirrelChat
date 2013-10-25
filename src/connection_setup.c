@@ -31,20 +31,20 @@
 #include <netdb.h>
 #include <pthread.h>
 
-static void connection_setup_thread(struct irc_network * network);
-static gboolean connection_final_setup_phase(struct irc_network * network);
+static void connection_setup_thread(struct sqchat_network * network);
+static gboolean connection_final_setup_phase(struct sqchat_network * network);
 
 // Starts a thread to resolve the hostname given and connects to the given host
-void begin_connection(struct irc_network * network) {
+void sqchat_begin_connection(struct sqchat_network * network) {
     network->status = ADDR_RES;
-    print_to_buffer(network->buffer,
-                    "Looking up \"%s\"...\n", network->address);
+    sqchat_buffer_print(network->buffer,
+                        "Looking up \"%s\"...\n", network->address);
     pthread_create(&network->addr_res_thread, NULL,
                    (void*(*)(void*))&connection_setup_thread,
                    network);
 }
 
-static void connection_setup_thread(struct irc_network * network) {
+static void connection_setup_thread(struct sqchat_network * network) {
     struct addrinfo hints;
     struct addrinfo * results;
     struct addrinfo * rp;
@@ -58,15 +58,16 @@ static void connection_setup_thread(struct irc_network * network) {
     func_result = getaddrinfo(network->address, network->port, &hints,
                               &results);
     if (func_result != 0) {
-        print_to_buffer(network->buffer,
-                        "Failed to look up \"%s\": %s\n",
-                        network->address, gai_strerror(func_result));
+        sqchat_buffer_print(network->buffer,
+                            "Failed to look up \"%s\": %s\n",
+                            network->address, gai_strerror(func_result));
         network->status = DISCONNECTED;
         return;
     }
 
-    print_to_buffer(network->buffer,
-                    "Lookup successful, attempting to connect to host...\n");
+    sqchat_buffer_print(network->buffer,
+                        "Lookup successful, attempting to connect to "
+                        "host...\n");
 
     /* Attempt to connect to the results given by getaddrinfo(), this might
      * later be moved into the main application loop, but for the time being
@@ -88,12 +89,12 @@ static void connection_setup_thread(struct irc_network * network) {
     freeaddrinfo(results);
     
     if (rp == NULL) {
-        print_to_buffer(network->buffer, "Connection failed!\n");
+        sqchat_buffer_print(network->buffer, "Connection failed!\n");
         network->status = DISCONNECTED;
         return;
     }
 
-    print_to_buffer(network->buffer, "Connection successful!\n");
+    sqchat_buffer_print(network->buffer, "Connection successful!\n");
 
     /* We've completed the basic connection portion, now for simplicity sake we
      * pass the rest of the work for setting up the connection back to the main
@@ -102,35 +103,38 @@ static void connection_setup_thread(struct irc_network * network) {
     g_idle_add((GSourceFunc) connection_final_setup_phase, network);
 }
 
-static gboolean connection_final_setup_phase(struct irc_network * network) {
+static gboolean connection_final_setup_phase(struct sqchat_network * network) {
 #ifdef WITH_SSL
     if (network->ssl)
-        begin_ssl_handshake(network);
+        sqchat_begin_ssl_handshake(network);
     else
 #endif
-        begin_registration(network);
+        sqchat_begin_registration(network);
 
     network->input_channel = g_io_channel_unix_new(network->socket);
     g_io_channel_set_encoding(network->input_channel, NULL, NULL);
     g_io_channel_set_buffered(network->input_channel, FALSE);
 
     g_io_add_watch_full(network->input_channel, G_PRIORITY_DEFAULT, G_IO_IN,
-                        (GIOFunc)net_input_handler, network, NULL);
+                        (GIOFunc)sqchat_net_input_handler, network, NULL);
     return false;
 }
 
-void begin_registration(struct irc_network * network) {
-    print_to_buffer(network->buffer,
-                    "Sending our registration information.\n");
-    send_to_network(network, "NICK %s\r\n"
-                             "USER %s * * %s\r\n",
-                    network->nickname, network->username, network->real_name);
+void sqchat_begin_registration(struct sqchat_network * network) {
+    sqchat_buffer_print(network->buffer,
+                        "Sending our registration information.\n");
+    sqchat_network_send(network,
+                        "NICK %s\r\n"
+                        "USER %s * * %s\r\n",
+                        network->nickname, network->username,
+                        network->real_name);
     if (network->password != NULL)
-        send_to_network(network, "PASS :%s\r\n", network->password);
+        sqchat_network_send(network, "PASS :%s\r\n", network->password);
 
-    print_to_buffer(network->buffer,
-                    "Attempting to negotiate capabilities with server (CAP)...\n");
-    send_to_network(network, "CAP LS\r\n");
+    sqchat_buffer_print(network->buffer,
+                        "Attempting to negotiate capabilities with server "
+                        "(CAP)...\n");
+    sqchat_network_send(network, "CAP LS\r\n");
     network->status = CONNECTED;
 }
 

@@ -37,7 +37,7 @@
  * and moves the buffer cursor forward. Otherwise returns null. NULL is returned
  * and errno is set in the event of an error.
  */
-char * check_for_messages(struct irc_network * network) {
+char * check_for_messages(struct sqchat_network * network) {
     char * next_terminator = strstr(&network->recv_buffer[network->buffer_cursor],
                                     "\r\n");
     char * output;
@@ -71,7 +71,7 @@ char * check_for_messages(struct irc_network * network) {
 
         // If the message is longer then the max allowed length, report an error
         else if (network->buffer_cursor == 0 &&
-                 network->buffer_fill_len >= IRC_MSG_LEN)
+                 network->buffer_fill_len >= SQCHAT_IRC_MSG_LEN)
             errno = EMSGSIZE;
 
         network->buffer_cursor = 0;
@@ -84,15 +84,16 @@ char * check_for_messages(struct irc_network * network) {
         char * output_utf8;
         output_utf8 =
             g_convert_with_fallback(output, -1, "UTF-8",
-                                    config_setting_get_string(sq_default_fallback_encoding),
+                                    config_setting_get_string(
+                                        sqchat_default_fallback_encoding),
                                     "�", NULL, NULL, NULL);
         return output_utf8;
     }
 }
 
-gboolean net_input_handler(GIOChannel *source,
+gboolean sqchat_net_input_handler(GIOChannel *source,
                            GIOCondition condition,
-                           struct irc_network * network) {
+                           struct sqchat_network * network) {
     char * msg;
     int result;
 
@@ -100,7 +101,7 @@ gboolean net_input_handler(GIOChannel *source,
 #ifdef WITH_SSL
     if (network->ssl) {
         if (network->status == DISCONNECTED) {
-            print_to_buffer(network->buffer->window->current_buffer,
+            sqchat_buffer_print(network->buffer->window->current_buffer,
                             "* Disconnected\n");
             return false;
         }
@@ -110,9 +111,9 @@ gboolean net_input_handler(GIOChannel *source,
                 result =
                     gnutls_read(network->ssl_session,
                                 &network->recv_buffer[network->buffer_fill_len],
-                                IRC_MSG_LEN - network->buffer_fill_len);
+                                SQCHAT_IRC_MSG_LEN - network->buffer_fill_len);
                 if (result == 0) {
-                    print_to_buffer(network->buffer, "Disconnected.\n");
+                    sqchat_buffer_print(network->buffer, "Disconnected.\n");
                     gnutls_deinit(network->ssl_session);
                     close(network->socket);
                     return FALSE;
@@ -120,41 +121,41 @@ gboolean net_input_handler(GIOChannel *source,
                 else if (result == GNUTLS_E_REHANDSHAKE) {
                     // Check if another handshake can be done securely
                     if (gnutls_safe_renegotiation_status(network->ssl_session)) {
-                        print_to_buffer(network->buffer,
-                                        "Server requested another SSL "
-                                        "handshake, please wait...\n");
+                        sqchat_buffer_print(network->buffer,
+                                            "Server requested another SSL "
+                                            "handshake, please wait...\n");
                         result = gnutls_handshake(network->ssl_session);
                         if (result == GNUTLS_E_SUCCESS)
-                            print_to_buffer(network->buffer,
-                                            "Handshake complete! Resuming "
-                                            "normal operations.\n");
+                            sqchat_buffer_print(network->buffer,
+                                                "Handshake complete! Resuming "
+                                                "normal operations.\n");
                         else if (result == GNUTLS_E_AGAIN ||
                                  result == GNUTLS_E_INTERRUPTED)
                             network->status = REHANDSHAKE;
                         else if (gnutls_error_is_fatal(result)) {
-                            print_to_buffer(network->buffer,
-                                            "Fatal SSL error: %s\n"
-                                            "Closing connection.\n",
-                                            gnutls_strerror(result));
-                            disconnect_irc_network(network, "SSL error");
+                            sqchat_buffer_print(network->buffer,
+                                                "Fatal SSL error: %s\n"
+                                                "Closing connection.\n",
+                                                gnutls_strerror(result));
+                            sqchat_disconnect_network(network, "SSL error");
                             close(network->socket);
                             return FALSE;
                         }
                         else
-                            print_to_buffer(network->buffer,
-                                            "SSL warning: %s\n",
-                                            gnutls_strerror(result));
+                            sqchat_buffer_print(network->buffer,
+                                                "SSL warning: %s\n",
+                                                gnutls_strerror(result));
                     }
                     else {
                         /* Something fishy may be happening, reject the
                          * additional handshake
                          */
-                        print_to_buffer(network->buffer,
-                                        "SSL warning: Server requested "
-                                        "another handshake, but our "
-                                        "connection does not support safe "
-                                        "renegotiation. Denying handshake "
-                                        "request.\n");
+                        sqchat_buffer_print(network->buffer,
+                                            "SSL warning: Server requested "
+                                            "another handshake, but our "
+                                            "connection does not support safe "
+                                            "renegotiation. Denying handshake "
+                                            "request.\n");
                         gnutls_alert_send_appropriate(network->ssl_session,
                                                       GNUTLS_A_NO_RENEGOTIATION);
                     }
@@ -166,11 +167,11 @@ gboolean net_input_handler(GIOChannel *source,
                  * We may eventually want to improve on this behavior
                  */
                 else if (result < 0) {
-                    print_to_buffer(network->buffer,
-                                    "SSL error during record receive: %s\n"
-                                    "Disconnected.\n",
-                                    gnutls_strerror(result));
-                    disconnect_irc_network(network, "SSL error");
+                    sqchat_buffer_print(network->buffer,
+                                        "SSL error during record receive: %s\n"
+                                        "Disconnected.\n",
+                                        gnutls_strerror(result));
+                    sqchat_disconnect_network(network, "SSL error");
                     gnutls_deinit(network->ssl_session);
                     close(network->socket);
                     return FALSE;
@@ -179,7 +180,7 @@ gboolean net_input_handler(GIOChannel *source,
                 network->buffer_fill_len += result;
 
                 while ((msg = check_for_messages(network)) != NULL) {
-                    process_irc_message(network, msg);
+                    sqchat_process_msg(network, msg);
                     free(msg);
                 }
             } while (gnutls_record_check_pending(network->ssl_session));
@@ -193,55 +194,55 @@ gboolean net_input_handler(GIOChannel *source,
             if (result == GNUTLS_E_SUCCESS) {
                 // If this is our first handshake, continue to the CAP phase
                 if (network->status == HANDSHAKE) {
-                    print_to_buffer(network->buffer,
-                                    "Handshake complete.\n");
-                    begin_registration(network);
+                    sqchat_buffer_print(network->buffer,
+                                        "Handshake complete.\n");
+                    sqchat_begin_registration(network);
                 }
                 else {
-                    print_to_buffer(network->buffer,
-                                    "Handshake complete. Resuming "
-                                    "connection.\n");
+                    sqchat_buffer_print(network->buffer,
+                                        "Handshake complete. Resuming "
+                                        "connection.\n");
                     network->status = CONNECTED;
                 }
             }
             else if (result != GNUTLS_E_AGAIN &&
                      result != GNUTLS_E_INTERRUPTED) {
                 if (gnutls_error_is_fatal(result)) {
-                    print_to_buffer(network->buffer,
-                                    "SSL error during handshake: %s\n",
-                                    gnutls_strerror(result));
-                    disconnect_irc_network(network, "SSL error");
+                    sqchat_buffer_print(network->buffer,
+                                        "SSL error during handshake: %s\n",
+                                        gnutls_strerror(result));
+                    sqchat_disconnect_network(network, "SSL error");
                 }
                 else
-                    print_to_buffer(network->buffer,
-                                    "SSL warning: %s\n",
-                                    gnutls_strerror(result));
+                    sqchat_buffer_print(network->buffer,
+                                        "SSL warning: %s\n",
+                                        gnutls_strerror(result));
             }
         }
     }
     else {
 #endif // WITH_SSL
         result = recv(network->socket,
-                           &network->recv_buffer[network->buffer_fill_len],
-                           IRC_MSG_LEN - network->buffer_fill_len, 0);
+                      &network->recv_buffer[network->buffer_fill_len],
+                      SQCHAT_IRC_MSG_LEN - network->buffer_fill_len, 0);
 
         if (result == 0) {
-            print_to_buffer(network->buffer, "Disconnected.\n");
+            sqchat_buffer_print(network->buffer, "Disconnected.\n");
             close(network->socket);
             return FALSE;
         }
         else if (result == -1) {
-            print_to_buffer(network->buffer,
-                            "Error: %s\n"
-                            "Closing connection.\n",
-                            strerror(errno));
+            sqchat_buffer_print(network->buffer,
+                                "Error: %s\n"
+                                "Closing connection.\n",
+                                strerror(errno));
             close(network->socket);
             return FALSE;
         }
 
         network->buffer_fill_len += result;
         while ((msg = check_for_messages(network)) != NULL) {
-            process_irc_message(network, msg);
+            sqchat_process_msg(network, msg);
             free(msg);
         }
 #ifdef WITH_SSL

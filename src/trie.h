@@ -36,46 +36,46 @@
 #ifndef __INC_TRIE_H__
 #define __INC_TRIE_H__
 
-/* This is used for some internal buffers in the trie functions. Since these
+/* This is used for some internal buffers in the sqchat_trie functions. Since these
  * bytes are allocated on the stack, you can set this pretty high. Think of
  * the longest key you might need to insert, then multiply by 4x
  */
 #define U_TRIE_KEY_MAX 2048
 
-typedef struct trie trie;
-typedef struct trie_e trie_e;
+typedef struct sqchat_trie sqchat_trie;
+typedef struct sqchat_trie_e sqchat_trie_e;
 
-struct trie_e {
+struct sqchat_trie_e {
 	void *val;
-	trie_e *up;
-	trie_e *n[16];
+	sqchat_trie_e *up;
+	sqchat_trie_e *n[16];
 };
 
-struct trie {
+struct sqchat_trie {
 	void (*canonize)(); /* char *key */
-	trie_e n;
+	sqchat_trie_e n;
 };
 
-extern trie *trie_new(void (*canonize)());
-extern void trie_free(trie * trie, void (*cb)(), void * priv)
+extern sqchat_trie *sqchat_trie_new(void (*canonize)());
+extern void sqchat_trie_free(sqchat_trie * sqchat_trie, void (*cb)(), void * priv)
     _nonnull(1);
-extern void trie_set(trie * trie, const char * key, void * val)
+extern void sqchat_trie_set(sqchat_trie * sqchat_trie, const char * key, void * val)
     _nonnull(1, 2, 3);
-extern void *trie_get(trie * trie, const char * key)
+extern void *sqchat_trie_get(sqchat_trie * sqchat_trie, const char * key)
     _nonnull(1, 2);
 /* void cb(void *value, void *priv); */
-extern void trie_each(trie * trie, void(*cb)(), void * priv)
+extern void sqchat_trie_each(sqchat_trie * sqchat_trie, void(*cb)(), void * priv)
     _nonnull(1, 2);
-extern void *trie_del(trie * trie, const char * key);
+extern void *sqchat_trie_del(sqchat_trie * sqchat_trie, const char * key);
 
-extern void trie_strtolower(char * s)
+extern void sqchat_trie_strtolower(char * s)
     _nonnull(1);
-extern void trie_strtoupper(char * s)
+extern void sqchat_trie_strtoupper(char * s)
     _nonnull(1);
 
-extern void trie_rfc1459_strtoupper(char * s)
+extern void sqchat_trie_rfc1459_strtoupper(char * s)
     _nonnull(1);
-extern void trie_rfc1459_strtolower(char * s)
+extern void sqchat_trie_rfc1459_strtolower(char * s)
     _nonnull(1);
 
 #endif

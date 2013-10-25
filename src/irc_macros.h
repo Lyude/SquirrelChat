@@ -14,13 +14,11 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef IRC_MACROS_H
-#define IRC_MACROS_H
+#ifndef __IRC_MACROS_H__
+#define __IRC_MACROS_H__
 
-#define IRC_MSG_LEN 512
-#define IRC_MSG_BUF_LEN 513
+#define SQCHAT_IRC_MSG_LEN 512
+#define SQCHAT_MSG_BUF_LEN 513
 
-#define IRC_DEFAULT_PORT "6667"
-
-#endif /* IRC_MACROS_H */
+#endif /* __IRC_MACROS_H__ */
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

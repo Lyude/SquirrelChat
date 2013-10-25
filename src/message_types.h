@@ -17,29 +17,29 @@
 #define __MESSAGE_TYPES_H__
 #include "irc_network.h"
 
-extern void init_message_types();
+extern void sqchat_init_message_types();
 
-#define MSG_CB(func_name)                               \
-    extern short func_name(struct irc_network * network, \
-                           char * hostmask,              \
-                           short argc,                   \
-                           char * argv[])                \
+#define MSG_CB(func_name)                                       \
+    extern short func_name(struct sqchat_network * network,     \
+                           char * hostmask,                     \
+                           short argc,                          \
+                           char * argv[])                       \
     _nonnull(1)
 
-MSG_CB(cap_msg_callback);
-MSG_CB(join_msg_callback);
-MSG_CB(part_msg_callback);
-MSG_CB(privmsg_msg_callback);
-MSG_CB(notice_msg_callback);
-MSG_CB(ping_msg_callback);
-MSG_CB(nick_msg_callback);
-MSG_CB(topic_msg_callback);
-MSG_CB(mode_msg_callback);
-MSG_CB(quit_msg_callback);
-MSG_CB(kick_msg_callback);
-MSG_CB(invite_msg_callback);
-MSG_CB(error_msg_callback);
-MSG_CB(wallops_msg_callback);
+MSG_CB(sqchat_cap_msg_callback);
+MSG_CB(sqchat_join_msg_callback);
+MSG_CB(sqchat_part_msg_callback);
+MSG_CB(sqchat_privmsg_msg_callback);
+MSG_CB(sqchat_notice_msg_callback);
+MSG_CB(sqchat_ping_msg_callback);
+MSG_CB(sqchat_nick_msg_callback);
+MSG_CB(sqchat_topic_msg_callback);
+MSG_CB(sqchat_mode_msg_callback);
+MSG_CB(sqchat_quit_msg_callback);
+MSG_CB(sqchat_kick_msg_callback);
+MSG_CB(sqchat_invite_msg_callback);
+MSG_CB(sqchat_error_msg_callback);
+MSG_CB(sqchat_wallops_msg_callback);
 
 #undef MSG_CB
 

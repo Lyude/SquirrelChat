@@ -21,56 +21,57 @@
 #include "ui/network_tree.h"
 
 #define CTCP_REQ_HANDLER(func_name)                     \
-    void func_name(struct irc_network * network,        \
+    void func_name(struct sqchat_network * network,     \
                    char * hostmask,                     \
                    char * target,                       \
                    char * msg)                          \
 
-CTCP_REQ_HANDLER(ctcp_version_req_handler) {
+CTCP_REQ_HANDLER(sqchat_ctcp_version_req_handler) {
     char * address;
     char * nickname;
-    split_irc_hostmask(hostmask, &nickname, &address);
+    sqchat_split_hostmask(hostmask, &nickname, &address);
     
-    sendf_ctcp_reply(network, nickname, "VERSION", "%s", "SquirrelChat");
+    sqchat_network_sendf_ctcp_reply(network, nickname, "VERSION", "%s",
+                                    "SquirrelChat");
 }
 
-CTCP_REQ_HANDLER(ctcp_action_req_handler) {
+CTCP_REQ_HANDLER(sqchat_ctcp_action_req_handler) {
     char * nickname;
     char * address;
-    split_irc_hostmask(hostmask, &nickname, &address);
+    sqchat_split_hostmask(hostmask, &nickname, &address);
 
-    struct buffer_info * output;
-    if (IRC_IS_CHAN(network, target)) {
+    struct sqchat_buffer * output;
+    if (SQCHAT_IS_CHAN(network, target)) {
         // Check if we're in the channel
-        if ((output = trie_get(network->buffers, target)) == NULL) {
-            print_to_buffer(network->buffer,
-                            "Error parsing CTCP: Received ACTION for %s from "
-                            "%s, but we're not in %s.\n",
-                            target, nickname, target);
+        if ((output = sqchat_trie_get(network->buffers, target)) == NULL) {
+            sqchat_buffer_print(network->buffer,
+                                "Error parsing CTCP: Received ACTION for %s "
+                                "from %s, but we're not in %s.\n",
+                                target, nickname, target);
             return;
         }
 
-        print_to_buffer(output, "* %s %s\n", nickname, msg);
+        sqchat_buffer_print(output, "* %s %s\n", nickname, msg);
     }
     else {
         // Check if we have a query open with this user, if not open a new one
-        if ((output = trie_get(network->buffers, target)) == NULL) {
-            output = new_buffer(target, QUERY, network);
-            add_buffer_to_tree(output, network);
+        if ((output = sqchat_trie_get(network->buffers, target)) == NULL) {
+            output = sqchat_buffer_new(target, QUERY, network);
+            sqchat_network_tree_buffer_add(output, network);
         }
-        print_to_buffer(output, "* %s %s\n", nickname, msg);
+        sqchat_buffer_print(output, "* %s %s\n", nickname, msg);
     }
 }
 
-CTCP_REQ_HANDLER(ctcp_ping_req_handler) {
+CTCP_REQ_HANDLER(sqchat_ctcp_ping_req_handler) {
     char * nickname;
     char * address;
-    split_irc_hostmask(hostmask, &nickname, &address);
+    sqchat_split_hostmask(hostmask, &nickname, &address);
 
     if (msg == NULL)
-        send_ctcp_reply(network, nickname, "PING");
+        sqchat_network_send_ctcp_reply(network, nickname, "PING");
     else
-        sendf_ctcp_reply(network, nickname, "PING", "%s", msg);
+        sqchat_network_sendf_ctcp_reply(network, nickname, "PING", "%s", msg);
 }
 
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

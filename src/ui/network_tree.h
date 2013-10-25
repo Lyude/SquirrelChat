@@ -13,32 +13,32 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NETWORK_TREE_H
-#define NETWORK_TREE_H
+#ifndef __NETWORK_TREE_H__
+#define __NETWORK_TREE_H__
 #include <gtk/gtk.h>
 
 #include "chat_window.h"
 
 #include "buffer.h"
 
-extern void create_network_tree(struct chat_window * window)
+extern void sqchat_network_tree_init(struct chat_window * window)
     _nonnull(1);
-extern void connect_network_tree_signals(struct chat_window * window)
-    _nonnull(1);
-
-extern struct irc_network * get_current_network(struct chat_window * window)
+extern void sqchat_network_tree_connect_signals(struct chat_window * window)
     _nonnull(1);
 
-extern void add_network_to_tree(struct chat_window * window,
-                                struct irc_network * network)
+extern struct sqchat_network * sqchat_network_tree_get_current(struct chat_window * window)
+    _nonnull(1);
+
+extern void sqchat_network_tree_network_add(struct chat_window * window,
+                                            struct sqchat_network * network)
     _nonnull(1, 2);
 
-extern void add_buffer_to_tree(struct buffer_info * buffer,
-                               struct irc_network * network)
+extern void sqchat_network_tree_buffer_add(struct sqchat_buffer * buffer,
+                                           struct sqchat_network * network)
     _nonnull(1, 2);
-extern void remove_buffer_from_tree(struct buffer_info * buffer)
+extern void sqchat_network_tree_buffer_remove(struct sqchat_buffer * buffer)
     _nonnull(1);
 
-#endif /* NETWORK_TREE_H */
+#endif /* __NETWORK_TREE_H__ */
 
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

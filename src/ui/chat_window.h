@@ -61,14 +61,14 @@ struct chat_window {
     GtkWidget * scrolled_window_for_user_list;
     GtkWidget * user_list;
 
-    struct buffer_info * current_buffer;
+    struct sqchat_buffer * current_buffer;
 };
 
 // TODO: Remove the "create_" part in the function name
-extern struct chat_window * create_new_chat_window(struct irc_network * network);
+extern struct chat_window * create_new_chat_window(struct sqchat_network * network);
 
 extern void change_active_buffer(struct chat_window * window,
-                                 struct buffer_info * new_buffer)
+                                 struct sqchat_buffer * new_buffer)
     _nonnull(1, 2);
 
 #endif // CHAT_WINDOW_H

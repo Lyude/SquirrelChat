@@ -15,15 +15,15 @@
  */
 #include "casemap.h"
 
-char rfc1459_tolower(const char c) {
+char sqchat_rfc1459_tolower(const char c) {
     return c >= 'A' && c <= '^' ? c + 32 : c;
 }
 
-char rfc1459_toupper(const char c) {
+char sqchat_rfc1459_toupper(const char c) {
     return c >= 'a' && c <= '~' ? c - 32 : c;
 }
 
-int rfc1459_strcasecmp(const char * s1, const char * s2) {
+int sqchat_rfc1459_strcasecmp(const char * s1, const char * s2) {
     const char * c1 = s1;
     const char * c2 = s2;
     int result;
@@ -31,7 +31,7 @@ int rfc1459_strcasecmp(const char * s1, const char * s2) {
     if (c1 == c2)
         return 0;
 
-    while ((result = rfc1459_tolower(*c1) - rfc1459_tolower(*c2++)) == 0)
+    while ((result = sqchat_rfc1459_tolower(*c1) - sqchat_rfc1459_tolower(*c2++)) == 0)
         if (*c1++ == '\0')
             break;
 

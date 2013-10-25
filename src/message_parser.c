@@ -33,11 +33,11 @@
 
 #include <stdio.h>
 
-#define MAX_POSSIBLE_PARAMS ((IRC_MSG_LEN - sizeof(":X X ")) / sizeof("X "))
+#define MAX_POSSIBLE_PARAMS ((SQCHAT_IRC_MSG_LEN - sizeof(":X X ")) / sizeof("X "))
 
-trie * message_types;
+sqchat_trie * message_types;
 
-irc_message_callback * numerics;
+sqchat_msg_cb * numerics;
 
 /* A function to convert strings to shorts, optimized specifically for IRC
  * numerics
@@ -56,165 +56,165 @@ short numeric_to_short(char * numeric) {
         return result;
 }
 
-void init_message_parser() {
-    message_types = trie_new(trie_strtoupper);
-    numerics = calloc(IRC_NUMERIC_MAX, sizeof(irc_message_callback*));
+void sqchat_init_msg_parser() {
+    message_types = sqchat_trie_new(sqchat_trie_strtoupper);
+    numerics = calloc(IRC_NUMERIC_MAX, sizeof(sqchat_msg_cb*));
 
     // Add in the built in message types
-    trie_set(message_types, "CAP", cap_msg_callback);
-    trie_set(message_types, "JOIN", join_msg_callback);
-    trie_set(message_types, "PART", part_msg_callback);
-    trie_set(message_types, "PRIVMSG", privmsg_msg_callback);
-    trie_set(message_types, "PING", ping_msg_callback);
-    trie_set(message_types, "NICK", nick_msg_callback);
-    trie_set(message_types, "TOPIC", topic_msg_callback);
-    trie_set(message_types, "NOTICE", notice_msg_callback);
-    trie_set(message_types, "MODE", mode_msg_callback);
-    trie_set(message_types, "QUIT", quit_msg_callback);
-    trie_set(message_types, "KICK", kick_msg_callback);
-    trie_set(message_types, "INVITE", invite_msg_callback);
-    trie_set(message_types, "ERROR", error_msg_callback);
-    trie_set(message_types, "WALLOPS", wallops_msg_callback);
+    sqchat_trie_set(message_types, "CAP", sqchat_cap_msg_callback);
+    sqchat_trie_set(message_types, "JOIN", sqchat_join_msg_callback);
+    sqchat_trie_set(message_types, "PART", sqchat_part_msg_callback);
+    sqchat_trie_set(message_types, "PRIVMSG", sqchat_privmsg_msg_callback);
+    sqchat_trie_set(message_types, "PING", sqchat_ping_msg_callback);
+    sqchat_trie_set(message_types, "NICK", sqchat_nick_msg_callback);
+    sqchat_trie_set(message_types, "TOPIC", sqchat_topic_msg_callback);
+    sqchat_trie_set(message_types, "NOTICE", sqchat_notice_msg_callback);
+    sqchat_trie_set(message_types, "MODE", sqchat_mode_msg_callback);
+    sqchat_trie_set(message_types, "QUIT", sqchat_quit_msg_callback);
+    sqchat_trie_set(message_types, "KICK", sqchat_kick_msg_callback);
+    sqchat_trie_set(message_types, "INVITE", sqchat_invite_msg_callback);
+    sqchat_trie_set(message_types, "ERROR", sqchat_error_msg_callback);
+    sqchat_trie_set(message_types, "WALLOPS", sqchat_wallops_msg_callback);
 
-    init_message_types();
-    init_ctcp();
+    sqchat_init_message_types();
+    sqchat_ctcp_init();
 
-    numerics[IRC_RPL_WELCOME] = echo_argv_1;
-    numerics[IRC_RPL_YOURHOST] = echo_argv_1;
-    numerics[IRC_RPL_CREATED] = echo_argv_1;
-    numerics[IRC_RPL_MYINFO] = rpl_myinfo;
-    numerics[IRC_RPL_ISUPPORT] = rpl_isupport;
-    numerics[IRC_RPL_NAMREPLY] = rpl_namreply;
-    numerics[IRC_RPL_ENDOFNAMES] = rpl_endofnames;
-    numerics[IRC_RPL_MOTDSTART] = rpl_motdstart;
-    numerics[IRC_RPL_MOTD] = rpl_motd;
-    numerics[IRC_RPL_ENDOFMOTD] = rpl_endofmotd;
-    numerics[IRC_ERR_NOMOTD] = generic_error;
-    numerics[IRC_ERR_NICKNAMEINUSE] = nick_change_error;
-    numerics[IRC_ERR_ERRORNEUSNICKNAME] = nick_change_error;
-    numerics[IRC_RPL_TOPIC] = rpl_topic;
-    numerics[IRC_RPL_NOTOPIC] = rpl_notopic;
-    numerics[IRC_RPL_TOPICWHOTIME] = rpl_topicwhotime;
-    numerics[IRC_RPL_CHANNELMODEIS] = rpl_channelmodeis;
-    numerics[IRC_RPL_CREATIONTIME] = rpl_creationtime;
-    numerics[IRC_RPL_SNOMASK] = rpl_snomask;
+    numerics[IRC_RPL_WELCOME] = sqchat_echo_argv_1;
+    numerics[IRC_RPL_YOURHOST] = sqchat_echo_argv_1;
+    numerics[IRC_RPL_CREATED] = sqchat_echo_argv_1;
+    numerics[IRC_RPL_MYINFO] = sqchat_rpl_myinfo;
+    numerics[IRC_RPL_ISUPPORT] = sqchat_rpl_isupport;
+    numerics[IRC_RPL_NAMREPLY] = sqchat_rpl_namreply;
+    numerics[IRC_RPL_ENDOFNAMES] = sqchat_rpl_endofnames;
+    numerics[IRC_RPL_MOTDSTART] = sqchat_rpl_motdstart;
+    numerics[IRC_RPL_MOTD] = sqchat_rpl_motd;
+    numerics[IRC_RPL_ENDOFMOTD] = sqchat_rpl_endofmotd;
+    numerics[IRC_ERR_NOMOTD] = sqchat_generic_error;
+    numerics[IRC_ERR_NICKNAMEINUSE] = sqchat_nick_change_error;
+    numerics[IRC_ERR_ERRORNEUSNICKNAME] = sqchat_nick_change_error;
+    numerics[IRC_RPL_TOPIC] = sqchat_rpl_topic;
+    numerics[IRC_RPL_NOTOPIC] = sqchat_rpl_notopic;
+    numerics[IRC_RPL_TOPICWHOTIME] = sqchat_rpl_topicwhotime;
+    numerics[IRC_RPL_CHANNELMODEIS] = sqchat_rpl_channelmodeis;
+    numerics[IRC_RPL_CREATIONTIME] = sqchat_rpl_creationtime;
+    numerics[IRC_RPL_SNOMASK] = sqchat_rpl_snomask;
 
-    numerics[IRC_RPL_WHOISUSER] = rpl_whoisuser;
-    numerics[IRC_RPL_WHOISSERVER] = rpl_whoisserver;
-    numerics[IRC_RPL_WHOISOPERATOR] = rpl_whoisoperator;
-    numerics[IRC_RPL_WHOISIDLE] = rpl_whoisidle;
-    numerics[IRC_RPL_WHOISCHANNELS] = rpl_whoischannels;
-    numerics[IRC_RPL_WHOISSECURE] = rpl_whois_generic;
-    numerics[IRC_RPL_WHOISACCOUNT] = rpl_whoisaccount;
-    numerics[IRC_RPL_WHOISREGNICK] = rpl_whois_generic;
-    numerics[IRC_RPL_WHOISHOST] = rpl_whois_generic;
-    numerics[IRC_RPL_WHOISSPECIAL] = rpl_whois_generic;
-    numerics[IRC_RPL_WHOISMODES] = rpl_whois_generic;
-    numerics[IRC_RPL_WHOISACTUALLY] = rpl_whoisactually;
-    numerics[IRC_RPL_ENDOFWHOIS] = rpl_endofwhois;
+    numerics[IRC_RPL_WHOISUSER] = sqchat_rpl_whoisuser;
+    numerics[IRC_RPL_WHOISSERVER] = sqchat_rpl_whoisserver;
+    numerics[IRC_RPL_WHOISOPERATOR] = sqchat_rpl_whoisoperator;
+    numerics[IRC_RPL_WHOISIDLE] = sqchat_rpl_whoisidle;
+    numerics[IRC_RPL_WHOISCHANNELS] = sqchat_rpl_whoischannels;
+    numerics[IRC_RPL_WHOISSECURE] = sqchat_rpl_whois_generic;
+    numerics[IRC_RPL_WHOISACCOUNT] = sqchat_rpl_whoisaccount;
+    numerics[IRC_RPL_WHOISREGNICK] = sqchat_rpl_whois_generic;
+    numerics[IRC_RPL_WHOISHOST] = sqchat_rpl_whois_generic;
+    numerics[IRC_RPL_WHOISSPECIAL] = sqchat_rpl_whois_generic;
+    numerics[IRC_RPL_WHOISMODES] = sqchat_rpl_whois_generic;
+    numerics[IRC_RPL_WHOISACTUALLY] = sqchat_rpl_whoisactually;
+    numerics[IRC_RPL_ENDOFWHOIS] = sqchat_rpl_endofwhois;
 
-    numerics[IRC_RPL_WHOWASUSER] = rpl_whowasuser;
-    numerics[IRC_RPL_ENDOFWHOWAS] = rpl_endofwhowas;
+    numerics[IRC_RPL_WHOWASUSER] = sqchat_rpl_whowasuser;
+    numerics[IRC_RPL_ENDOFWHOWAS] = sqchat_rpl_endofwhowas;
 
-    numerics[IRC_RPL_YOUREOPER] = generic_echo_rpl_end;
+    numerics[IRC_RPL_YOUREOPER] = sqchat_generic_echo_rpl_end;
 
-    numerics[IRC_RPL_LUSERCLIENT] = generic_echo_rpl;
-    numerics[IRC_RPL_LUSEROP] = generic_lusers_rpl;
-    numerics[IRC_RPL_LUSERUNKNOWN] = generic_lusers_rpl;
-    numerics[IRC_RPL_LUSERCHANNELS] = generic_lusers_rpl;
-    numerics[IRC_RPL_LOCALUSERS] = rpl_localglobalusers;
-    numerics[IRC_RPL_GLOBALUSERS] = rpl_localglobalusers;
-    numerics[IRC_RPL_STATSCONN] = generic_echo_rpl;
-    numerics[IRC_RPL_LUSERME] = generic_echo_rpl_end;
+    numerics[IRC_RPL_LUSERCLIENT] = sqchat_generic_echo_rpl;
+    numerics[IRC_RPL_LUSEROP] = sqchat_generic_lusers_rpl;
+    numerics[IRC_RPL_LUSERUNKNOWN] = sqchat_generic_lusers_rpl;
+    numerics[IRC_RPL_LUSERCHANNELS] = sqchat_generic_lusers_rpl;
+    numerics[IRC_RPL_LOCALUSERS] = sqchat_rpl_localglobalusers;
+    numerics[IRC_RPL_GLOBALUSERS] = sqchat_rpl_localglobalusers;
+    numerics[IRC_RPL_STATSCONN] = sqchat_generic_echo_rpl;
+    numerics[IRC_RPL_LUSERME] = sqchat_generic_echo_rpl_end;
 
-    numerics[IRC_RPL_INVITING] = rpl_inviting;
+    numerics[IRC_RPL_INVITING] = sqchat_rpl_inviting;
 
-    numerics[IRC_RPL_TIME] = rpl_time;
+    numerics[IRC_RPL_TIME] = sqchat_rpl_time;
 
-    numerics[IRC_RPL_VERSION] = rpl_version;
+    numerics[IRC_RPL_VERSION] = sqchat_rpl_version;
 
-    numerics[IRC_RPL_INFO] = rpl_info;
-    numerics[IRC_RPL_ENDOFINFO] = rpl_endofinfo;
+    numerics[IRC_RPL_INFO] = sqchat_rpl_info;
+    numerics[IRC_RPL_ENDOFINFO] = sqchat_rpl_endofinfo;
 
-    numerics[IRC_RPL_AWAY] = rpl_away;
-    numerics[IRC_RPL_NOWAWAY] = rpl_nowaway;
-    numerics[IRC_RPL_UNAWAY] = rpl_unaway;
+    numerics[IRC_RPL_AWAY] = sqchat_rpl_away;
+    numerics[IRC_RPL_NOWAWAY] = sqchat_rpl_nowaway;
+    numerics[IRC_RPL_UNAWAY] = sqchat_rpl_unaway;
 
-    numerics[IRC_RPL_WHOREPLY] = rpl_whoreply;
-    numerics[IRC_RPL_ENDOFWHO] = rpl_endofwho;
+    numerics[IRC_RPL_WHOREPLY] = sqchat_rpl_whoreply;
+    numerics[IRC_RPL_ENDOFWHO] = sqchat_rpl_endofwho;
 
-    numerics[IRC_RPL_LINKS] = rpl_links;
-    numerics[IRC_RPL_ENDOFLINKS] = rpl_endoflinks;
+    numerics[IRC_RPL_LINKS] = sqchat_rpl_links;
+    numerics[IRC_RPL_ENDOFLINKS] = sqchat_rpl_endoflinks;
 
-    numerics[IRC_RPL_LISTSTART] = rpl_liststart;
-    numerics[IRC_RPL_LIST] = rpl_list;
-    numerics[IRC_RPL_LISTEND] = rpl_listend;
+    numerics[IRC_RPL_LISTSTART] = sqchat_rpl_liststart;
+    numerics[IRC_RPL_LIST] = sqchat_rpl_list;
+    numerics[IRC_RPL_LISTEND] = sqchat_rpl_listend;
 
-    numerics[IRC_RPL_HOSTHIDDEN] = rpl_hosthidden;
+    numerics[IRC_RPL_HOSTHIDDEN] = sqchat_rpl_hosthidden;
 
-    numerics[IRC_RPL_TRACELINK] = rpl_tracelink;
-    numerics[IRC_RPL_TRACECONNECTING] = generic_rpl_trace;
-    numerics[IRC_RPL_TRACEHANDSHAKE] = generic_rpl_trace;
-    numerics[IRC_RPL_TRACEUNKNOWN] = generic_rpl_trace;
-    numerics[IRC_RPL_TRACEOPERATOR] = rpl_traceoperator;
-    numerics[IRC_RPL_TRACEUSER] = rpl_traceuser;
-    numerics[IRC_RPL_TRACESERVER] = rpl_traceserver;
-    numerics[IRC_RPL_TRACESERVICE] = rpl_traceservice;
-    numerics[IRC_RPL_TRACECLASS] = generic_rpl_trace;
-    numerics[IRC_RPL_TRACEEND] = rpl_traceend;
+    numerics[IRC_RPL_TRACELINK] = sqchat_rpl_tracelink;
+    numerics[IRC_RPL_TRACECONNECTING] = sqchat_generic_rpl_trace;
+    numerics[IRC_RPL_TRACEHANDSHAKE] = sqchat_generic_rpl_trace;
+    numerics[IRC_RPL_TRACEUNKNOWN] = sqchat_generic_rpl_trace;
+    numerics[IRC_RPL_TRACEOPERATOR] = sqchat_rpl_traceoperator;
+    numerics[IRC_RPL_TRACEUSER] = sqchat_rpl_traceuser;
+    numerics[IRC_RPL_TRACESERVER] = sqchat_rpl_traceserver;
+    numerics[IRC_RPL_TRACESERVICE] = sqchat_rpl_traceservice;
+    numerics[IRC_RPL_TRACECLASS] = sqchat_generic_rpl_trace;
+    numerics[IRC_RPL_TRACEEND] = sqchat_rpl_traceend;
 
-    numerics[IRC_ERR_NOADMININFO] = generic_error;
-    numerics[IRC_ERR_NOSUCHNICK] = generic_target_error;
-    numerics[IRC_ERR_NOSUCHSERVER] = generic_target_error;
-    numerics[IRC_ERR_CANNOTSENDTOCHAN] = generic_channel_error;
-    numerics[IRC_ERR_TOOMANYCHANNELS] = generic_channel_error;
-    numerics[IRC_ERR_WASNOSUCHNICK] = generic_target_error;
-    numerics[IRC_ERR_TOOMANYTARGETS] = generic_target_error;
-    numerics[IRC_ERR_NOSUCHSERVICE] = generic_target_error;
-    numerics[IRC_ERR_NOORIGIN] = generic_error;
-    numerics[IRC_ERR_NORECEPIENT] = generic_error;
-    numerics[IRC_ERR_NOTEXTTOSEND] = generic_error;
-    numerics[IRC_ERR_NOTOPLEVEL] = generic_target_error;
-    numerics[IRC_ERR_WILDTOPLEVEL] = generic_target_error;
-    numerics[IRC_ERR_BADMASK] = generic_target_error;
-    numerics[IRC_ERR_NOSUCHCHANNEL] = generic_channel_error;
-    numerics[IRC_ERR_KEYSET] = generic_channel_error;
-    numerics[IRC_ERR_NOCHANMODES] = generic_channel_error;
-    numerics[IRC_ERR_UNKNOWNMODE] = generic_channel_error;
-    numerics[IRC_ERR_BADCHANMASK] = generic_channel_error;
-    numerics[IRC_ERR_BANLISTFULL] = generic_channel_error;
-    numerics[IRC_ERR_CHANOPRIVSNEEDED] = generic_channel_error;
-    numerics[IRC_ERR_NEEDMOREPARAMS] = generic_command_error;
-    numerics[IRC_ERR_UNKNOWNCOMMAND] = generic_command_error;
-    numerics[IRC_RPL_TRYAGAIN] = generic_command_error;
-    numerics[IRC_ERR_FILEERROR] = generic_error;
-    numerics[IRC_ERR_NONICKNAMEGIVEN] = generic_target_error;
-    numerics[IRC_ERR_NICKCOLLISION] = generic_target_error;
-    numerics[IRC_ERR_UNAVAILRESOURCE] = generic_target_error;
-    numerics[IRC_ERR_USERNOTINCHANNEL] = generic_user_channel_error;
-    numerics[IRC_ERR_NOTONCHANNEL] = generic_channel_error;
-    numerics[IRC_ERR_USERONCHANNEL] = generic_user_channel_error;
-    numerics[IRC_ERR_ALREADYREGISTERED] = generic_error;
-    numerics[IRC_ERR_NOPERMFORHOST] = generic_network_error;
-    numerics[IRC_ERR_PASSWDMISMATCH] = generic_network_error;
-    numerics[IRC_ERR_YOUREBANNEDCREEP] = generic_network_error;
-    numerics[IRC_ERR_YOUWILLBEBANNED] = generic_error;
-    numerics[IRC_ERR_CANTKILLSERVER] = generic_error;
-    numerics[IRC_ERR_RESTRICTED] = echo_argv_1;
-    numerics[IRC_ERR_UNIQOPPRIVSNEEDED] = generic_error;
-    numerics[IRC_ERR_NOOPERHOST] = generic_error;
-    numerics[IRC_ERR_UMODEUNKNOWNFLAG] = generic_error;
-    numerics[IRC_ERR_USERSDONTMATCH] = generic_error;
-    numerics[IRC_ERR_NOPRIVILEGES] = generic_error;
+    numerics[IRC_ERR_NOADMININFO] = sqchat_generic_error;
+    numerics[IRC_ERR_NOSUCHNICK] = sqchat_generic_target_error;
+    numerics[IRC_ERR_NOSUCHSERVER] = sqchat_generic_target_error;
+    numerics[IRC_ERR_CANNOTSENDTOCHAN] = sqchat_generic_channel_error;
+    numerics[IRC_ERR_TOOMANYCHANNELS] = sqchat_generic_channel_error;
+    numerics[IRC_ERR_WASNOSUCHNICK] = sqchat_generic_target_error;
+    numerics[IRC_ERR_TOOMANYTARGETS] = sqchat_generic_target_error;
+    numerics[IRC_ERR_NOSUCHSERVICE] = sqchat_generic_target_error;
+    numerics[IRC_ERR_NOORIGIN] = sqchat_generic_error;
+    numerics[IRC_ERR_NORECEPIENT] = sqchat_generic_error;
+    numerics[IRC_ERR_NOTEXTTOSEND] = sqchat_generic_error;
+    numerics[IRC_ERR_NOTOPLEVEL] = sqchat_generic_target_error;
+    numerics[IRC_ERR_WILDTOPLEVEL] = sqchat_generic_target_error;
+    numerics[IRC_ERR_BADMASK] = sqchat_generic_target_error;
+    numerics[IRC_ERR_NOSUCHCHANNEL] = sqchat_generic_channel_error;
+    numerics[IRC_ERR_KEYSET] = sqchat_generic_channel_error;
+    numerics[IRC_ERR_NOCHANMODES] = sqchat_generic_channel_error;
+    numerics[IRC_ERR_UNKNOWNMODE] = sqchat_generic_channel_error;
+    numerics[IRC_ERR_BADCHANMASK] = sqchat_generic_channel_error;
+    numerics[IRC_ERR_BANLISTFULL] = sqchat_generic_channel_error;
+    numerics[IRC_ERR_CHANOPRIVSNEEDED] = sqchat_generic_channel_error;
+    numerics[IRC_ERR_NEEDMOREPARAMS] = sqchat_generic_command_error;
+    numerics[IRC_ERR_UNKNOWNCOMMAND] = sqchat_generic_command_error;
+    numerics[IRC_RPL_TRYAGAIN] = sqchat_generic_command_error;
+    numerics[IRC_ERR_FILEERROR] = sqchat_generic_error;
+    numerics[IRC_ERR_NONICKNAMEGIVEN] = sqchat_generic_target_error;
+    numerics[IRC_ERR_NICKCOLLISION] = sqchat_generic_target_error;
+    numerics[IRC_ERR_UNAVAILRESOURCE] = sqchat_generic_target_error;
+    numerics[IRC_ERR_USERNOTINCHANNEL] = sqchat_generic_user_channel_error;
+    numerics[IRC_ERR_NOTONCHANNEL] = sqchat_generic_channel_error;
+    numerics[IRC_ERR_USERONCHANNEL] = sqchat_generic_user_channel_error;
+    numerics[IRC_ERR_ALREADYREGISTERED] = sqchat_generic_error;
+    numerics[IRC_ERR_NOPERMFORHOST] = sqchat_generic_network_error;
+    numerics[IRC_ERR_PASSWDMISMATCH] = sqchat_generic_network_error;
+    numerics[IRC_ERR_YOUREBANNEDCREEP] = sqchat_generic_network_error;
+    numerics[IRC_ERR_YOUWILLBEBANNED] = sqchat_generic_error;
+    numerics[IRC_ERR_CANTKILLSERVER] = sqchat_generic_error;
+    numerics[IRC_ERR_RESTRICTED] = sqchat_echo_argv_1;
+    numerics[IRC_ERR_UNIQOPPRIVSNEEDED] = sqchat_generic_error;
+    numerics[IRC_ERR_NOOPERHOST] = sqchat_generic_error;
+    numerics[IRC_ERR_UMODEUNKNOWNFLAG] = sqchat_generic_error;
+    numerics[IRC_ERR_USERSDONTMATCH] = sqchat_generic_error;
+    numerics[IRC_ERR_NOPRIVILEGES] = sqchat_generic_error;
 }
 
-void process_irc_message(struct irc_network * network, char * msg) {
+void sqchat_process_msg(struct sqchat_network * network, char * msg) {
     char * cursor;
     char * hostmask;
     char * command;
     char * params;
     short numeric;
-    irc_message_callback callback;
+    sqchat_msg_cb callback;
 
     /* TODO: Maybe figure out a better behavior for when bad messages are
      * received...
@@ -256,79 +256,89 @@ void process_irc_message(struct irc_network * network, char * msg) {
     }
 
     if ((numeric = numeric_to_short(command)) != -1) {
-        if (numeric > 0 && numeric <= IRC_NUMERIC_MAX && numerics[numeric] != NULL) {
+        if (numeric > 0 &&
+            numeric <= IRC_NUMERIC_MAX && numerics[numeric] != NULL) {
             switch (numerics[numeric](network, hostmask, argc, argv)) {
-                case IRC_MSG_ERR_ARGS:
-                    print_to_buffer(network->buffer,
-                                    "Error parsing numeric response: Not "
-                                    "enough arguments included in the "
-                                    "response.\n"
-                                    "Numeric: %i\n", numeric);
-                    dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
+                case SQCHAT_MSG_ERR_ARGS:
+                    sqchat_buffer_print(network->buffer,
+                                        "Error parsing numeric response: Not "
+                                        "enough arguments included in the "
+                                        "response.\n"
+                                        "Numeric: %i\n", numeric);
+                    sqchat_dump_msg_to_buffer(network->buffer, hostmask, argc,
+                                              argv);
                     if (network->claimed_responses)
-                        remove_last_response_claim(network);
+                        sqchat_remove_last_response_claim(network);
                     break;
-                case IRC_MSG_ERR_ARGS_FATAL:
-                    print_to_buffer(network->buffer,
-                                    "Fatal: Error parsing numeric response: "
-                                    "Not enough arguments included in the "
-                                    "response.\n"
-                                    "Numeric: %i\n", numeric);
-                    dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
-                    disconnect_irc_network(network, "Invalid data received");
+                case SQCHAT_MSG_ERR_ARGS_FATAL:
+                    sqchat_buffer_print(network->buffer,
+                                        "Fatal: Error parsing numeric "
+                                        "response: Not enough arguments "
+                                        "included in the response from the "
+                                        "server.\n"
+                                        "Numeric: %i\n",
+                                        numeric);
+                    sqchat_dump_msg_to_buffer(network->buffer, hostmask, argc,
+                                              argv);
+                    sqchat_disconnect_network(network, "Invalid data received");
                     break;
-                case IRC_MSG_ERR_MISC:
-                    dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
-                case IRC_MSG_ERR_MISC_NODUMP:
+                case SQCHAT_MSG_ERR_MISC:
+                    sqchat_dump_msg_to_buffer(network->buffer, hostmask, argc,
+                                              argv);
+                case SQCHAT_MSG_ERR_MISC_NODUMP:
                     if (network->claimed_responses)
-                        remove_last_response_claim(network);
+                        sqchat_remove_last_response_claim(network);
                     break;
             }
         }
         else {
-            print_to_buffer(network->buffer,
-                            "Error parsing message: unknown numeric %i\n",
-                            numeric);
-            dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
+            sqchat_buffer_print(network->buffer,
+                                "Error parsing message: unknown numeric %i\n",
+                                numeric);
+            sqchat_dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
         }
     }
     // Attempt to look up the command
-    else if ((callback = trie_get(message_types, command)) != NULL) {
+    else if ((callback = sqchat_trie_get(message_types, command)) != NULL) {
         switch (callback(network, hostmask, argc, argv)) {
-            case IRC_MSG_ERR_ARGS:
-                print_to_buffer(network->buffer,
-                                "Error parsing message: Not enough arguments "
-                                "included in the message.\n"
-                                "Type: %s\n", command);
-                dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
+            case SQCHAT_MSG_ERR_ARGS:
+                sqchat_buffer_print(network->buffer,
+                                    "Error parsing message: Not enough arguments "
+                                    "included in the message.\n"
+                                    "Type: %s\n", command);
+                sqchat_dump_msg_to_buffer(network->buffer, hostmask, argc,
+                                          argv);
                 if (network->claimed_responses)
-                    remove_last_response_claim(network);
+                    sqchat_remove_last_response_claim(network);
                 break;
-            case IRC_MSG_ERR_ARGS_FATAL:
-                print_to_buffer(network->buffer,
-                                "Fatal: Error parsing message: Not enough "
-                                "arguments included in the message.\n"
-                                "Type: %s\n", command);
-                dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
-                disconnect_irc_network(network, "Invalid data received");
+            case SQCHAT_MSG_ERR_ARGS_FATAL:
+                sqchat_buffer_print(network->buffer,
+                                    "Fatal: Error parsing message: Not enough "
+                                    "arguments included in the message.\n"
+                                    "Type: %s\n", command);
+                sqchat_dump_msg_to_buffer(network->buffer, hostmask, argc,
+                                          argv);
+                sqchat_disconnect_network(network, "Invalid data received");
                 break;
-            case IRC_MSG_ERR_MISC:
-                dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
-            case IRC_MSG_ERR_MISC_NODUMP:
+            case SQCHAT_MSG_ERR_MISC:
+                sqchat_dump_msg_to_buffer(network->buffer, hostmask, argc,
+                                          argv);
+            case SQCHAT_MSG_ERR_MISC_NODUMP:
                 if (network->claimed_responses)
-                    remove_last_response_claim(network);
+                    sqchat_remove_last_response_claim(network);
                 break;
         }
     }
     else {
-        print_to_buffer(network->buffer,
-                        "Error parsing message: unknown message type: \"%s\"\n",
-                        command);
-        dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
+        sqchat_buffer_print(network->buffer,
+                            "Error parsing message: unknown message type: "
+                            "\"%s\"\n",
+                            command);
+        sqchat_dump_msg_to_buffer(network->buffer, hostmask, argc, argv);
     }
 }
 
-void split_irc_hostmask(char * hostmask, char ** nickname, char ** address) {
+void sqchat_split_hostmask(char * hostmask, char ** nickname, char ** address) {
     char * saveptr;
     *nickname = strtok_r(hostmask, "!", &saveptr);
     *address = strtok_r(NULL, "!", &saveptr);

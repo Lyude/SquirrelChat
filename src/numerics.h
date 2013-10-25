@@ -18,75 +18,75 @@
 
 #include "irc_network.h"
 
-extern void init_numerics();
+extern void sqchat_init_numerics();
 
-#define NUMERIC_CB(name)                            \
-    extern short name(struct irc_network * network, \
-                      char * hostmask,              \
-                      short argc,                   \
-                      char * argv[])                \
+#define NUMERIC_CB(name)                                    \
+    extern short name(struct sqchat_network * network,      \
+                      char * hostmask,                      \
+                      short argc,                           \
+                      char * argv[])                        \
     _nonnull(1)
 
-NUMERIC_CB(echo_argv_1);
-NUMERIC_CB(rpl_myinfo);
-NUMERIC_CB(rpl_isupport);
-NUMERIC_CB(rpl_namreply);
-NUMERIC_CB(rpl_endofnames);
-NUMERIC_CB(rpl_motdstart);
-NUMERIC_CB(rpl_motd);
-NUMERIC_CB(rpl_endofmotd);
-NUMERIC_CB(rpl_topic);
-NUMERIC_CB(rpl_notopic);
-NUMERIC_CB(rpl_topicwhotime);
-NUMERIC_CB(rpl_channelmodeis);
-NUMERIC_CB(rpl_creationtime);
-NUMERIC_CB(rpl_whoisuser);
-NUMERIC_CB(rpl_whoisserver);
-NUMERIC_CB(rpl_whoisoperator);
-NUMERIC_CB(rpl_whoisidle);
-NUMERIC_CB(rpl_whoischannels);
-NUMERIC_CB(rpl_whoissecure);
-NUMERIC_CB(rpl_whoisaccount);
-NUMERIC_CB(rpl_whois_generic);
-NUMERIC_CB(rpl_whowasuser);
-NUMERIC_CB(rpl_endofwhois);
-NUMERIC_CB(rpl_whoisactually);
-NUMERIC_CB(rpl_endofwhowas);
-NUMERIC_CB(generic_lusers_rpl);
-NUMERIC_CB(rpl_localglobalusers);
-NUMERIC_CB(rpl_inviting);
-NUMERIC_CB(rpl_time);
-NUMERIC_CB(rpl_version);
-NUMERIC_CB(rpl_info);
-NUMERIC_CB(rpl_endofinfo);
-NUMERIC_CB(rpl_nowaway);
-NUMERIC_CB(rpl_unaway);
-NUMERIC_CB(rpl_away);
-NUMERIC_CB(rpl_whoreply);
-NUMERIC_CB(rpl_endofwho);
-NUMERIC_CB(rpl_links);
-NUMERIC_CB(rpl_endoflinks);
-NUMERIC_CB(rpl_liststart);
-NUMERIC_CB(rpl_list);
-NUMERIC_CB(rpl_listend);
-NUMERIC_CB(rpl_hosthidden);
-NUMERIC_CB(generic_rpl_trace);
-NUMERIC_CB(rpl_tracelink);
-NUMERIC_CB(rpl_traceserver);
-NUMERIC_CB(rpl_traceservice);
-NUMERIC_CB(rpl_traceoperator);
-NUMERIC_CB(rpl_traceuser);
-NUMERIC_CB(rpl_traceend);
-NUMERIC_CB(rpl_snomask);
-NUMERIC_CB(generic_error);
-NUMERIC_CB(generic_network_error);
-NUMERIC_CB(generic_command_error);
-NUMERIC_CB(generic_channel_error);
-NUMERIC_CB(generic_target_error);
-NUMERIC_CB(generic_user_channel_error);
-NUMERIC_CB(generic_echo_rpl);
-NUMERIC_CB(generic_echo_rpl_end);
-NUMERIC_CB(nick_change_error);
+NUMERIC_CB(sqchat_echo_argv_1);
+NUMERIC_CB(sqchat_rpl_myinfo);
+NUMERIC_CB(sqchat_rpl_isupport);
+NUMERIC_CB(sqchat_rpl_namreply);
+NUMERIC_CB(sqchat_rpl_endofnames);
+NUMERIC_CB(sqchat_rpl_motdstart);
+NUMERIC_CB(sqchat_rpl_motd);
+NUMERIC_CB(sqchat_rpl_endofmotd);
+NUMERIC_CB(sqchat_rpl_topic);
+NUMERIC_CB(sqchat_rpl_notopic);
+NUMERIC_CB(sqchat_rpl_topicwhotime);
+NUMERIC_CB(sqchat_rpl_channelmodeis);
+NUMERIC_CB(sqchat_rpl_creationtime);
+NUMERIC_CB(sqchat_rpl_whoisuser);
+NUMERIC_CB(sqchat_rpl_whoisserver);
+NUMERIC_CB(sqchat_rpl_whoisoperator);
+NUMERIC_CB(sqchat_rpl_whoisidle);
+NUMERIC_CB(sqchat_rpl_whoischannels);
+NUMERIC_CB(sqchat_rpl_whoissecure);
+NUMERIC_CB(sqchat_rpl_whoisaccount);
+NUMERIC_CB(sqchat_rpl_whois_generic);
+NUMERIC_CB(sqchat_rpl_whowasuser);
+NUMERIC_CB(sqchat_rpl_endofwhois);
+NUMERIC_CB(sqchat_rpl_whoisactually);
+NUMERIC_CB(sqchat_rpl_endofwhowas);
+NUMERIC_CB(sqchat_generic_lusers_rpl);
+NUMERIC_CB(sqchat_rpl_localglobalusers);
+NUMERIC_CB(sqchat_rpl_inviting);
+NUMERIC_CB(sqchat_rpl_time);
+NUMERIC_CB(sqchat_rpl_version);
+NUMERIC_CB(sqchat_rpl_info);
+NUMERIC_CB(sqchat_rpl_endofinfo);
+NUMERIC_CB(sqchat_rpl_nowaway);
+NUMERIC_CB(sqchat_rpl_unaway);
+NUMERIC_CB(sqchat_rpl_away);
+NUMERIC_CB(sqchat_rpl_whoreply);
+NUMERIC_CB(sqchat_rpl_endofwho);
+NUMERIC_CB(sqchat_rpl_links);
+NUMERIC_CB(sqchat_rpl_endoflinks);
+NUMERIC_CB(sqchat_rpl_liststart);
+NUMERIC_CB(sqchat_rpl_list);
+NUMERIC_CB(sqchat_rpl_listend);
+NUMERIC_CB(sqchat_rpl_hosthidden);
+NUMERIC_CB(sqchat_generic_rpl_trace);
+NUMERIC_CB(sqchat_rpl_tracelink);
+NUMERIC_CB(sqchat_rpl_traceserver);
+NUMERIC_CB(sqchat_rpl_traceservice);
+NUMERIC_CB(sqchat_rpl_traceoperator);
+NUMERIC_CB(sqchat_rpl_traceuser);
+NUMERIC_CB(sqchat_rpl_traceend);
+NUMERIC_CB(sqchat_rpl_snomask);
+NUMERIC_CB(sqchat_generic_error);
+NUMERIC_CB(sqchat_generic_network_error);
+NUMERIC_CB(sqchat_generic_command_error);
+NUMERIC_CB(sqchat_generic_channel_error);
+NUMERIC_CB(sqchat_generic_target_error);
+NUMERIC_CB(sqchat_generic_user_channel_error);
+NUMERIC_CB(sqchat_generic_echo_rpl);
+NUMERIC_CB(sqchat_generic_echo_rpl_end);
+NUMERIC_CB(sqchat_nick_change_error);
 
 #undef NUMERIC_CB
 #endif

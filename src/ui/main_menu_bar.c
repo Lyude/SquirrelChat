@@ -23,7 +23,7 @@
 #include "main_menu_bar.h"
 #include "settings_dialog.h"
 
-void create_main_menu_bar(struct chat_window * window) {
+void sqchat_main_menu_bar_new(struct chat_window * window) {
     /* Menu items and submenus that don't need to be referenced outside of this
      * scope
      */
@@ -73,8 +73,8 @@ void create_main_menu_bar(struct chat_window * window) {
 }
 
 void new_network_menu_item_callback(GtkMenuItem * menuitem,
-                                          struct chat_window * window) {
-    add_network_to_tree(window, new_irc_network());
+                                    struct chat_window * window) {
+    sqchat_network_tree_network_add(window, sqchat_new_irc_network());
 }
 
 void about_menu_item_callback(GtkMenuItem * menuitem,
@@ -98,18 +98,18 @@ void about_menu_item_callback(GtkMenuItem * menuitem,
 void connect_current_network(GtkMenuItem * menuitem,
                              struct chat_window * window) {
     GtkTreeIter selected_row;
-    struct irc_network * network;
+    struct sqchat_network * network;
 
-    connect_irc_network(window->current_buffer->network);
+    sqchat_connect_network(window->current_buffer->network);
 }
 
 static void preferences_menu_item_cb(GtkMenuItem * menuitem,
                                      struct chat_window * parent) {
-    open_settings_dialog(parent);
+    sqchat_settings_dialog_show(parent);
 }
 
 // Connects all the signals for the items in the menu bar
-void connect_main_menu_bar_signals(struct chat_window * window) {
+void sqchat_main_menu_bar_connect_signals(struct chat_window * window) {
     g_signal_connect(window->connect_menu_item, "activate",
                      G_CALLBACK(connect_current_network), window);
     g_signal_connect(window->new_server_buffer_menu_item, "activate",

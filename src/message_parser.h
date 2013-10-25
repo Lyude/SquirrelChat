@@ -17,21 +17,21 @@
 #define __MESSAGE_PARSER_H__
 #include "irc_network.h"
 
-typedef short (*irc_message_callback)(struct irc_network *,
-                                      char *,     // hostmask
-                                      short,      // argc
-                                      char*[]);   // argv
+typedef short (*sqchat_msg_cb)(struct sqchat_network *,
+                               char *,     // hostmask
+                               short,      // argc
+                               char*[]);   // argv
 
-#define IRC_MSG_ERR_ARGS        1
-#define IRC_MSG_ERR_ARGS_FATAL  2
-#define IRC_MSG_ERR_MISC        3
-#define IRC_MSG_ERR_MISC_NODUMP 4
+#define SQCHAT_MSG_ERR_ARGS        1
+#define SQCHAT_MSG_ERR_ARGS_FATAL  2
+#define SQCHAT_MSG_ERR_MISC        3
+#define SQCHAT_MSG_ERR_MISC_NODUMP 4
 
-extern void init_message_parser();
+extern void sqchat_init_msg_parser();
 
-extern void process_irc_message(struct irc_network * network, char * msg)
+extern void sqchat_process_msg(struct sqchat_network * network, char * msg)
     _nonnull(1, 2);
-void split_irc_hostmask(char * hostmask, char ** nickname, char ** address)
+void sqchat_split_hostmask(char * hostmask, char ** nickname, char ** address)
     _nonnull(1, 2, 3);
 
 #endif

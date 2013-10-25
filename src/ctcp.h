@@ -20,20 +20,20 @@
 #include "net_io.h"
 #include "message_parser.h"
 
-#define CTCP_DELIM '\001'
-#define CTCP_DELIM_STR "\001"
+#define SQCHAT_CTCP_DELIM '\001'
+#define SQCHAT_CTCP_DELIM_STR "\001"
 
-typedef void (*ctcp_callback)(struct irc_network * network,
-                              char *, // hostmask
-                              char *, // target
-                              char *); // message
+typedef void (*sqchat_ctcp_callback)(struct sqchat_network * network,
+                                     char *, // hostmask
+                                     char *, // target
+                                     char *); // message
 
-extern void init_ctcp();
+extern void sqchat_ctcp_init();
 
-extern void add_ctcp_request(const char * type, ctcp_callback cb)
+extern void sqchat_add_ctcp_request(const char * type, sqchat_ctcp_callback cb)
     _nonnull(1, 2);
 
-extern void add_ctcp_response(const char * type, ctcp_callback cb)
+extern void sqchat_add_ctcp_response(const char * type, sqchat_ctcp_callback cb)
     _nonnull(1, 2);
 
 enum _ctcp_type {
@@ -41,32 +41,36 @@ enum _ctcp_type {
     RESPONSE
 };
 
-extern void process_ctcp(struct irc_network * network,
-                         enum _ctcp_type type,
-                         char * hostmask,
-                         char * target,
-                         char * msg)
+extern void sqchat_process_ctcp(struct sqchat_network * network,
+                                enum _ctcp_type type,
+                                char * hostmask,
+                                char * target,
+                                char * msg)
     _nonnull(1, 3, 4, 5);
 
-#define send_ctcp(_network, _target, _type)                                 \
-    send_to_network(_network,                                               \
-                    "PRIVMSG %s :" CTCP_DELIM_STR "%s" CTCP_DELIM_STR       \
-                    "\r\n", _target, _type)
+#define sqchat_network_send_ctcp(_network, _target, _type)                  \
+    sqchat_network_send(_network,                                           \
+                        "PRIVMSG %s :" SQCHAT_CTCP_DELIM_STR "%s"           \
+                        SQCHAT_CTCP_DELIM_STR                               \
+                        "\r\n", _target, _type)
 
-#define sendf_ctcp(_network, _target, _type, _msg, ...)                     \
-    send_to_network(_network,                                               \
-                    "PRIVMSG %s :" CTCP_DELIM_STR "%s " _msg CTCP_DELIM_STR \
-                    "\r\n", _target, _type, __VA_ARGS__)
+#define sqchat_network_sendf_ctcp(_network, _target, _type, _msg, ...)      \
+    sqchat_network_send(_network,                                           \
+                        "PRIVMSG %s :" SQCHAT_CTCP_DELIM_STR "%s " _msg     \
+                        SQCHAT_CTCP_DELIM_STR                               \
+                        "\r\n", _target, _type, __VA_ARGS__)
 
-#define send_ctcp_reply(_network, _target, _type)                           \
-    send_to_network(_network,                                               \
-                    "NOTICE %s :" CTCP_DELIM_STR "%s " CTCP_DELIM_STR       \
-                    "\r\n", _target, _type)
+#define sqchat_network_send_ctcp_reply(_network, _target, _type)            \
+    sqchat_network_send(_network,                                           \
+                        "NOTICE %s :" SQCHAT_CTCP_DELIM_STR "%s "           \
+                        SQCHAT_CTCP_DELIM_STR                               \
+                        "\r\n", _target, _type)
 
-#define sendf_ctcp_reply(_network, _target, _type, _msg, ...)               \
-    send_to_network(_network,                                               \
-                    "NOTICE %s :" CTCP_DELIM_STR "%s " _msg CTCP_DELIM_STR  \
-                    "\r\n", _target, _type, __VA_ARGS__)
+#define sqchat_network_sendf_ctcp_reply(_network, _target, _type, _msg, ...)\
+    sqchat_network_send(_network,                                           \
+                        "NOTICE %s :" SQCHAT_CTCP_DELIM_STR "%s " _msg      \
+                        SQCHAT_CTCP_DELIM_STR                               \
+                        "\r\n", _target, _type, __VA_ARGS__)
 
 #endif // __CTCP_H__
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

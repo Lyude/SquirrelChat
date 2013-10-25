@@ -42,7 +42,7 @@ static void settings_dialog_result_handler(GtkDialog * dialog,
                                            int response_id,
                                            struct chat_window * parent);
 
-void open_settings_dialog(struct chat_window * parent) {    
+void sqchat_settings_dialog_show(struct chat_window * parent) {    
     settings_dialog = 
         gtk_dialog_new_with_buttons("SquirrelChat Settings",
                                     GTK_WINDOW(parent->window),
@@ -70,19 +70,19 @@ void open_settings_dialog(struct chat_window * parent) {
     gtk_misc_set_alignment(GTK_MISC(default_nick_label), 0, 0.5);
     default_nick_entry = gtk_entry_new();
     gtk_entry_set_text(GTK_ENTRY(default_nick_entry),
-                       config_setting_get_string(sq_default_nick));
+                       config_setting_get_string(sqchat_default_nick));
 
     default_username_label = gtk_label_new("Username: ");
     gtk_misc_set_alignment(GTK_MISC(default_username_label), 0, 0.5);
     default_username_entry = gtk_entry_new();
     gtk_entry_set_text(GTK_ENTRY(default_username_entry),
-                       config_setting_get_string(sq_default_username));
+                       config_setting_get_string(sqchat_default_username));
 
     default_real_name_label = gtk_label_new("Real name: ");
     gtk_misc_set_alignment(GTK_MISC(default_real_name_label), 0, 0.5);
     default_real_name_entry = gtk_entry_new();
     gtk_entry_set_text(GTK_ENTRY(default_real_name_entry),
-                       config_setting_get_string(sq_default_real_name));
+                       config_setting_get_string(sqchat_default_real_name));
 
     gtk_grid_insert_column(GTK_GRID(your_info_grid), 0);
     gtk_grid_insert_column(GTK_GRID(your_info_grid), 1);
@@ -118,17 +118,17 @@ static void settings_dialog_result_handler(GtkDialog * dialog,
                                            struct chat_window * parent) {
     if (response_id != GTK_RESPONSE_DELETE_EVENT &&
         response_id != GTK_RESPONSE_CANCEL) {
-        config_setting_set_string(sq_default_nick, gtk_entry_get_text(
+        config_setting_set_string(sqchat_default_nick, gtk_entry_get_text(
                     GTK_ENTRY(default_nick_entry)));
-        config_setting_set_string(sq_default_username, gtk_entry_get_text(
+        config_setting_set_string(sqchat_default_username, gtk_entry_get_text(
                     GTK_ENTRY(default_username_entry)));
-        config_setting_set_string(sq_default_real_name, gtk_entry_get_text(
+        config_setting_set_string(sqchat_default_real_name, gtk_entry_get_text(
                     GTK_ENTRY(default_real_name_entry)));
         if (response_id == GTK_RESPONSE_OK) {
-            char filename_buf[strlen(sq_config_dir) + sizeof("/squirrelchat.conf")];
-            sprintf(&filename_buf[0], "%s/squirrelchat.conf", sq_config_dir);
+            char filename_buf[strlen(sqchat_config_dir) + sizeof("/squirrelchat.conf")];
+            sprintf(&filename_buf[0], "%s/squirrelchat.conf", sqchat_config_dir);
             // Save the options to the configuration file
-            if (config_write_file(&global_config, filename_buf) == false) {
+            if (config_write_file(&sqchat_global_config, filename_buf) == false) {
                 GtkWidget * dialog;
                 dialog = gtk_message_dialog_new(
                     GTK_WINDOW(parent->window),

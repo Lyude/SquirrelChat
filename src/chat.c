@@ -18,11 +18,11 @@
 #include "net_io.h"
 
 // TODO: Add support for splitting messages over 512 chars
-void send_privmsg(struct irc_network * network,
-                  const char * recepient,
-                  const char * msg) {
-    send_to_network(network, "PRIVMSG %s :%s\r\n",
-                    recepient, msg);
+void sqchat_send_privmsg(struct sqchat_network * network,
+                         const char * recepient,
+                         const char * msg) {
+    sqchat_network_send(network, "PRIVMSG %s :%s\r\n",
+                        recepient, msg);
 }
 
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

@@ -41,9 +41,9 @@
 
 static void __null_canonize(char * s) { }
 
-static trie_e *trie_e_new(trie_e * up)
+static sqchat_trie_e *sqchat_trie_e_new(sqchat_trie_e * up)
 {
-    trie_e *e;
+    sqchat_trie_e *e;
     int i;
 
     e = malloc(sizeof(*e));
@@ -55,28 +55,28 @@ static trie_e *trie_e_new(trie_e * up)
     return e;
 }
 
-static void trie_e_del(trie_e *e)
+static void sqchat_trie_e_del(sqchat_trie_e *e)
 {
     free(e);
 }
 
-trie *trie_new(void (*canonize)())
+sqchat_trie *sqchat_trie_new(void (*canonize)())
 {
-    trie *trie;
+    sqchat_trie *sqchat_trie;
     int i;
 
-    trie = malloc(sizeof(*trie));
-    trie->canonize = canonize ? canonize : __null_canonize;
+    sqchat_trie = malloc(sizeof(*sqchat_trie));
+    sqchat_trie->canonize = canonize ? canonize : __null_canonize;
 
-    trie->n.val = NULL;
-    trie->n.up = NULL;
+    sqchat_trie->n.val = NULL;
+    sqchat_trie->n.up = NULL;
     for (i=0; i<16; i++)
-        trie->n.n[i] = 0;
+        sqchat_trie->n.n[i] = 0;
 
-    return trie;
+    return sqchat_trie;
 }
 
-static void free_real(trie_e * e, void (*cb)(), void * priv)
+static void free_real(sqchat_trie_e * e, void (*cb)(), void * priv)
 {
     int i;
 
@@ -84,16 +84,16 @@ static void free_real(trie_e * e, void (*cb)(), void * priv)
         if (!e->n[i])
             continue;
         free_real(e->n[i], cb, priv);
-        trie_e_del(e->n[i]);
+        sqchat_trie_e_del(e->n[i]);
     }
     if (cb && e->val)
         cb(e->val, priv);
 }
 
-void trie_free(trie * trie, void (*cb)(), void * priv)
+void sqchat_trie_free(sqchat_trie * sqchat_trie, void (*cb)(), void * priv)
 {
-    free_real(&trie->n, cb, priv);
-    free(trie);
+    free_real(&sqchat_trie->n, cb, priv);
+    free(sqchat_trie);
 }
 
 static char nibble(char * s, int i)
@@ -101,26 +101,26 @@ static char nibble(char * s, int i)
     return (i%2==0) ? s[i/2]>>4 : s[i/2]&0xf;
 }
 
-static trie_e *retrieval(trie * trie, const char * tkey, int create)
+static sqchat_trie_e *retrieval(sqchat_trie * sqchat_trie, const char * tkey, int create)
 {
-    trie_e *n;
+    sqchat_trie_e *n;
     char key[U_TRIE_KEY_MAX];
     unsigned int c, nib = 0; /* even=high, odd=low */
 
     strncpy(key, tkey, U_TRIE_KEY_MAX);
 
-    trie->canonize(key);
+    sqchat_trie->canonize(key);
 
     if (!key[0])
         return NULL;
 
-    n = &trie->n;
+    n = &sqchat_trie->n;
 
     for (; n && key[nib/2]; nib++) {
         c = nibble(key, nib);
         if (n->n[c] == NULL) {
             if (create)
-                n->n[c] = trie_e_new(n);
+                n->n[c] = sqchat_trie_e_new(n);
             else
                 return NULL;
         }
@@ -130,19 +130,19 @@ static trie_e *retrieval(trie * trie, const char * tkey, int create)
     return n;
 }
 
-void trie_set(trie * trie, const char * key, void * val)
+void sqchat_trie_set(sqchat_trie * sqchat_trie, const char * key, void * val)
 {
-    trie_e *n = retrieval(trie, key, 1);
+    sqchat_trie_e *n = retrieval(sqchat_trie, key, 1);
     n->val = val;
 }
 
-void *trie_get(trie * trie, const char * key)
+void *sqchat_trie_get(sqchat_trie * sqchat_trie, const char * key)
 {
-    trie_e *n = retrieval(trie, key, 0);
+    sqchat_trie_e *n = retrieval(sqchat_trie, key, 0);
     return n ? n->val : NULL;
 }
 
-static void each(trie_e *e, void (*cb)(), void *priv)
+static void each(sqchat_trie_e *e, void (*cb)(), void *priv)
 {
     int i;
 
@@ -155,18 +155,18 @@ static void each(trie_e *e, void (*cb)(), void *priv)
     }
 }
 
-void trie_each(trie *trie, void(*cb)(), void * priv)
+void sqchat_trie_each(sqchat_trie *sqchat_trie, void(*cb)(), void * priv)
 {
-    each(&trie->n, cb, priv);
+    each(&sqchat_trie->n, cb, priv);
 }
 
-void *trie_del(trie * trie, const char * key)
+void *sqchat_trie_del(sqchat_trie * sqchat_trie, const char * key)
 {
-    trie_e *prev, *cur;
+    sqchat_trie_e *prev, *cur;
     void *val;
     int i, nempty;
 
-    cur = retrieval(trie, key, 0);
+    cur = retrieval(sqchat_trie, key, 0);
 
     if (cur == NULL)
         return NULL;
@@ -184,32 +184,32 @@ void *trie_del(trie * trie, const char * key)
                 nempty++;
         }
         prev = cur;
-        if (nempty != 16 || cur->val || cur == &trie->n)
+        if (nempty != 16 || cur->val || cur == &sqchat_trie->n)
             break;
         cur = cur->up;
-        trie_e_del(prev);
+        sqchat_trie_e_del(prev);
     }
 
     return val;
 }
 
-void trie_strtolower(char * s) {
+void sqchat_trie_strtolower(char * s) {
     for (int i = 0; s[i] != '\0'; i++)
         s[i] = tolower(s[i]);
 }
 
-void trie_strtoupper(char * s) {
+void sqchat_trie_strtoupper(char * s) {
     for (int i = 0; s[i] != '\0'; i++)
         s[i] = toupper(s[i]);
 }
 
-void trie_rfc1459_strtoupper(char * s) {
+void sqchat_trie_rfc1459_strtoupper(char * s) {
     for (int i = 0; s[i] != '\0'; i++)
-        s[i] = rfc1459_toupper(s[i]);
+        s[i] = sqchat_rfc1459_toupper(s[i]);
 }
 
-void trie_rfc1459_strtolower(char * s) {
+void sqchat_trie_rfc1459_strtolower(char * s) {
     for (int i = 0; s[i] != '\0'; i++)
-        s[i] = rfc1459_tolower(s[i]);
+        s[i] = sqchat_rfc1459_tolower(s[i]);
 }
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

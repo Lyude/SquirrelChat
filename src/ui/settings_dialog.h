@@ -16,7 +16,7 @@
 
 #ifndef __SETTINGS_WINDOW_H__
 #define __SETTINGS_WINDOW_H__
-extern void open_settings_dialog(struct chat_window * parent);
+extern void sqchat_settings_dialog_show(struct chat_window * parent);
 #endif
 
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

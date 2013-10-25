@@ -14,15 +14,15 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NET_IO_H
-#define NET_IO_H
+#ifndef __NET_IO_H__
+#define __NET_IO_H__
 
 #include "irc_network.h"
 #include <stdbool.h>
 
-extern void send_to_network(struct irc_network * buffer,
-                            const char * msg, ...)
+extern void sqchat_network_send(struct sqchat_network * buffer,
+                                const char * msg, ...)
     _nonnull(1, 2) _format(printf, 2, 3);
 
-#endif /* NET_IO_H */
+#endif /* __NET_IO_H__ */
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

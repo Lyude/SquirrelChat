@@ -24,41 +24,45 @@
 #include <ctype.h>
 #include <stdlib.h>
 
-trie * command_trie;
+sqchat_trie * sqchat_command_trie;
 
-// Sets up the commands trie and adds the default client commands to said trie
-void init_irc_commands() {
-    command_trie = trie_new(trie_strtolower);
-    add_builtin_commands();
+/* Sets up the commands sqchat_trie and adds the default client commands to 
+ * said trie
+ */
+void sqchat_init_irc_commands() {
+    sqchat_command_trie = sqchat_trie_new(sqchat_trie_strtolower);
+    sqchat_add_builtin_commands();
 }
 
 // Adds an IRC command
-void add_irc_command(char * command,
-                     irc_command_callback callback,
-                     unsigned short argc_max,
-                     char * syntax_msg,
-                     char * help_msg) {
-    struct irc_command_info * info;
-    info = malloc(sizeof(struct irc_command_info));
+void sqchat_add_irc_command(char * command,
+                            sqchat_command_callback callback,
+                            unsigned short argc_max,
+                            char * syntax_msg,
+                            char * help_msg) {
+    struct sqchat_command_info * info;
+    info = malloc(sizeof(struct sqchat_command_info));
     info->argc_max = argc_max;
     info->syntax_msg = syntax_msg;
     info->help_msg = help_msg;
     info->callback = callback;
 
-    trie_set(command_trie, command, info);
+    sqchat_trie_set(sqchat_command_trie, command, info);
 }
 
 // Removes an added IRC command
-void del_irc_command(char * command) {
-    struct irc_command_info * info = trie_get(command_trie, command);
+void sqchat_del_irc_command(char * command) {
+    struct sqchat_command_info * info =
+        sqchat_trie_get(sqchat_command_trie, command);
     free(info);
-    trie_del(command_trie, command);
+    sqchat_trie_del(sqchat_command_trie, command);
 }
 
-void call_command(struct buffer_info * buffer,
-                  char * command,
-                  char * params) {
-    struct irc_command_info * info = trie_get(command_trie, command);
+void sqchat_call_command(struct sqchat_buffer * buffer,
+                         char * command,
+                         char * params) {
+    struct sqchat_command_info * info =
+        sqchat_trie_get(sqchat_command_trie, command);
     unsigned short argc;
 
     // Make sure the command exists
@@ -66,12 +70,12 @@ void call_command(struct buffer_info * buffer,
         // If it doesn't exist, send the command to the server if possible
         if (buffer->network->status != DISCONNECTED) {
             if (params == NULL)
-                send_to_network(buffer->network, "%s\r\n", command);
+                sqchat_network_send(buffer->network, "%s\r\n", command);
             else
-                send_to_network(buffer->network, "%s %s\r\n", command, params);
+                sqchat_network_send(buffer->network, "%s %s\r\n", command, params);
         }
         else
-            print_to_buffer(buffer, "Error: Unknown command \"%s\"\n", command);
+            sqchat_buffer_print(buffer, "Error: Unknown command \"%s\"\n", command);
         return;
     }
 
@@ -90,7 +94,9 @@ void call_command(struct buffer_info * buffer,
                 *param_end = '\0';
                 argv[argc] = params;
 
-                // Eat everything up until the next parameter, or the end of the string
+                /* Eat everything up until the next parameter, or the end of 
+                 * the string
+                 */
                 for (params = param_end + 1; *params == ' '; ++params);
             }
         }
@@ -99,26 +105,26 @@ void call_command(struct buffer_info * buffer,
         argc = 0;
     // When a command returns -1, it the parameters passed were incorrect
     if (info->callback(buffer, argc, argv, params) == -1)
-        print_command_syntax(buffer, command);
+        sqchat_print_command_syntax(buffer, command);
 }
 
-void print_command_syntax(struct buffer_info * buffer,
-                          char * command) {
+void sqchat_print_command_syntax(struct sqchat_buffer * buffer,
+                                 char * command) {
     /* We don't need to check if command is valid, since this cannot be
      * explicitly called by the user in any way
      */
-    print_to_buffer(buffer, "Syntax: %s\n",
-        ((struct irc_command_info *)trie_get(command_trie, command))->syntax_msg);
+    sqchat_buffer_print(buffer, "Syntax: %s\n",
+        ((struct sqchat_command_info *)sqchat_trie_get(sqchat_command_trie, command))->syntax_msg);
 }
 
-void print_command_help(struct buffer_info * buffer,
-                        char * command) {
-    struct irc_command_info * info;
-    if ((info = trie_get(command_trie, command)) == NULL)
-        print_to_buffer(buffer, "Unknown command: %s\n", command);
+void sqchat_print_command_help(struct sqchat_buffer * buffer,
+                               char * command) {
+    struct sqchat_command_info * info;
+    if ((info = sqchat_trie_get(sqchat_command_trie, command)) == NULL)
+        sqchat_buffer_print(buffer, "Unknown command: %s\n", command);
     else {
-        print_command_syntax(buffer, command);
-        print_to_buffer(buffer, "%s", info->help_msg);
+        sqchat_print_command_syntax(buffer, command);
+        sqchat_buffer_print(buffer, "%s", info->help_msg);
     }
 }
 

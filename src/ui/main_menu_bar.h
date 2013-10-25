@@ -13,18 +13,18 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MAIN_MENU_H
-#define MAIN_MENU_H
+#ifndef __MAIN_MENU_H__
+#define __MAIN_MENU_H__
 
 #include "chat_window.h"
 
 #include <gtk/gtk.h>
 
-extern void create_main_menu_bar(struct chat_window * window)
+extern void sqchat_main_menu_bar_new(struct chat_window * window)
     _nonnull(1);
-extern void connect_main_menu_bar_signals(struct chat_window * window)
+extern void sqchat_main_menu_bar_connect_signals(struct chat_window * window)
     _nonnull(1);
 
-#endif /* MAIN_MENU_H */
+#endif /* __MAIN_MENU_H__ */
 
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

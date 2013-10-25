@@ -27,34 +27,34 @@
 #include <libconfig.h>
 #include <gtk/gtk.h>
 
-config_t global_config;
-config_setting_t * global_config_root;
+config_t sqchat_global_config;
+config_setting_t * sqchat_global_config_root;
 
-char * sq_config_dir;
+char * sqchat_config_dir;
 
-config_setting_t * sq_default_nick;
-config_setting_t * sq_default_username;
-config_setting_t * sq_default_real_name;
-config_setting_t * sq_default_fallback_encoding;
+config_setting_t * sqchat_default_nick;
+config_setting_t * sqchat_default_username;
+config_setting_t * sqchat_default_real_name;
+config_setting_t * sqchat_default_fallback_encoding;
 
 static void create_main_settings_file();
 static void set_default_settings();
 
-void init_settings() {
+void sqchat_init_settings() {
     struct statfs buf;
     int ret;
     char * filename_buf;
     const char * home_dir = getenv("HOME");
 
-    config_init(&global_config);
-    global_config_root = config_root_setting(&global_config);
+    config_init(&sqchat_global_config);
+    sqchat_global_config_root = config_root_setting(&sqchat_global_config);
 
     // Figure out the maximum length of a filename on this filesystem
     statfs(home_dir, &buf);
     filename_buf = alloca(buf.f_namelen);
 
-    sq_config_dir = malloc(buf.f_namelen);
-    sq_config_dir = realloc(sq_config_dir, snprintf(sq_config_dir, buf.f_namelen,
+    sqchat_config_dir = malloc(buf.f_namelen);
+    sqchat_config_dir = realloc(sqchat_config_dir, snprintf(sqchat_config_dir, buf.f_namelen,
                                               "%s/.config/squirrelchat",
                                               home_dir) + 1);
 
@@ -66,14 +66,14 @@ void init_settings() {
     mkdir(filename_buf, S_IRWXU | S_IRWXG | S_IRWXO);
 
     // If the function was sucessful, we need to make a default settings file
-    if (mkdir(sq_config_dir, S_IRWXU | S_IRGRP | S_IROTH) == 0) {
+    if (mkdir(sqchat_config_dir, S_IRWXU | S_IRGRP | S_IROTH) == 0) {
         // TODO: Display first time run wizard
         umask(S_IRWXG | S_IRWXO);
         create_main_settings_file();
     }
     else if (errno == EEXIST) {
         FILE * config_file;
-        snprintf(filename_buf, buf.f_namelen, "%s/squirrelchat.conf", sq_config_dir);
+        snprintf(filename_buf, buf.f_namelen, "%s/squirrelchat.conf", sqchat_config_dir);
 
         /* Check to make sure all the required configuration files exist and are
          * readable
@@ -100,13 +100,13 @@ void init_settings() {
         }
 
         // Try to read the settings from the user's profile
-        else if (config_read(&global_config, config_file) == CONFIG_FALSE) {
-            char * err_msg = strdup(config_error_text(&global_config));
-            config_error_t err_type = config_error_type(&global_config);
-            char * err_file = (config_error_file(&global_config) ?
-                               strdup(config_error_file(&global_config)) :
+        else if (config_read(&sqchat_global_config, config_file) == CONFIG_FALSE) {
+            char * err_msg = strdup(config_error_text(&sqchat_global_config));
+            config_error_t err_type = config_error_type(&sqchat_global_config);
+            char * err_file = (config_error_file(&sqchat_global_config) ?
+                               strdup(config_error_file(&sqchat_global_config)) :
                                NULL);
-            int err_line = config_error_line(&global_config);
+            int err_line = config_error_line(&sqchat_global_config);
 
             /* We can't trust the config structure since the configuration file
              * most likely has bad syntax, and implementing something to check
@@ -115,8 +115,8 @@ void init_settings() {
              * Maybe sometime in the future, but for right now we're just going
              * to destroy the config in the memory and create a new one
              */
-            config_destroy(&global_config);
-            config_init(&global_config);
+            config_destroy(&sqchat_global_config);
+            config_init(&sqchat_global_config);
 
             set_default_settings();
 
@@ -150,44 +150,44 @@ void init_settings() {
             fclose(config_file);
 
         // Cache settings to their global variables
-        sq_default_nick = config_setting_get_member(global_config_root,
+        sqchat_default_nick = config_setting_get_member(sqchat_global_config_root,
                                                     "default_nick");
-        sq_default_username = config_setting_get_member(global_config_root,
+        sqchat_default_username = config_setting_get_member(sqchat_global_config_root,
                                                         "default_username");
-        sq_default_real_name = config_setting_get_member(global_config_root,
+        sqchat_default_real_name = config_setting_get_member(sqchat_global_config_root,
                                                          "default_real_name");
-        sq_default_fallback_encoding =
-            config_setting_get_member(global_config_root,
+        sqchat_default_fallback_encoding =
+            config_setting_get_member(sqchat_global_config_root,
                                       "default_fallback_encoding");
     }
 }
 
 static void set_default_settings() {
-    sq_default_nick = config_setting_add(global_config_root, "default_nick",
+    sqchat_default_nick = config_setting_add(sqchat_global_config_root, "default_nick",
                                          CONFIG_TYPE_STRING);
-    sq_default_username =
-        config_setting_add(global_config_root, "default_username",
+    sqchat_default_username =
+        config_setting_add(sqchat_global_config_root, "default_username",
                            CONFIG_TYPE_STRING);
-    sq_default_real_name =
-        config_setting_add(global_config_root, "default_real_name",
+    sqchat_default_real_name =
+        config_setting_add(sqchat_global_config_root, "default_real_name",
                            CONFIG_TYPE_STRING);
-    sq_default_fallback_encoding =
-        config_setting_add(global_config_root, "default_fallback_encoding",
+    sqchat_default_fallback_encoding =
+        config_setting_add(sqchat_global_config_root, "default_fallback_encoding",
                            CONFIG_TYPE_STRING);
 
-    config_setting_set_string(sq_default_nick, getlogin());
-    config_setting_set_string(sq_default_username, getlogin());
-    config_setting_set_string(sq_default_real_name, getlogin());
-    config_setting_set_string(sq_default_fallback_encoding, "WINDOWS-1252");
+    config_setting_set_string(sqchat_default_nick, getlogin());
+    config_setting_set_string(sqchat_default_username, getlogin());
+    config_setting_set_string(sqchat_default_real_name, getlogin());
+    config_setting_set_string(sqchat_default_fallback_encoding, "WINDOWS-1252");
 }
 
 static void create_main_settings_file() {
     set_default_settings();
 
     // Write all the settings to a new file
-    char filename_buf[strlen(sq_config_dir) + sizeof("/squirrelchat.conf")];
-    sprintf(&filename_buf[0], "%s/squirrelchat.conf", sq_config_dir);
-    if (config_write_file(&global_config, filename_buf) == CONFIG_FALSE) {
+    char filename_buf[strlen(sqchat_config_dir) + sizeof("/squirrelchat.conf")];
+    sprintf(&filename_buf[0], "%s/squirrelchat.conf", sqchat_config_dir);
+    if (config_write_file(&sqchat_global_config, filename_buf) == CONFIG_FALSE) {
         // Alert the user
         GtkWidget * dialog;
         dialog = gtk_message_dialog_new(

@@ -14,15 +14,15 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CHAT_H
-#define CHAT_H
+#ifndef __CHAT_H__
+#define __CHAT_H__
 
 #include "irc_network.h"
 
-void send_privmsg(struct irc_network * network,
-                  const char * recepient,
-                  const char * message)
+void sqchat_send_privmsg(struct sqchat_network * network,
+                         const char * recepient,
+                         const char * message)
     _nonnull(1, 2, 3);
 
-#endif /* CHAT_H */
+#endif /* __CHAT_H__ */
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

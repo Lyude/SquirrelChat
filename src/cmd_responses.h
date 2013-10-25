@@ -21,26 +21,26 @@
 
 #include "irc_network.h"
 
-typedef struct cmd_response_claim cmd_response_claim;
+typedef struct sqchat_cmd_response_claim sqchat_cmd_response_claim;
 
-struct cmd_response_claim {
-    struct buffer_info * buffer;
+struct sqchat_cmd_response_claim {
+    struct sqchat_buffer * buffer;
     void * data;
     void (*data_free_func)(void *);
-    cmd_response_claim * next;
+    sqchat_cmd_response_claim * next;
 };
 
-extern void claim_response(struct irc_network * network,
-                           struct buffer_info * buffer,
-                           void * data,
-                           void (*data_free_func)(void *))
+extern void sqchat_claim_response(struct sqchat_network * network,
+                                  struct sqchat_buffer * buffer,
+                                  void * data,
+                                  void (*data_free_func)(void *))
     _nonnull(1, 2);
-extern void remove_last_response_claim(struct irc_network * network)
+extern void sqchat_remove_last_response_claim(struct sqchat_network * network)
     _nonnull(1);
 
-extern struct buffer_info * route_rpl(const struct irc_network * network)
+extern struct sqchat_buffer * sqchat_route_rpl(const struct sqchat_network * network)
     _nonnull(1);
-extern struct buffer_info * route_rpl_end(struct irc_network * network)
+extern struct sqchat_buffer * sqchat_route_rpl_end(struct sqchat_network * network)
     _nonnull(1);
 
 #endif // __CMD_RESPONSES_H__

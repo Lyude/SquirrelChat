@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <gtk/gtk.h>
 
-struct chat_window * create_new_chat_window(struct irc_network * network) {
+struct chat_window * create_new_chat_window(struct sqchat_network * network) {
     // Containers that are only ever referenced here
     GtkWidget * chat_and_command_box_container;
 
@@ -42,7 +42,7 @@ struct chat_window * create_new_chat_window(struct irc_network * network) {
     gtk_container_add(GTK_CONTAINER(new_window->window),
                       new_window->top_vertical_container);
 
-    create_main_menu_bar(new_window);
+    sqchat_main_menu_bar_new(new_window);
     gtk_box_pack_start(GTK_BOX(new_window->top_vertical_container),
                        new_window->main_menu_bar, FALSE, FALSE, 0);
 
@@ -52,7 +52,7 @@ struct chat_window * create_new_chat_window(struct irc_network * network) {
                        new_window->network_tree_and_buffer_pane,
                        TRUE, TRUE, 0);
 
-    create_network_tree(new_window);
+    sqchat_network_tree_init(new_window);
     new_window->scrolled_window_for_network_tree =
         gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_kinetic_scrolling(
@@ -75,7 +75,7 @@ struct chat_window * create_new_chat_window(struct irc_network * network) {
                            125);
 
     chat_and_command_box_container =gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    create_chat_viewer(new_window);
+    sqchat_chat_viewer_new(new_window);
 
     new_window->scrolled_window_for_chat_viewer =
         gtk_scrolled_window_new(NULL, NULL);
@@ -85,7 +85,7 @@ struct chat_window * create_new_chat_window(struct irc_network * network) {
     gtk_container_add(GTK_CONTAINER(new_window->scrolled_window_for_chat_viewer),
                       new_window->chat_viewer);
 
-    create_command_box(new_window);
+    sqchat_command_box_new(new_window);
 
     gtk_box_pack_start(GTK_BOX(chat_and_command_box_container),
                        new_window->scrolled_window_for_chat_viewer,
@@ -96,7 +96,7 @@ struct chat_window * create_new_chat_window(struct irc_network * network) {
     gtk_paned_add1(GTK_PANED(new_window->chat_viewer_and_user_list_pane),
                    chat_and_command_box_container);
 
-    create_user_list(new_window);
+    sqchat_user_list_new(new_window);
     new_window->scrolled_window_for_user_list =
         gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_kinetic_scrolling(
@@ -111,15 +111,15 @@ struct chat_window * create_new_chat_window(struct irc_network * network) {
      * provided
      */
     if (network == NULL) {
-        struct irc_network * placeholder = new_irc_network();
-        add_network_to_tree(new_window, placeholder);
+        struct sqchat_network * placeholder = sqchat_new_irc_network();
+        sqchat_network_tree_network_add(new_window, placeholder);
         change_active_buffer(new_window, placeholder->buffer);
     }
 
     // Connect the signals
-    connect_network_tree_signals(new_window);
-    connect_main_menu_bar_signals(new_window);
-    connect_command_box_signals(new_window);
+    sqchat_network_tree_connect_signals(new_window);
+    sqchat_main_menu_bar_connect_signals(new_window);
+    sqchat_command_box_connect_signals(new_window);
 
     // TODO: Destroy chat_window struct when windows are destroyed
     g_signal_connect(new_window->window, "destroy", G_CALLBACK(gtk_main_quit),
@@ -132,14 +132,16 @@ struct chat_window * create_new_chat_window(struct irc_network * network) {
 }
 
 void change_active_buffer(struct chat_window * window,
-                          struct buffer_info * new_buffer) {
+                          struct sqchat_buffer * new_buffer) {
     // Record the scroll position of the current buffer
 //    window->current_buffer->buffer_scroll_pos = gtk_adjustment_get_value(
 //        gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(
 //            window->scrolled_window_for_chat_viewer)));
 
-    gtk_entry_set_buffer(GTK_ENTRY(window->command_box), new_buffer->command_box_buffer);
-    gtk_text_view_set_buffer(GTK_TEXT_VIEW(window->chat_viewer), new_buffer->buffer);
+    gtk_entry_set_buffer(GTK_ENTRY(window->command_box),
+                         new_buffer->command_box_buffer);
+    gtk_text_view_set_buffer(GTK_TEXT_VIEW(window->chat_viewer),
+                             new_buffer->buffer);
     gtk_text_view_scroll_to_mark(GTK_TEXT_VIEW(window->chat_viewer),
                                  gtk_text_buffer_get_mark(new_buffer->buffer,
                                                           "insert"),

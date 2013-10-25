@@ -17,21 +17,21 @@
 #include "errors.h"
 #include "ui/buffer.h"
 
-void dump_msg_to_buffer(struct buffer_info * buffer,
-                        char * hostmask,
-                        short argc,
-                        char * argv[]) {
-    print_to_buffer(buffer,
-                    "Received from: \"%s\"\n"
-                    "Args: [ ",
-                    hostmask);
+void sqchat_dump_msg_to_buffer(struct sqchat_buffer * buffer,
+                               char * hostmask,
+                               short argc,
+                               char * argv[]) {
+    sqchat_buffer_print(buffer,
+                        "Received from: \"%s\"\n"
+                        "Args: [ ",
+                        hostmask);
     for (short i = 0; i < argc; i++)
-        print_to_buffer(buffer, "\"%s\", ", argv[i]);
-    print_to_buffer(buffer, " ]\n");
+        sqchat_buffer_print(buffer, "\"%s\", ", argv[i]);
+    sqchat_buffer_print(buffer, " ]\n");
 }
 
 #if GNUTLS_DEBUG_LEVEL > 0
-void _gnutls_debug_log(int level, const char * msg) {
+void _sqchat_gnutls_debug_log(int level, const char * msg) {
     printf("*** GnuTLS Debug (%i): %s",
            level, msg);
 }

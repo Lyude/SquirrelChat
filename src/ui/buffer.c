@@ -26,12 +26,12 @@
 #include <string.h>
 #include <stdarg.h>
 
-static gboolean flush_buffer_output(struct buffer_info * buffer);
+static gboolean flush_buffer_output(struct sqchat_buffer * buffer);
 
-struct buffer_info * new_buffer(const char * buffer_name,
-                                enum buffer_type type,
-                                struct irc_network * network) {
-    struct buffer_info * buffer = malloc(sizeof(struct buffer_info));
+struct sqchat_buffer * sqchat_buffer_new(const char * buffer_name,
+                                  enum sqchat_buffer_type type,
+                                  struct sqchat_network * network) {
+    struct sqchat_buffer * buffer = malloc(sizeof(struct sqchat_buffer));
     buffer->type = type;
     buffer->buffer_name = (type != NETWORK) ? strdup(buffer_name) : NULL;
     buffer->row = NULL;
@@ -46,30 +46,30 @@ struct buffer_info * new_buffer(const char * buffer_name,
 
     // Add a userlist if the buffer is a channel buffer
     if (type == CHANNEL) {
-        buffer->chan_data = malloc(sizeof(struct __channel_data));
+        buffer->chan_data = malloc(sizeof(struct __sqchat_channel_data));
         buffer->chan_data->user_list_store =
             gtk_list_store_new(3, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_POINTER);
-        buffer->chan_data->users = trie_new(trie_strtolower);
+        buffer->chan_data->users = sqchat_trie_new(sqchat_trie_strtolower);
     }
     else if (type == QUERY) {
-        buffer->query_data = malloc(sizeof(struct __query_data));
+        buffer->query_data = malloc(sizeof(struct __sqchat_query_data));
         buffer->query_data->away_msg = NULL;
     }
 
     if (type != NETWORK)
-        trie_set(network->buffers, buffer_name, buffer);
+        sqchat_trie_set(network->buffers, buffer_name, buffer);
 
     return buffer;
 }
 
 static void destroy_users(GtkTreeRowReference * user,
-                          struct buffer_info * buffer) {
+                          struct sqchat_buffer * buffer) {
     if (buffer->network->multi_prefix) {
         GtkTreeIter user_row;
         gtk_tree_model_get_iter(GTK_TREE_MODEL(buffer->chan_data->user_list_store),
                                 &user_row,
                                 gtk_tree_row_reference_get_path(user));
-        free(get_user_prefixes(buffer, &user_row));
+        free(sqchat_user_list_user_get_prefixes(buffer, &user_row));
     }
     gtk_tree_row_reference_free(user);
 }
@@ -77,20 +77,20 @@ static void destroy_users(GtkTreeRowReference * user,
 /* NOTE: This should only ever be called from the main thread, behavior when
  * called in other threads is undefined. In addition, checking to see if any
  * other threads are accessing the buffer is too much of a pain, so please make
- * sure any other threads that have a chance of using the print_to_buffer()
+ * sure any other threads that have a chance of using the sqchat_buffer_print()
  * function sometime during their life time have been terminated before calling
- * destroy_buffer()
+ * sqchat_buffer_destroy()
  */
-void destroy_buffer(struct buffer_info * buffer) {
+void sqchat_buffer_destroy(struct sqchat_buffer * buffer) {
     if (buffer->type == CHANNEL) {
         g_object_unref(buffer->chan_data->user_list_store);
-        trie_free(buffer->chan_data->users, destroy_users, buffer);
+        sqchat_trie_free(buffer->chan_data->users, destroy_users, buffer);
     }
     g_object_unref(buffer->buffer);
     g_object_unref(buffer->command_box_buffer);
 
     if (buffer->type != NETWORK)
-        trie_del(buffer->network->buffers, buffer->buffer_name);
+        sqchat_trie_del(buffer->network->buffers, buffer->buffer_name);
 
     free(buffer->buffer_name);
     gtk_tree_row_reference_free(buffer->row);
@@ -100,8 +100,8 @@ void destroy_buffer(struct buffer_info * buffer) {
 
     // If there was still data waiting to be outputted, destroy it
     if (g_idle_remove_by_data(buffer)) {
-        struct __queued_output * n;
-        for (struct __queued_output * c = buffer->out_queue;
+        struct __sqchat_queued_output * n;
+        for (struct __sqchat_queued_output * c = buffer->out_queue;
              c != NULL;
              c = n) {
             free(c->msg);
@@ -113,11 +113,11 @@ void destroy_buffer(struct buffer_info * buffer) {
     free(buffer);
 }
 
-void print_to_buffer(struct buffer_info * buffer,
-                     const char * msg, ...) {
+void sqchat_buffer_print(struct sqchat_buffer * buffer,
+                         const char * msg, ...) {
     va_list args;
     size_t parsed_msg_len;
-    struct __queued_output * parsed_msg = malloc(sizeof(struct __queued_output));
+    struct __sqchat_queued_output * parsed_msg = malloc(sizeof(struct __sqchat_queued_output));
 
     parsed_msg->next = NULL;
 
@@ -146,7 +146,7 @@ void print_to_buffer(struct buffer_info * buffer,
     pthread_mutex_unlock(&buffer->output_mutex);
 }
 
-static gboolean flush_buffer_output(struct buffer_info * buffer) {
+static gboolean flush_buffer_output(struct sqchat_buffer * buffer) {
     pthread_mutex_lock(&buffer->output_mutex);
 
     char output_dump[buffer->out_queue_size + 1];
@@ -155,9 +155,9 @@ static gboolean flush_buffer_output(struct buffer_info * buffer) {
     GtkAdjustment * scroll_adjustment =
         gtk_scrollable_get_vadjustment(GTK_SCROLLABLE(buffer->window->chat_viewer));
 
-    struct __queued_output * n;
+    struct __sqchat_queued_output * n;
     // Concatenate all the messages in the queue and clear it
-    for (struct __queued_output * c = buffer->out_queue;
+    for (struct __sqchat_queued_output * c = buffer->out_queue;
          c != NULL;
          c = n) {
         strcpy(dump_pos, c->msg);

@@ -18,23 +18,23 @@
 
 #include <stdlib.h>
 
-void claim_response(struct irc_network * network,
-                        struct buffer_info * buffer,
-                        void * data,
-                        void (*data_free_func)(void *)) {
-    cmd_response_claim ** end;
+void sqchat_claim_response(struct sqchat_network * network,
+                           struct sqchat_buffer * buffer,
+                           void * data,
+                           void (*data_free_func)(void *)) {
+    sqchat_cmd_response_claim ** end;
     // Find the last response claim
     for (end = &network->claimed_responses; *end != NULL; end = &(*end)->next);
 
-    *end = malloc(sizeof(cmd_response_claim));
+    *end = malloc(sizeof(sqchat_cmd_response_claim));
     (*end)->buffer = buffer;
     (*end)->data = data;
     (*end)->data_free_func = data_free_func;
     (*end)->next = NULL;
 }
 
-void remove_last_response_claim(struct irc_network * network) {
-    cmd_response_claim * next;
+void sqchat_remove_last_response_claim(struct sqchat_network * network) {
+    sqchat_cmd_response_claim * next;
 
     next = network->claimed_responses->next;
 
@@ -50,17 +50,17 @@ void remove_last_response_claim(struct irc_network * network) {
  * follow; one for responses that check for response claims but can't satisfy
  * them, and one for responses that do the same but can satisfy claims.
  */
-struct buffer_info * route_rpl(const struct irc_network * network) {
+struct sqchat_buffer * sqchat_route_rpl(const struct sqchat_network * network) {
     if (network->claimed_responses != NULL)
         return network->claimed_responses->buffer;
     else
         return network->window->current_buffer;
 }
 
-struct buffer_info * route_rpl_end(struct irc_network * network) {
+struct sqchat_buffer * sqchat_route_rpl_end(struct sqchat_network * network) {
     if (network->claimed_responses != NULL) {
-        struct buffer_info * output = network->claimed_responses->buffer;
-        remove_last_response_claim(network);
+        struct sqchat_buffer * output = network->claimed_responses->buffer;
+        sqchat_remove_last_response_claim(network);
         return output;
     }
     else

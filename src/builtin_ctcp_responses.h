@@ -17,15 +17,15 @@
 #define __BUILTIN_CTCP_RESPONSES_H__
 #include "ctcp.h"
 
-#define BUILTIN_CTCP_RESP(func_name)                    \
-    extern void func_name(struct irc_network * network, \
-                          char * hostmask,              \
-                          char * target,                \
-                          char * msg)                   \
+#define BUILTIN_CTCP_RESP(func_name)                            \
+    extern void func_name(struct sqchat_network * network,      \
+                          char * hostmask,                      \
+                          char * target,                        \
+                          char * msg)                           \
     _nonnull(1, 2)
 
-BUILTIN_CTCP_RESP(ctcp_version_resp_handler);
-BUILTIN_CTCP_RESP(ctcp_ping_resp_handler);
+BUILTIN_CTCP_RESP(sqchat_ctcp_version_resp_handler);
+BUILTIN_CTCP_RESP(sqchat_ctcp_ping_resp_handler);
 
 #undef BUILTIN_CTCP_RESP
 

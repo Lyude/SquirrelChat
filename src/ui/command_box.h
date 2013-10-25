@@ -18,9 +18,9 @@
 
 #include "chat_window.h"
 
-extern void create_command_box(struct chat_window * window)
+extern void sqchat_command_box_new(struct chat_window * window)
     _nonnull(1);
-extern void connect_command_box_signals(struct chat_window * window)
+extern void sqchat_command_box_connect_signals(struct chat_window * window)
     _nonnull(1);
 
 #endif // __COMMAND_BOX_H__

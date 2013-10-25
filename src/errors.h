@@ -18,21 +18,18 @@
 
 #include "ui/buffer.h"
 
-extern void dump_msg_to_buffer(struct buffer_info * buffer,
-                               char * hostmask,
-                               short argc,
-                               char * argv[])
+extern void sqchat_dump_msg_to_buffer(struct sqchat_buffer * buffer,
+                                      char * hostmask,
+                                      short argc,
+                                      char * argv[])
     _nonnull(1);
 
 #ifdef WITH_SSL
 #if GNUTLS_DEBUG_LEVEL > 0
-extern void _gnutls_debug_log(int level, const char * msg)
+extern void _sqchat_gnutls_debug_log(int level, const char * msg)
     _nonnull(2);
 #endif
 #endif
-
-extern void handle_ssl_error(struct irc_network * network, int error)
-    _nonnull(1);
 
 #endif // __SQUIRRELCHAT_ERRORS_H__
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
