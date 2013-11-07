@@ -93,7 +93,7 @@ struct sqchat_network {
     GIOChannel * input_channel;
 
     GtkTreeRowReference * row;
-    struct chat_window * window;
+    struct sqchat_chat_window * window;
 
     struct sqchat_buffer * buffer;
     sqchat_trie * buffers;

@@ -20,9 +20,9 @@
 
 #include <gtk/gtk.h>
 
-extern void sqchat_main_menu_bar_new(struct chat_window * window)
+extern void sqchat_main_menu_bar_new(struct sqchat_chat_window * window)
     _nonnull(1);
-extern void sqchat_main_menu_bar_connect_signals(struct chat_window * window)
+extern void sqchat_main_menu_bar_connect_signals(struct sqchat_chat_window * window)
     _nonnull(1);
 
 #endif /* __MAIN_MENU_H__ */

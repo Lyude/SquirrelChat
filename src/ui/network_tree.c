@@ -24,7 +24,7 @@
 GtkTreeIter network_tree_toplevel;
 
 // Sets up the network tree
-void sqchat_network_tree_init(struct chat_window * window) {
+void sqchat_network_tree_init(struct sqchat_chat_window * window) {
     GtkCellRenderer * network_tree_renderer;
 
     GtkTreeViewColumn *network_tree_title_column;
@@ -58,7 +58,7 @@ void sqchat_network_tree_init(struct chat_window * window) {
 }
 
 // Adds an empty network buffer to the network tree
-void sqchat_network_tree_network_add(struct chat_window * window,
+void sqchat_network_tree_network_add(struct sqchat_chat_window * window,
                                      struct sqchat_network * network) {
     GtkTreePath * toplevel_path;
     gtk_tree_store_append(window->network_tree_store,
@@ -78,7 +78,7 @@ void sqchat_network_tree_network_add(struct chat_window * window,
 }
 
 // Get's the currently selected network in the network tree
-struct sqchat_network * sqchat_network_tree_get_current(struct chat_window * window) {
+struct sqchat_network * sqchat_network_tree_get_current(struct sqchat_chat_window * window) {
     GtkTreeIter selected_row;
     struct sqchat_network * network;
     gtk_tree_selection_get_selected(
@@ -130,7 +130,7 @@ void sqchat_network_tree_buffer_remove(struct sqchat_buffer * buffer) {
  * network buffers
  */
 void cursor_changed_handler(GtkTreeSelection *treeselection,
-                            struct chat_window * window) {
+                            struct sqchat_chat_window * window) {
     struct sqchat_buffer * buffer;
     GtkTreeModel * network_list_model =
         gtk_tree_view_get_model(gtk_tree_selection_get_tree_view(treeselection));
@@ -142,14 +142,14 @@ void cursor_changed_handler(GtkTreeSelection *treeselection,
     gtk_tree_model_get(network_list_model, &selected_row,
                        1, &buffer, -1);
 
-    change_active_buffer(window, buffer);
+    sqchat_chat_window_change_active_buffer(window, buffer);
 }
 
 /* Connects the signals for the network tree
  * (done as a seperate function because we cannot connect all of the signals
  * until all of the widgets for the window are created
  */
-void sqchat_network_tree_connect_signals(struct chat_window * window) {
+void sqchat_network_tree_connect_signals(struct sqchat_chat_window * window) {
     g_signal_connect(gtk_tree_view_get_selection(GTK_TREE_VIEW(window->network_tree)),
                      "changed", G_CALLBACK(cursor_changed_handler), window);
 }

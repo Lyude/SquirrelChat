@@ -57,7 +57,7 @@ struct sqchat_buffer {
     size_t out_queue_size;
 
     struct sqchat_network * network;
-    struct chat_window * window;
+    struct sqchat_chat_window * window;
     GtkTextBuffer * buffer;
     double buffer_scroll_pos;
     GtkEntryBuffer * command_box_buffer;

@@ -18,7 +18,7 @@
 
 #include "chat_window.h"
 
-extern void sqchat_chat_viewer_new(struct chat_window * window)
+extern void sqchat_chat_viewer_new(struct sqchat_chat_window * window)
     _nonnull(1);
 
 #endif // __CHAT_VIEWER_H__

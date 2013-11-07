@@ -40,9 +40,9 @@ GtkWidget * default_real_name_entry;
 
 static void settings_dialog_result_handler(GtkDialog * dialog,
                                            int response_id,
-                                           struct chat_window * parent);
+                                           struct sqchat_chat_window * parent);
 
-void sqchat_settings_dialog_show(struct chat_window * parent) {    
+void sqchat_settings_dialog_show(struct sqchat_chat_window * parent) {    
     settings_dialog = 
         gtk_dialog_new_with_buttons("SquirrelChat Settings",
                                     GTK_WINDOW(parent->window),
@@ -115,7 +115,7 @@ void sqchat_settings_dialog_show(struct chat_window * parent) {
 
 static void settings_dialog_result_handler(GtkDialog * dialog,
                                            int response_id,
-                                           struct chat_window * parent) {
+                                           struct sqchat_chat_window * parent) {
     if (response_id != GTK_RESPONSE_DELETE_EVENT &&
         response_id != GTK_RESPONSE_CANCEL) {
         config_setting_set_string(sqchat_default_nick, gtk_entry_get_text(

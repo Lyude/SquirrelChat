@@ -21,15 +21,15 @@
 
 #include "buffer.h"
 
-extern void sqchat_network_tree_init(struct chat_window * window)
+extern void sqchat_network_tree_init(struct sqchat_chat_window * window)
     _nonnull(1);
-extern void sqchat_network_tree_connect_signals(struct chat_window * window)
-    _nonnull(1);
-
-extern struct sqchat_network * sqchat_network_tree_get_current(struct chat_window * window)
+extern void sqchat_network_tree_connect_signals(struct sqchat_chat_window * window)
     _nonnull(1);
 
-extern void sqchat_network_tree_network_add(struct chat_window * window,
+extern struct sqchat_network * sqchat_network_tree_get_current(struct sqchat_chat_window * window)
+    _nonnull(1);
+
+extern void sqchat_network_tree_network_add(struct sqchat_chat_window * window,
                                             struct sqchat_network * network)
     _nonnull(1, 2);
 

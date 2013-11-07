@@ -23,7 +23,7 @@
 #include "main_menu_bar.h"
 #include "settings_dialog.h"
 
-void sqchat_main_menu_bar_new(struct chat_window * window) {
+void sqchat_main_menu_bar_new(struct sqchat_chat_window * window) {
     /* Menu items and submenus that don't need to be referenced outside of this
      * scope
      */
@@ -73,12 +73,12 @@ void sqchat_main_menu_bar_new(struct chat_window * window) {
 }
 
 void new_network_menu_item_callback(GtkMenuItem * menuitem,
-                                    struct chat_window * window) {
+                                    struct sqchat_chat_window * window) {
     sqchat_network_tree_network_add(window, sqchat_new_irc_network());
 }
 
 void about_menu_item_callback(GtkMenuItem * menuitem,
-                              struct chat_window * window) {
+                              struct sqchat_chat_window * window) {
     char * authors[] = { "Stephen Chandler Paul",
                          "Quora Dodrill",
                          NULL };
@@ -96,7 +96,7 @@ void about_menu_item_callback(GtkMenuItem * menuitem,
 
 // Callback used by the "Connect" menu item
 void connect_current_network(GtkMenuItem * menuitem,
-                             struct chat_window * window) {
+                             struct sqchat_chat_window * window) {
     GtkTreeIter selected_row;
     struct sqchat_network * network;
 
@@ -104,12 +104,12 @@ void connect_current_network(GtkMenuItem * menuitem,
 }
 
 static void preferences_menu_item_cb(GtkMenuItem * menuitem,
-                                     struct chat_window * parent) {
+                                     struct sqchat_chat_window * parent) {
     sqchat_settings_dialog_show(parent);
 }
 
 // Connects all the signals for the items in the menu bar
-void sqchat_main_menu_bar_connect_signals(struct chat_window * window) {
+void sqchat_main_menu_bar_connect_signals(struct sqchat_chat_window * window) {
     g_signal_connect(window->connect_menu_item, "activate",
                      G_CALLBACK(connect_current_network), window);
     g_signal_connect(window->new_server_buffer_menu_item, "activate",

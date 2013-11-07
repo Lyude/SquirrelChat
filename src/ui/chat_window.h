@@ -26,7 +26,7 @@
 /* Struct containing all the important widgets for a window, passed to most
  * controlling the widgets in each window
  */
-struct chat_window {
+struct sqchat_chat_window {
     GtkWidget * window;
     GtkWidget * top_vertical_container;
 
@@ -65,10 +65,10 @@ struct chat_window {
 };
 
 // TODO: Remove the "create_" part in the function name
-extern struct chat_window * create_new_chat_window(struct sqchat_network * network);
+extern struct sqchat_chat_window * sqchat_chat_window_new(struct sqchat_network * network);
 
-extern void change_active_buffer(struct chat_window * window,
-                                 struct sqchat_buffer * new_buffer)
+extern void sqchat_chat_window_change_active_buffer(struct sqchat_chat_window * window,
+                                                    struct sqchat_buffer * new_buffer)
     _nonnull(1, 2);
 
 #endif // CHAT_WINDOW_H

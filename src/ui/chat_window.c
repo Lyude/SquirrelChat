@@ -27,11 +27,11 @@
 #include <stdlib.h>
 #include <gtk/gtk.h>
 
-struct chat_window * create_new_chat_window(struct sqchat_network * network) {
+struct sqchat_chat_window * sqchat_chat_window_new(struct sqchat_network * network) {
     // Containers that are only ever referenced here
     GtkWidget * chat_and_command_box_container;
 
-    struct chat_window * new_window = malloc(sizeof(struct chat_window));
+    struct sqchat_chat_window * new_window = malloc(sizeof(struct sqchat_chat_window));
 
     new_window->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(new_window->window), "SquirrelChat");
@@ -113,7 +113,7 @@ struct chat_window * create_new_chat_window(struct sqchat_network * network) {
     if (network == NULL) {
         struct sqchat_network * placeholder = sqchat_new_irc_network();
         sqchat_network_tree_network_add(new_window, placeholder);
-        change_active_buffer(new_window, placeholder->buffer);
+        sqchat_chat_window_change_active_buffer(new_window, placeholder->buffer);
     }
 
     // Connect the signals
@@ -121,7 +121,7 @@ struct chat_window * create_new_chat_window(struct sqchat_network * network) {
     sqchat_main_menu_bar_connect_signals(new_window);
     sqchat_command_box_connect_signals(new_window);
 
-    // TODO: Destroy chat_window struct when windows are destroyed
+    // TODO: Destroy sqchat_chat_window struct when windows are destroyed
     g_signal_connect(new_window->window, "destroy", G_CALLBACK(gtk_main_quit),
                      NULL);
 
@@ -131,8 +131,8 @@ struct chat_window * create_new_chat_window(struct sqchat_network * network) {
     return new_window;
 }
 
-void change_active_buffer(struct chat_window * window,
-                          struct sqchat_buffer * new_buffer) {
+void sqchat_chat_window_change_active_buffer(struct sqchat_chat_window * window,
+                                             struct sqchat_buffer * new_buffer) {
     // Record the scroll position of the current buffer
 //    window->current_buffer->buffer_scroll_pos = gtk_adjustment_get_value(
 //        gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(

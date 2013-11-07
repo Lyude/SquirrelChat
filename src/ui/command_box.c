@@ -23,7 +23,7 @@
 #include <gtk/gtk.h>
 
 void command_box_activated_handler(GtkEntry * entry,
-                                   struct chat_window * window) {
+                                   struct sqchat_chat_window * window) {
     char * input = strdup(gtk_entry_get_text(entry));
     guint16 input_len = gtk_entry_get_text_length(entry);
     // If the input is a blank message or a blank command, do nothing
@@ -88,11 +88,11 @@ void command_box_activated_handler(GtkEntry * entry,
     gtk_entry_set_text(entry, "");
 }
 
-void sqchat_command_box_new(struct chat_window * window) {
+void sqchat_command_box_new(struct sqchat_chat_window * window) {
     window->command_box = gtk_entry_new();
 }
 
-void sqchat_command_box_connect_signals(struct chat_window * window) {
+void sqchat_command_box_connect_signals(struct sqchat_chat_window * window) {
     g_signal_connect(window->command_box, "activate",
                      G_CALLBACK(command_box_activated_handler), window);
 }

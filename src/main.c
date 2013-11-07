@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
     gtk_init(&argc, &argv);
     sqchat_init_settings();
 
-    struct chat_window * window = create_new_chat_window(NULL);
+    struct sqchat_chat_window * window = sqchat_chat_window_new(NULL);
 
     gtk_main();
 

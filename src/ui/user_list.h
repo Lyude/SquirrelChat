@@ -23,7 +23,7 @@
 #include <p99_generic.h>
 #endif
 
-extern void sqchat_user_list_new(struct chat_window * window)
+extern void sqchat_user_list_new(struct sqchat_chat_window * window)
     _nonnull(1);
 
 extern void sqchat_user_list_user_add(struct sqchat_buffer * buffer,
