@@ -52,7 +52,7 @@ struct sqchat_chat_window * sqchat_chat_window_new(struct sqchat_network * netwo
                        new_window->network_tree_and_buffer_pane,
                        TRUE, TRUE, 0);
 
-    sqchat_network_tree_init(new_window);
+    sqchat_network_tree_new(new_window);
     new_window->scrolled_window_for_network_tree =
         gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_kinetic_scrolling(
