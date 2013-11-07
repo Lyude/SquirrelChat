@@ -29,8 +29,8 @@
 static gboolean flush_buffer_output(struct sqchat_buffer * buffer);
 
 struct sqchat_buffer * sqchat_buffer_new(const char * buffer_name,
-                                  enum sqchat_buffer_type type,
-                                  struct sqchat_network * network) {
+                                         enum sqchat_buffer_type type,
+                                         struct sqchat_network * network) {
     struct sqchat_buffer * buffer = malloc(sizeof(struct sqchat_buffer));
     buffer->type = type;
     buffer->buffer_name = (type != NETWORK) ? strdup(buffer_name) : NULL;
