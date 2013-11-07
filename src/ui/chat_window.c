@@ -67,6 +67,8 @@ struct sqchat_chat_window * sqchat_chat_window_new(struct sqchat_network * netwo
         = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
     gtk_paned_add2(GTK_PANED(new_window->network_tree_and_buffer_pane),
                    new_window->chat_viewer_and_user_list_pane);
+    gtk_paned_set_position(GTK_PANED(new_window->chat_viewer_and_user_list_pane),
+                           380);
 
     /* Set the default position of the divider between the network tree and
      * buffer
@@ -102,6 +104,9 @@ struct sqchat_chat_window * sqchat_chat_window_new(struct sqchat_network * netwo
     gtk_scrolled_window_set_kinetic_scrolling(
             GTK_SCROLLED_WINDOW(new_window->scrolled_window_for_user_list),
             TRUE);
+    gtk_scrolled_window_set_policy(
+            GTK_SCROLLED_WINDOW(new_window->scrolled_window_for_user_list),
+            GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
     gtk_container_add(GTK_CONTAINER(new_window->scrolled_window_for_user_list),
                       new_window->user_list);
     gtk_paned_add2(GTK_PANED(new_window->chat_viewer_and_user_list_pane),
