@@ -126,10 +126,10 @@ NUMERIC_CB(sqchat_rpl_isupport) {
                 {
                     GtkTreeIter network_row;
                     GtkTreeModel * network_model =
-                        gtk_tree_row_reference_get_model(network->row);
+                        gtk_tree_row_reference_get_model(network->buffer->row);
 
                     gtk_tree_model_get_iter(network_model, &network_row,
-                            gtk_tree_row_reference_get_path(network->row));
+                            gtk_tree_row_reference_get_path(network->buffer->row));
 
                     gtk_tree_store_set(GTK_TREE_STORE(network_model),
                                        &network_row, 0, network->name, -1);

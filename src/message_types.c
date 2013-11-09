@@ -109,8 +109,14 @@ MSG_CB(sqchat_join_msg_callback) {
     sqchat_split_hostmask(hostmask, &nickname, &address);
 
     // Check if we're the user joining a channel
-    if (strcmp(network->nickname, nickname) == 0)
-        sqchat_network_tree_buffer_add(sqchat_buffer_new(argv[0], CHANNEL, network), network);
+    if (strcmp(network->nickname, nickname) == 0) {
+        struct sqchat_buffer * new_channel;
+
+        new_channel = sqchat_buffer_new(argv[0], CHANNEL, network);
+        sqchat_network_tree_buffer_add(new_channel, network);
+
+        sqchat_chat_window_change_active_buffer(network->window, new_channel);
+    }
     else {
         struct sqchat_buffer * buffer;
         GtkTreeIter new_user_row;

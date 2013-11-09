@@ -70,7 +70,7 @@ void sqchat_network_tree_network_add(struct sqchat_chat_window * window,
         gtk_tree_model_get_path(GTK_TREE_MODEL(window->network_tree_store),
                                 &network_tree_toplevel);
 
-    network->row = gtk_tree_row_reference_new(
+    network->buffer->row = gtk_tree_row_reference_new(
             GTK_TREE_MODEL(window->network_tree_store),
             toplevel_path);
     network->window = window;
@@ -94,10 +94,13 @@ void sqchat_network_tree_buffer_add(struct sqchat_buffer * buffer,
     GtkTreeIter network_row;
     GtkTreeIter buffer_row;
     GtkTreeRowReference * buffer_ref;
-    GtkTreeModel * tree_model = gtk_tree_row_reference_get_model(network->row);
+    GtkTreeModel * tree_model =
+        gtk_tree_row_reference_get_model(network->buffer->row);
 
     gtk_tree_model_get_iter(tree_model, &network_row,
-                            gtk_tree_row_reference_get_path(network->row));
+                            gtk_tree_row_reference_get_path(
+                                network->buffer->row
+                            ));
 
     // Append a new buffer
     gtk_tree_store_append(GTK_TREE_STORE(tree_model), &buffer_row,
@@ -142,7 +145,9 @@ void cursor_changed_handler(GtkTreeSelection *treeselection,
     gtk_tree_model_get(network_list_model, &selected_row,
                        1, &buffer, -1);
 
-    sqchat_chat_window_change_active_buffer(window, buffer);
+    // If the active buffer hasn't been changed already, change it
+    if (window->current_buffer != buffer)
+        sqchat_chat_window_change_active_buffer(window, buffer);
 }
 
 /* Connects the signals for the network tree

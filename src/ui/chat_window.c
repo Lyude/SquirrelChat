@@ -138,6 +138,8 @@ struct sqchat_chat_window * sqchat_chat_window_new(struct sqchat_network * netwo
 
 void sqchat_chat_window_change_active_buffer(struct sqchat_chat_window * window,
                                              struct sqchat_buffer * new_buffer) {
+    GtkTreePath * path_to_buffer = gtk_tree_row_reference_get_path(new_buffer->row);
+
     // Record the scroll position of the current buffer
 //    window->current_buffer->buffer_scroll_pos = gtk_adjustment_get_value(
 //        gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(
@@ -164,5 +166,12 @@ void sqchat_chat_window_change_active_buffer(struct sqchat_chat_window * window,
         gtk_widget_hide(window->scrolled_window_for_user_list);
 
     window->current_buffer = new_buffer;
+
+    // Make sure that the buffer is selected in the network tree
+    gtk_tree_view_expand_to_path(GTK_TREE_VIEW(window->network_tree),
+                                 path_to_buffer);
+    gtk_tree_view_set_cursor(GTK_TREE_VIEW(window->network_tree),
+                             path_to_buffer,
+                             NULL, false);
 }
 // vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4

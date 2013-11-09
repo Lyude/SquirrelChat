@@ -74,7 +74,10 @@ void sqchat_main_menu_bar_new(struct sqchat_chat_window * window) {
 
 void new_network_menu_item_callback(GtkMenuItem * menuitem,
                                     struct sqchat_chat_window * window) {
-    sqchat_network_tree_network_add(window, sqchat_new_irc_network());
+    struct sqchat_network * new_network = sqchat_new_irc_network();
+
+    sqchat_network_tree_network_add(window, new_network);
+    sqchat_chat_window_change_active_buffer(window, new_network->buffer);
 }
 
 void about_menu_item_callback(GtkMenuItem * menuitem,
