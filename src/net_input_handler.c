@@ -137,7 +137,7 @@ gboolean sqchat_net_input_handler(GIOChannel *source,
                                                 "Fatal SSL error: %s\n"
                                                 "Closing connection.\n",
                                                 gnutls_strerror(result));
-                            sqchat_disconnect_network(network, "SSL error");
+                            sqchat_network_disconnect(network, "SSL error");
                             close(network->socket);
                             return FALSE;
                         }
@@ -171,7 +171,7 @@ gboolean sqchat_net_input_handler(GIOChannel *source,
                                         "SSL error during record receive: %s\n"
                                         "Disconnected.\n",
                                         gnutls_strerror(result));
-                    sqchat_disconnect_network(network, "SSL error");
+                    sqchat_network_disconnect(network, "SSL error");
                     gnutls_deinit(network->ssl_session);
                     close(network->socket);
                     return FALSE;
@@ -211,7 +211,7 @@ gboolean sqchat_net_input_handler(GIOChannel *source,
                     sqchat_buffer_print(network->buffer,
                                         "SSL error during handshake: %s\n",
                                         gnutls_strerror(result));
-                    sqchat_disconnect_network(network, "SSL error");
+                    sqchat_network_disconnect(network, "SSL error");
                 }
                 else
                     sqchat_buffer_print(network->buffer,

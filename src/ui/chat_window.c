@@ -116,7 +116,7 @@ struct sqchat_chat_window * sqchat_chat_window_new(struct sqchat_network * netwo
      * provided
      */
     if (network == NULL) {
-        struct sqchat_network * placeholder = sqchat_new_irc_network();
+        struct sqchat_network * placeholder = sqchat_network_new();
         sqchat_network_tree_network_add(new_window, placeholder);
         sqchat_chat_window_change_active_buffer(new_window, placeholder->buffer);
     }

@@ -266,7 +266,7 @@ verification_error:
         if (fatal) {
             for (int i = 0; i < chain_size; i++)
                 gnutls_x509_crt_deinit(cert[i]);
-            sqchat_disconnect_network(network, "SSL error");
+            sqchat_network_disconnect(network, "SSL error");
             return GNUTLS_E_CERTIFICATE_ERROR;
         }
     }

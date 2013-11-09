@@ -39,7 +39,7 @@
  * NOTE: The struct is automatically sanitized by this function, so there is no
  * need to do it yourself
  */
-struct sqchat_network * sqchat_new_irc_network() {
+struct sqchat_network * sqchat_network_new() {
     // Allocate and sanitize the structure
     struct sqchat_network * network = malloc(sizeof(struct sqchat_network));
     memset(network, 0, sizeof(struct sqchat_network));
@@ -58,8 +58,8 @@ struct sqchat_network * sqchat_new_irc_network() {
 /* TODO: Switch the tab when freeing a network to ensure all references to the
  * text buffer are removed
  */
-void sqchat_free_network(struct sqchat_network * network,
-                         GtkTreeStore * network_tree_store) {
+void sqchat_network_destroy(struct sqchat_network * network,
+                            GtkTreeStore * network_tree_store) {
     sqchat_buffer_destroy(network->buffer);
     free(network->name);
     free(network->nickname);
@@ -67,7 +67,7 @@ void sqchat_free_network(struct sqchat_network * network,
     free(network);
 }
 
-void sqchat_connect_network(struct sqchat_network * network) {
+void sqchat_network_connect(struct sqchat_network * network) {
 #ifndef WITH_SSL
     if (network->ssl) {
         sqchat_buffer_print(network->buffer,
@@ -88,7 +88,7 @@ void sqchat_connect_network(struct sqchat_network * network) {
     sqchat_begin_connection(network);
 }
 
-void sqchat_disconnect_network(struct sqchat_network * network,
+void sqchat_network_disconnect(struct sqchat_network * network,
                             const char * msg) {
     sqchat_network_send(network, "QUIT :%s\r\n", msg ? msg : "");
     network->status = DISCONNECTED;

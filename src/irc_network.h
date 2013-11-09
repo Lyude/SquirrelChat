@@ -99,14 +99,14 @@ struct sqchat_network {
     struct sqchat_cmd_response_claim * claimed_responses;
 };
 
-extern struct sqchat_network * sqchat_new_irc_network();
-extern void sqchat_free_network(struct sqchat_network * network,
-                                GtkTreeStore * network_tree_store)
+extern struct sqchat_network * sqchat_network_new();
+extern void sqchat_network_destroy(struct sqchat_network * network,
+                                   GtkTreeStore * network_tree_store)
     _nonnull(1, 2);
 
-extern void sqchat_connect_network(struct sqchat_network * network)
+extern void sqchat_network_connect(struct sqchat_network * network)
     _nonnull(1);
-extern void sqchat_disconnect_network(struct sqchat_network * network,
+extern void sqchat_network_disconnect(struct sqchat_network * network,
                                       const char * msg)
     _nonnull(1);
 

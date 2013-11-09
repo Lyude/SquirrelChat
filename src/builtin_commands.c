@@ -409,7 +409,7 @@ BI_CMD(sqchat_cmd_topic) {
 // Max argc: 0
 BI_CMD(sqchat_cmd_connect) {
     if (buffer->network->status == DISCONNECTED)
-        sqchat_connect_network(buffer->network);
+        sqchat_network_connect(buffer->network);
     return 0;
 }
 
@@ -418,7 +418,7 @@ BI_CMD(sqchat_cmd_quit) {
     if (buffer->network->status == DISCONNECTED)
         sqchat_buffer_print(buffer, "Not connected!\n");
     else
-        sqchat_disconnect_network(buffer->network, trailing);
+        sqchat_network_disconnect(buffer->network, trailing);
     return 0;
 }
 

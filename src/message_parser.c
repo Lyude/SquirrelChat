@@ -280,7 +280,7 @@ void sqchat_process_msg(struct sqchat_network * network, char * msg) {
                                         numeric);
                     sqchat_dump_msg_to_buffer(network->buffer, hostmask, argc,
                                               argv);
-                    sqchat_disconnect_network(network, "Invalid data received");
+                    sqchat_network_disconnect(network, "Invalid data received");
                     break;
                 case SQCHAT_MSG_ERR_MISC:
                     sqchat_dump_msg_to_buffer(network->buffer, hostmask, argc,
@@ -318,7 +318,7 @@ void sqchat_process_msg(struct sqchat_network * network, char * msg) {
                                     "Type: %s\n", command);
                 sqchat_dump_msg_to_buffer(network->buffer, hostmask, argc,
                                           argv);
-                sqchat_disconnect_network(network, "Invalid data received");
+                sqchat_network_disconnect(network, "Invalid data received");
                 break;
             case SQCHAT_MSG_ERR_MISC:
                 sqchat_dump_msg_to_buffer(network->buffer, hostmask, argc,
