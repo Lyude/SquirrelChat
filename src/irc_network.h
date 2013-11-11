@@ -72,6 +72,8 @@ struct sqchat_network {
     bool away                           : 1;
 
     bool ssl                            : 1;
+
+    bool destroy_on_disconnect          : 1;
     bool                                : 0;
 
     gnutls_session_t ssl_session;
@@ -100,9 +102,8 @@ struct sqchat_network {
 };
 
 extern struct sqchat_network * sqchat_network_new();
-extern void sqchat_network_destroy(struct sqchat_network * network,
-                                   GtkTreeStore * network_tree_store)
-    _nonnull(1, 2);
+extern void sqchat_network_destroy(struct sqchat_network * network)
+    _nonnull(1);
 
 extern void sqchat_network_connect(struct sqchat_network * network)
     _nonnull(1);

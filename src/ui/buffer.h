@@ -72,6 +72,9 @@ struct sqchat_buffer {
 extern struct sqchat_buffer * sqchat_buffer_new(const char * buffer_name,
                                                 enum sqchat_buffer_type type,
                                                 struct sqchat_network * network);
+extern void sqchat_buffer_free(struct sqchat_buffer * buffer)
+    _nonnull(1);
+
 extern void sqchat_buffer_destroy(struct sqchat_buffer * buffer)
     _nonnull(1);
 

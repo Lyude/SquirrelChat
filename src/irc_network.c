@@ -20,6 +20,7 @@
 #include "net_input_handler.h"
 #include "settings.h"
 #include "connection_setup.h"
+#include "cmd_responses.h"
 
 #include <gtk/gtk.h>
 #include <glib.h>
@@ -58,13 +59,33 @@ struct sqchat_network * sqchat_network_new() {
 /* TODO: Switch the tab when freeing a network to ensure all references to the
  * text buffer are removed
  */
-void sqchat_network_destroy(struct sqchat_network * network,
-                            GtkTreeStore * network_tree_store) {
-    sqchat_buffer_destroy(network->buffer);
-    free(network->name);
-    free(network->nickname);
+void sqchat_network_destroy(struct sqchat_network * network) {
+    if (network->status != DISCONNECTED) {
+        // Tell the net input handler to destroy the network when it disconnects
+        network->destroy_on_disconnect = true;
 
-    free(network);
+        sqchat_network_disconnect(network, NULL);
+    }
+    else {
+        sqchat_buffer_destroy(network->buffer);
+        sqchat_trie_free(network->buffers, sqchat_buffer_free, NULL);
+
+        free(network->name);
+        free(network->address);
+        free(network->port);
+        free(network->password);
+        free(network->nickname);
+        free(network->username);
+        free(network->real_name);
+        for (struct sqchat_cmd_response_claim * c = network->claimed_responses;
+             c != NULL;) {
+            struct sqchat_cmd_response_claim * current = c;
+            c = c->next;
+            free(current);
+        }
+
+        free(network);
+    }
 }
 
 void sqchat_network_connect(struct sqchat_network * network) {
@@ -89,9 +110,21 @@ void sqchat_network_connect(struct sqchat_network * network) {
 }
 
 void sqchat_network_disconnect(struct sqchat_network * network,
-                            const char * msg) {
+                               const char * msg) {
     sqchat_network_send(network, "QUIT :%s\r\n", msg ? msg : "");
-    network->status = DISCONNECTED;
+
+#ifdef WITH_SSL
+    if (network->ssl)
+        network->ssl_cred = NULL;
+#endif
+
+    for (struct __sqchat_queued_output * c = network->claimed_responses;
+         c != NULL;) {
+        struct __sqchat_queued_output * next_c = c->next;
+        free(c->msg);
+        free(c);
+        c = next_c;
+    }
 
     free(network->version);
     free(network->server_name);
@@ -117,18 +150,6 @@ void sqchat_network_disconnect(struct sqchat_network * network,
     network->prefix_chars = NULL;
     network->prefix_symbols = NULL;
     network->casecmp = NULL;
-
-#ifdef WITH_SSL
-    if (network->ssl) {
-        gnutls_bye(network->ssl_session, GNUTLS_SHUT_WR);
-
-        network->ssl_cred = NULL;
-
-        /* We leave the deinitialization of the ssl session to the net input
-         * handler
-         */
-    }
-#endif
 }
 
 // vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:

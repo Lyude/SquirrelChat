@@ -55,6 +55,8 @@ struct sqchat_buffer * sqchat_buffer_new(const char * buffer_name,
         buffer->query_data = malloc(sizeof(struct __sqchat_query_data));
         buffer->query_data->away_msg = NULL;
     }
+    else
+        buffer->extra_data = NULL;
 
     if (type != NETWORK)
         sqchat_trie_set(network->buffers, buffer_name, buffer);
@@ -74,14 +76,13 @@ static void destroy_users(GtkTreeRowReference * user,
     gtk_tree_row_reference_free(user);
 }
 
-/* NOTE: This should only ever be called from the main thread, behavior when
- * called in other threads is undefined. In addition, checking to see if any
- * other threads are accessing the buffer is too much of a pain, so please make
- * sure any other threads that have a chance of using the sqchat_buffer_print()
- * function sometime during their life time have been terminated before calling
- * sqchat_buffer_destroy()
- */
 void sqchat_buffer_destroy(struct sqchat_buffer * buffer) {
+    if (buffer->type != NETWORK)
+        sqchat_trie_del(buffer->network->buffers, buffer->buffer_name);
+    sqchat_buffer_free(buffer);
+}
+
+void sqchat_buffer_free(struct sqchat_buffer * buffer) {
     if (buffer->type == CHANNEL) {
         g_object_unref(buffer->chan_data->user_list_store);
         sqchat_trie_free(buffer->chan_data->users, destroy_users, buffer);
@@ -89,16 +90,15 @@ void sqchat_buffer_destroy(struct sqchat_buffer * buffer) {
     g_object_unref(buffer->buffer);
     g_object_unref(buffer->command_box_buffer);
 
-    if (buffer->type != NETWORK)
-        sqchat_trie_del(buffer->network->buffers, buffer->buffer_name);
-
     free(buffer->buffer_name);
     gtk_tree_row_reference_free(buffer->row);
     free(buffer->extra_data);
 
     pthread_mutex_destroy(&buffer->output_mutex);
 
-    // If there was still data waiting to be outputted, destroy it
+    /* If there was still data waiting to be outputted, destroy it and remove
+     * idle function from the event loop
+     */
     if (g_idle_remove_by_data(buffer)) {
         struct __sqchat_queued_output * n;
         for (struct __sqchat_queued_output * c = buffer->out_queue;

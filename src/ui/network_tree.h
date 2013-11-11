@@ -32,6 +32,7 @@ extern struct sqchat_network * sqchat_network_tree_get_current(struct sqchat_cha
 extern void sqchat_network_tree_network_add(struct sqchat_chat_window * window,
                                             struct sqchat_network * network)
     _nonnull(1, 2);
+extern void sqchat_network_tree_network_remove(struct sqchat_network * network);
 
 extern void sqchat_network_tree_buffer_add(struct sqchat_buffer * buffer,
                                            struct sqchat_network * network)

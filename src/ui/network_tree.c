@@ -20,6 +20,8 @@
 #include <gtk/gtk.h>
 
 #include "chat_window.h"
+#include "../net_io.h"
+#include "../cmd_responses.h"
 
 GtkTreeIter network_tree_toplevel;
 
@@ -57,6 +59,78 @@ void sqchat_network_tree_new(struct sqchat_chat_window * window) {
                                     FALSE); // Temporary fix for segfault
 }
 
+static void buffer_close_item_callback(GtkMenuItem * menuitem, struct sqchat_buffer * buffer);
+
+static void show_right_click_menu(GtkWidget * widget,
+                                  GdkEventButton * event,
+                                  struct sqchat_buffer * buffer) {
+    int button;
+    int event_time;
+    GtkWidget * menu = gtk_menu_new();
+    GtkWidget * close_item = gtk_menu_item_new_with_label("Close");
+
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), close_item);
+
+    if (event != NULL) {
+        button = event->button;
+        event_time = event->time;
+    }
+    else {
+        button = 0;
+        event_time = gtk_get_current_event_time();
+    }
+
+    g_signal_connect(close_item, "activate",
+                 G_CALLBACK(buffer_close_item_callback), buffer);
+
+    gtk_widget_show_all(menu);
+
+    gtk_menu_attach_to_widget(GTK_MENU(menu), widget, NULL);
+    gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, button, event_time);
+}
+
+static void buffer_close_item_callback(GtkMenuItem * menuitem,
+                                       struct sqchat_buffer * buffer) {
+    if (buffer->type == NETWORK) {
+        if (buffer->network->status != DISCONNECTED) {
+            GtkWidget * dialog;
+
+            dialog =
+                gtk_message_dialog_new(GTK_WINDOW(buffer->window->window),
+                                       GTK_DIALOG_MODAL |
+                                           GTK_DIALOG_DESTROY_WITH_PARENT,
+                                       GTK_MESSAGE_WARNING,
+                                       GTK_BUTTONS_YES_NO,
+                                       "This network is still connected, are "
+                                       "you sure you would like to close it?");
+            if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_YES) {
+                sqchat_network_tree_network_remove(buffer->network);
+                sqchat_network_destroy(buffer->network);
+            }
+            gtk_widget_destroy(dialog);
+        }
+        else {
+            sqchat_network_tree_network_remove(buffer->network);
+            sqchat_network_destroy(buffer->network);
+        }
+    }
+    else if (buffer->type == CHANNEL) {
+        if (buffer->network->status == CONNECTED) {
+            sqchat_network_send(buffer->network,
+                                "PART %s\r\n",
+                                buffer->buffer_name);
+        }
+        else {
+            sqchat_network_tree_buffer_remove(buffer);
+            sqchat_buffer_destroy(buffer);
+        }
+    }
+    else {
+        sqchat_network_tree_buffer_remove(buffer);
+        sqchat_buffer_destroy(buffer);
+    }
+}
+
 // Adds an empty network buffer to the network tree
 void sqchat_network_tree_network_add(struct sqchat_chat_window * window,
                                      struct sqchat_network * network) {
@@ -75,6 +149,29 @@ void sqchat_network_tree_network_add(struct sqchat_chat_window * window,
             toplevel_path);
     network->window = window;
     network->buffer->window = window;
+}
+
+void sqchat_network_tree_network_remove(struct sqchat_network * network) {
+    /* Check to make sure there are other buffers we can switch to
+     * so that we can ensure that all references to the buffer are
+     * destroyed. If there isn't, just create a generic untitled
+     * buffer and switch to that.
+     */
+    if (gtk_tree_model_iter_n_children(
+                GTK_TREE_MODEL(network->window->network_tree_store), NULL) == 1) {
+        struct sqchat_network * placeholder = sqchat_network_new();
+
+        sqchat_network_tree_network_add(network->window, placeholder);
+        sqchat_chat_window_change_active_buffer(network->window,
+                                                placeholder->buffer);
+    }
+
+    if (network->status != DISCONNECTED)
+        sqchat_network_disconnect(network, NULL);
+
+    // Close all of the buffers belonging to the network
+    sqchat_trie_each(network->buffers, sqchat_network_tree_buffer_remove, NULL);
+    sqchat_network_tree_buffer_remove(network->buffer);
 }
 
 // Get's the currently selected network in the network tree
@@ -150,6 +247,55 @@ void cursor_changed_handler(GtkTreeSelection *treeselection,
         sqchat_chat_window_change_active_buffer(window, buffer);
 }
 
+static bool button_event_handler(GtkWidget * widget,
+                                 GdkEventButton * event,
+                                 struct sqchat_chat_window * window) {
+    if (gdk_event_triggers_context_menu((GdkEvent *)event) &&
+        event->type == GDK_BUTTON_PRESS) {
+        GtkTreePath * path;
+        GtkTreeIter row;
+        struct sqchat_buffer * buffer;
+
+        // Figure out what row the cursor is over, if any
+        if (gtk_tree_view_get_path_at_pos(GTK_TREE_VIEW(window->network_tree),
+                                          event->x, event->y, &path, NULL, NULL,
+                                          NULL) == false)
+            return true;
+        gtk_tree_model_get_iter(GTK_TREE_MODEL(window->network_tree_store),
+                                &row, path);
+        gtk_tree_path_free(path);
+
+        // Extract the buffer pointer from the row
+        gtk_tree_model_get(GTK_TREE_MODEL(window->network_tree_store), &row,
+                           1, &buffer, -1);
+
+        show_right_click_menu(widget, event, buffer);
+        return true;
+    }
+
+    return false;
+}
+
+static bool popup_menu_handler(GtkWidget * widget,
+                               struct sqchat_chat_window * window) {
+    GtkTreePath * path;
+    GtkTreeIter row;
+    struct sqchat_buffer * buffer;
+
+    // Figure out what row is selected and get it's buffer pointer
+    gtk_tree_view_get_cursor(GTK_TREE_VIEW(window->network_tree), &path, NULL);
+    gtk_tree_model_get_iter(GTK_TREE_MODEL(window->network_tree_store), &row,
+                            path);
+    gtk_tree_path_free(path);
+    gtk_tree_model_get(GTK_TREE_MODEL(window->network_tree_store), &row,
+                       1, &buffer, -1);
+
+    show_right_click_menu(widget, NULL, buffer);
+    return true;
+}
+
+
+
 /* Connects the signals for the network tree
  * (done as a seperate function because we cannot connect all of the signals
  * until all of the widgets for the window are created
@@ -157,6 +303,10 @@ void cursor_changed_handler(GtkTreeSelection *treeselection,
 void sqchat_network_tree_connect_signals(struct sqchat_chat_window * window) {
     g_signal_connect(gtk_tree_view_get_selection(GTK_TREE_VIEW(window->network_tree)),
                      "changed", G_CALLBACK(cursor_changed_handler), window);
+    g_signal_connect(window->network_tree, "button-press-event",
+                     G_CALLBACK(button_event_handler), window);
+    g_signal_connect(window->network_tree, "popup-menu",
+                     G_CALLBACK(popup_menu_handler), window);
 }
 
 // vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:

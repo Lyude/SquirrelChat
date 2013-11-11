@@ -32,6 +32,19 @@
 
 #include <gnutls/gnutls.h>
 
+/* When the socket and ssl session is closed for a network, this function is
+ * called to mark the network as disconnected, print a message, and/or destroy
+ * the network if nessecary
+ */
+static inline void finish_network_disconnect(struct sqchat_network * network) {
+    network->status = DISCONNECTED;
+
+    if (network->destroy_on_disconnect)
+        sqchat_network_destroy(network);
+    else
+        sqchat_buffer_print(network->buffer, "* Disconnected.\n");
+}
+
 /* Checks for messages waiting in a network's buffer
  * If there is still a message waiting in the network's buffer, it returns it
  * and moves the buffer cursor forward. Otherwise returns null. NULL is returned
@@ -92,8 +105,8 @@ char * check_for_messages(struct sqchat_network * network) {
 }
 
 gboolean sqchat_net_input_handler(GIOChannel *source,
-                           GIOCondition condition,
-                           struct sqchat_network * network) {
+                                  GIOCondition condition,
+                                  struct sqchat_network * network) {
     char * msg;
     int result;
 
@@ -101,8 +114,8 @@ gboolean sqchat_net_input_handler(GIOChannel *source,
 #ifdef WITH_SSL
     if (network->ssl) {
         if (network->status == DISCONNECTED) {
-            sqchat_buffer_print(network->buffer->window->current_buffer,
-                            "* Disconnected\n");
+            finish_network_disconnect(network);
+
             return false;
         }
         else if (network->status == CONNECTED) {
@@ -113,9 +126,11 @@ gboolean sqchat_net_input_handler(GIOChannel *source,
                                 &network->recv_buffer[network->buffer_fill_len],
                                 SQCHAT_IRC_MSG_LEN - network->buffer_fill_len);
                 if (result == 0) {
-                    sqchat_buffer_print(network->buffer, "Disconnected.\n");
                     gnutls_deinit(network->ssl_session);
                     close(network->socket);
+
+                    finish_network_disconnect(network);
+
                     return FALSE;
                 }
                 else if (result == GNUTLS_E_REHANDSHAKE) {
@@ -138,7 +153,11 @@ gboolean sqchat_net_input_handler(GIOChannel *source,
                                                 "Closing connection.\n",
                                                 gnutls_strerror(result));
                             sqchat_network_disconnect(network, "SSL error");
+                            gnutls_deinit(network->ssl_session);
                             close(network->socket);
+
+                            finish_network_disconnect(network);
+
                             return FALSE;
                         }
                         else
@@ -169,11 +188,14 @@ gboolean sqchat_net_input_handler(GIOChannel *source,
                 else if (result < 0) {
                     sqchat_buffer_print(network->buffer,
                                         "SSL error during record receive: %s\n"
-                                        "Disconnected.\n",
+                                        "* Disconnected.\n",
                                         gnutls_strerror(result));
                     sqchat_network_disconnect(network, "SSL error");
                     gnutls_deinit(network->ssl_session);
                     close(network->socket);
+
+                    finish_network_disconnect(network);
+
                     return FALSE;
                 }
 
@@ -212,6 +234,7 @@ gboolean sqchat_net_input_handler(GIOChannel *source,
                                         "SSL error during handshake: %s\n",
                                         gnutls_strerror(result));
                     sqchat_network_disconnect(network, "SSL error");
+                    finish_network_disconnect(network);
                 }
                 else
                     sqchat_buffer_print(network->buffer,
@@ -227,8 +250,10 @@ gboolean sqchat_net_input_handler(GIOChannel *source,
                       SQCHAT_IRC_MSG_LEN - network->buffer_fill_len, 0);
 
         if (result == 0) {
-            sqchat_buffer_print(network->buffer, "Disconnected.\n");
             close(network->socket);
+
+            finish_network_disconnect(network);
+
             return FALSE;
         }
         else if (result == -1) {
@@ -237,6 +262,9 @@ gboolean sqchat_net_input_handler(GIOChannel *source,
                                 "Closing connection.\n",
                                 strerror(errno));
             close(network->socket);
+
+            finish_network_disconnect(network);
+
             return FALSE;
         }
 

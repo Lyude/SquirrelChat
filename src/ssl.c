@@ -30,7 +30,7 @@ void sqchat_begin_ssl_handshake(struct sqchat_network * network) {
     int ret;
     const char * err;
 
-    gnutls_init(&network->ssl_session, GNUTLS_CLIENT);
+    int gtls = gnutls_init(&network->ssl_session, GNUTLS_CLIENT);
     gnutls_certificate_allocate_credentials(&network->ssl_cred);
 
     gnutls_session_set_ptr(network->ssl_session, network);
