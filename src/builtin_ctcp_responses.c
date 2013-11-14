@@ -62,4 +62,4 @@ BUILTIN_CTCP_RESP(sqchat_ctcp_ping_resp_handler) {
                             ((current_time.tv_sec * 1.0e+9 +
                               current_time.tv_nsec) - response_time) * 1.0e-6);
 }
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
+// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4

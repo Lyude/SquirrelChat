@@ -65,4 +65,4 @@ BI_CMD(sqchat_cmd_realname);
 #undef BI_CMD
 
 #endif // __BUILTIN_COMMANDS_H__
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
+// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4

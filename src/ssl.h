@@ -25,4 +25,4 @@ extern void sqchat_begin_ssl_handshake(struct sqchat_network * network)
 
 #endif // __SQ_SSL_H__
 
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
+// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4

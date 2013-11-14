@@ -80,4 +80,4 @@ extern void sqchat_buffer_print(struct sqchat_buffer * buffer,
     _nonnull(1, 2) _format(printf, 2, 3);
 
 #endif /* __BUFFER_H__ */
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
+// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4

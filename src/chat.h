@@ -25,4 +25,4 @@ void sqchat_send_privmsg(struct sqchat_network * network,
     _nonnull(1, 2, 3);
 
 #endif /* __CHAT_H__ */
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
+// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4

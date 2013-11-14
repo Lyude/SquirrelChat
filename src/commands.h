@@ -55,4 +55,4 @@ extern void sqchat_print_command_help(struct sqchat_buffer * buffer,
     _nonnull(1, 2);
 
 #endif // __COMMANDS_H__
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
+// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4

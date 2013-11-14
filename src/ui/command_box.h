@@ -24,4 +24,4 @@ extern void sqchat_command_box_connect_signals(struct sqchat_chat_window * windo
     _nonnull(1);
 
 #endif // __COMMAND_BOX_H__
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
+// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4

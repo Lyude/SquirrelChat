@@ -212,4 +212,4 @@ void sqchat_trie_rfc1459_strtolower(char * s) {
     for (int i = 0; s[i] != '\0'; i++)
         s[i] = sqchat_rfc1459_tolower(s[i]);
 }
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
+// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4

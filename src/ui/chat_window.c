@@ -174,4 +174,4 @@ void sqchat_chat_window_change_active_buffer(struct sqchat_chat_window * window,
                              path_to_buffer,
                              NULL, false);
 }
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
+// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4

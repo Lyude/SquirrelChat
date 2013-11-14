@@ -31,4 +31,4 @@ CTCP_REQ_HANDLER(sqchat_ctcp_ping_req_handler);
 
 #undef CTCP_REQ_HANDLER
 #endif // __BUILTIN_CTCP_REQUESTS_H__
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
+// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4

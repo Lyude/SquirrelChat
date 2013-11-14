@@ -22,4 +22,4 @@ extern void sqchat_chat_viewer_new(struct sqchat_chat_window * window)
     _nonnull(1);
 
 #endif // __CHAT_VIEWER_H__
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
+// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4

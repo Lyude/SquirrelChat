@@ -131,4 +131,4 @@ void sqchat_network_disconnect(struct sqchat_network * network,
 #endif
 }
 
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
+// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4

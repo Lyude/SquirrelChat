@@ -343,4 +343,4 @@ void sqchat_split_hostmask(char * hostmask, char ** nickname, char ** address) {
     *nickname = strtok_r(hostmask, "!", &saveptr);
     *address = strtok_r(NULL, "!", &saveptr);
 }
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
+// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4

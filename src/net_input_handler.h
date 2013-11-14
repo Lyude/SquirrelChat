@@ -27,4 +27,4 @@ extern gboolean sqchat_net_input_handler(GIOChannel *source,
     _nonnull(3);
 
 #endif // __NET_INPUT_HANDLER__
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
+// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4

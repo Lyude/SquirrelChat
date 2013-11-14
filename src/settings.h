@@ -30,4 +30,4 @@ extern config_setting_t * sqchat_default_real_name;
 extern config_setting_t * sqchat_default_fallback_encoding;
 
 #endif // __SETTINGS_H__
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
+// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4

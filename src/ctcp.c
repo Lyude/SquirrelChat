@@ -71,4 +71,4 @@ void sqchat_process_ctcp(struct sqchat_network * network,
                             type, hostmask, target, msg);
 }
 
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
+// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4

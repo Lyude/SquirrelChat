@@ -31,4 +31,4 @@ BUILTIN_CTCP_RESP(sqchat_ctcp_ping_resp_handler);
 
 #endif // __BUILTIN_CTCP_RESPONSES_H__
 
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
+// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4

@@ -159,4 +159,4 @@ void sqchat_network_tree_connect_signals(struct sqchat_chat_window * window) {
                      "changed", G_CALLBACK(cursor_changed_handler), window);
 }
 
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
+// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4

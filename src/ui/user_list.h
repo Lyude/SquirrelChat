@@ -75,4 +75,4 @@ extern int _sqchat_user_list_user_set_visible_prefix_by_nick(struct sqchat_buffe
 #endif
 
 #endif // __USER_LIST_H__
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
+// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4

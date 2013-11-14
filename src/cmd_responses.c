@@ -67,4 +67,4 @@ struct sqchat_buffer * sqchat_route_rpl_end(struct sqchat_network * network) {
         return network->window->current_buffer;
 }
 
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
+// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4

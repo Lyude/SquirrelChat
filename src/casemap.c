@@ -37,4 +37,4 @@ int sqchat_rfc1459_strcasecmp(const char * s1, const char * s2) {
 
     return result;
 }
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
+// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4

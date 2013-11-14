@@ -127,4 +127,4 @@ void sqchat_main_menu_bar_connect_signals(struct sqchat_chat_window * window) {
                      G_CALLBACK(about_menu_item_callback), window);
 }
 
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
+// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4

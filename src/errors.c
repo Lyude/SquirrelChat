@@ -37,4 +37,4 @@ void _sqchat_gnutls_debug_log(int level, const char * msg) {
 }
 #endif
 
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4
+// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4
