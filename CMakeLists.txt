@@ -34,7 +34,7 @@ configure_file(src/config.h.cmake src/config.h)
 add_definitions("-imacros ${CMAKE_SOURCE_DIR}/src/attributes.h
                  -D_POSIX_C_SOURCE=200809L -Wno-int-to-pointer-cast
                  -Wno-pointer-to-int-cast
-                 -include ${CMAKE_SOURCE_DIR}/src/config.h")
+                 -include ${CMAKE_CURRENT_BINARY_DIR}/src/config.h")
 # Although complete in clang, gcc's C11 support is still missing some features,
 # specifically _Generic support. Until this changes, the required header files
 # from P99 that enable the use of the P99_GENERIC macro have been hacked to work
