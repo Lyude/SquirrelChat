@@ -73,4 +73,4 @@ extern void sqchat_chat_window_change_active_buffer(struct sqchat_chat_window * 
 
 #endif // CHAT_WINDOW_H
 
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4
+// vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:

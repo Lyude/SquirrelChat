@@ -23,4 +23,4 @@ extern int sqchat_rfc1459_strcasecmp(const char * s1, const char * s2)
     _nonnull(1, 2);
 
 #endif // __CASEMAP_H__
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4
+// vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:

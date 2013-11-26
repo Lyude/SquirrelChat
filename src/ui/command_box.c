@@ -97,4 +97,4 @@ void sqchat_command_box_connect_signals(struct sqchat_chat_window * window) {
                      G_CALLBACK(command_box_activated_handler), window);
 }
 
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4
+// vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:

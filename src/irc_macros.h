@@ -21,4 +21,4 @@
 #define SQCHAT_MSG_BUF_LEN 513
 
 #endif /* __IRC_MACROS_H__ */
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4
+// vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:

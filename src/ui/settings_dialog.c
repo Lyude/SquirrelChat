@@ -148,4 +148,4 @@ static void settings_dialog_result_handler(GtkDialog * dialog,
     else
         gtk_widget_destroy(settings_dialog);
 }
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4
+// vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:

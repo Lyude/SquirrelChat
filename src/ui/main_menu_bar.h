@@ -27,4 +27,4 @@ extern void sqchat_main_menu_bar_connect_signals(struct sqchat_chat_window * win
 
 #endif /* __MAIN_MENU_H__ */
 
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4
+// vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:

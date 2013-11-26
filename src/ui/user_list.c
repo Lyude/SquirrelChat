@@ -243,4 +243,4 @@ int sqchat_user_list_user_prefix_subtract(struct sqchat_buffer * buffer,
     return 0;
 }
 
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4
+// vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:

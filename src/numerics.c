@@ -807,4 +807,4 @@ NUMERIC_CB(sqchat_nick_change_error) {
     sqchat_remove_last_response_claim(network);
     return 0;
 }
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4
+// vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:

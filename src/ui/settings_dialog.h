@@ -19,4 +19,4 @@
 extern void sqchat_settings_dialog_show(struct sqchat_chat_window * parent);
 #endif
 
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4
+// vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:

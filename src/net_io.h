@@ -25,4 +25,4 @@ extern void sqchat_network_send(struct sqchat_network * buffer,
     _nonnull(1, 2) _format(printf, 2, 3);
 
 #endif /* __NET_IO_H__ */
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4
+// vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:

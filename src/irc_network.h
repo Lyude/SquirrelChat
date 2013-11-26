@@ -113,4 +113,4 @@ extern void sqchat_network_disconnect(struct sqchat_network * network,
 #define SQCHAT_IS_CHAN(_network, _str) (strchr((_network)->chantypes, *(_str)))
 
 #endif /* __IRC_NETWORK_H__ */
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4
+// vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:

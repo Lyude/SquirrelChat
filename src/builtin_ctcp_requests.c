@@ -74,4 +74,4 @@ CTCP_REQ_HANDLER(sqchat_ctcp_ping_req_handler) {
         sqchat_network_sendf_ctcp_reply(network, nickname, "PING", "%s", msg);
 }
 
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4
+// vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:

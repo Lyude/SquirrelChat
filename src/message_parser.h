@@ -35,4 +35,4 @@ void sqchat_split_hostmask(char * hostmask, char ** nickname, char ** address)
     _nonnull(1, 2, 3);
 
 #endif
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4
+// vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:

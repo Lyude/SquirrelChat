@@ -835,4 +835,4 @@ BI_CMD(sqchat_cmd_realname) {
     return 0;
 }
 
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4
+// vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:

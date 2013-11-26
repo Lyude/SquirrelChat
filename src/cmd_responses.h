@@ -44,4 +44,4 @@ extern struct sqchat_buffer * sqchat_route_rpl_end(struct sqchat_network * netwo
     _nonnull(1);
 
 #endif // __CMD_RESPONSES_H__
-// vim: expandtab:tw=80:tabstop=4:shiftwidth=4:softtabstop=4:cinoptions=(0,W4
+// vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:
