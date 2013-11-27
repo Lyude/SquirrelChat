@@ -304,7 +304,7 @@ BI_CMD(sqchat_cmd_server) {
 
 // Max argc: 1
 BI_CMD(sqchat_cmd_msg) {
-    if (argc < 1)
+    if (argc < 1 || trailing == NULL)
         return SQCHAT_CMD_SYNTAX_ERR;
     else if (buffer->network->status != CONNECTED)
         sqchat_buffer_print(buffer, "Not connected!\n");
