@@ -97,8 +97,7 @@ char * check_for_messages(struct sqchat_network * network) {
         char * output_utf8;
         output_utf8 =
             g_convert_with_fallback(output, -1, "UTF-8",
-                                    config_setting_get_string(
-                                        sqchat_default_fallback_encoding),
+                                    sqchat_fallback_encoding,
                                     "�", NULL, NULL, NULL);
         return output_utf8;
     }

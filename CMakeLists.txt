@@ -17,7 +17,6 @@ project(SquirrelChat C)
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
-pkg_check_modules(LIBCONFIG REQUIRED libconfig)
 
 option (WITH_SSL            "Enable SSL support" ON)
 option (GNUTLS_DEBUG_LEVEL  "Set the debug level for GnuTLS" 0)

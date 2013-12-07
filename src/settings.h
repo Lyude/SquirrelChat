@@ -16,18 +16,22 @@
 #ifndef __SETTINGS_H__
 #define __SETTINGS_H__
 
-#include <libconfig.h>
+#include <glib.h>
 
-extern config_t sqchat_global_config;
-extern config_setting_t * sqchat_global_config_root;
 extern char * sqchat_config_dir;
+extern char * sqchat_config_main_file_path;
 
 extern void sqchat_init_settings();
+extern GKeyFile * sqchat_get_keyfile_for_config(const char * filename)
+    _nonnull(1);
+extern int sqchat_settings_update_file(const char * filename)
+    _nonnull(1);
 
-extern config_setting_t * sqchat_default_nick;
-extern config_setting_t * sqchat_default_username;
-extern config_setting_t * sqchat_default_real_name;
-extern config_setting_t * sqchat_default_fallback_encoding;
+extern GKeyFile * sqchat_main_settings;
+extern char * sqchat_default_nickname;
+extern char * sqchat_default_username;
+extern char * sqchat_default_real_name;
+extern char * sqchat_fallback_encoding;
 
 #endif // __SETTINGS_H__
 // vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:

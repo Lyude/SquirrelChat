@@ -45,9 +45,9 @@ struct sqchat_network * sqchat_network_new() {
     struct sqchat_network * network = malloc(sizeof(struct sqchat_network));
     memset(network, 0, sizeof(struct sqchat_network));
 
-    network->nickname = strdup(config_setting_get_string(sqchat_default_nick));
-    network->username = strdup(config_setting_get_string(sqchat_default_username));
-    network->real_name = strdup(config_setting_get_string(sqchat_default_real_name));
+    network->nickname = strdup(sqchat_default_nickname);
+    network->username = strdup(sqchat_default_username);
+    network->real_name = strdup(sqchat_default_real_name);
 
     network->buffer = sqchat_buffer_new(NULL, NETWORK, network);
 

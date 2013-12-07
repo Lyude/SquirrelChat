@@ -16,6 +16,7 @@
 
 #include "settings.h"
 
+#include <stdbool.h>
 #include <sys/stat.h>
 #include <strings.h>
 #include <string.h>
@@ -24,185 +25,265 @@
 #include <unistd.h>
 #include <sys/vfs.h>
 
-#include <libconfig.h>
 #include <gtk/gtk.h>
+#include <glib.h>
+#include <glib/gi18n.h>
+#include <glib/gstdio.h>
 
-config_t sqchat_global_config;
-config_setting_t * sqchat_global_config_root;
+GQuark main_settings_quark;
 
 char * sqchat_config_dir;
+char * sqchat_config_main_file_path;
 
-config_setting_t * sqchat_default_nick;
-config_setting_t * sqchat_default_username;
-config_setting_t * sqchat_default_real_name;
-config_setting_t * sqchat_default_fallback_encoding;
+GKeyFile * sqchat_main_settings;
+char * sqchat_default_nickname;
+char * sqchat_default_username;
+char * sqchat_default_real_name;
+char * sqchat_fallback_encoding;
 
-static void create_main_settings_file();
-static void set_default_settings();
+static void config_file_error(const char * file, const GError * error);
+static void parse_settings(const char * filename, GKeyFile ** out);
+static void cache_settings(const char * filename);
+static void create_file(const char * filename);
+static void try_to_load_setting_string(const char * filename,
+                                       GKeyFile * keyfile,
+                                       const char * group,
+                                       const char * setting,
+                                       const char * default_value,
+                                       char ** out);
 
 void sqchat_init_settings() {
-    struct statfs buf;
-    int ret;
-    char * filename_buf;
-    const char * home_dir = getenv("HOME");
+    // Setup the quarks
+    main_settings_quark = g_quark_from_static_string("settings.conf");
 
-    config_init(&sqchat_global_config);
-    sqchat_global_config_root = config_root_setting(&sqchat_global_config);
+    // Figure out what the config directory should be
+    sqchat_config_dir = g_strconcat(g_get_user_config_dir(), "/squirrelchat",
+                                    NULL);
 
-    // Figure out the maximum length of a filename on this filesystem
-    statfs(home_dir, &buf);
-    filename_buf = alloca(buf.f_namelen);
+    // Instantiate the key file structs
+    sqchat_main_settings = g_key_file_new();
 
-    sqchat_config_dir = malloc(buf.f_namelen);
-    sqchat_config_dir = realloc(sqchat_config_dir, snprintf(sqchat_config_dir, buf.f_namelen,
-                                              "%s/.config/squirrelchat",
-                                              home_dir) + 1);
-
-    // Check if we have a configuration folder in the user's home directory
-    /* TODO: when i'm not drunk figure out if we should let the group read it or
-     * not
+    /* Check if there's already a settings folder for SquirrelChat, otherwise
+     * make one
      */
-    snprintf(filename_buf, buf.f_namelen, "%s/.config", home_dir);
-    mkdir(filename_buf, S_IRWXU | S_IRWXG | S_IRWXO);
-
-    // If the function was sucessful, we need to make a default settings file
-    if (mkdir(sqchat_config_dir, S_IRWXU | S_IRGRP | S_IROTH) == 0) {
-        // TODO: Display first time run wizard
-        umask(S_IRWXG | S_IRWXO);
-        create_main_settings_file();
+    if (access(sqchat_config_dir, R_OK | W_OK) != 0) {
+        g_mkdir_with_parents(sqchat_config_dir, 0755);
+        create_file("settings.conf");
     }
-    else if (errno == EEXIST) {
-        FILE * config_file;
-        snprintf(filename_buf, buf.f_namelen, "%s/squirrelchat.conf", sqchat_config_dir);
+    else
+        parse_settings("settings.conf", &sqchat_main_settings);
 
-        /* Check to make sure all the required configuration files exist and are
-         * readable
-         */
-        if ((config_file = fopen(filename_buf, "r")) == NULL) {
-            int error = errno;
-            set_default_settings();
-            if (error == ENOENT)
-                create_main_settings_file();
-            else {
-                GtkWidget * dialog;
-                dialog = gtk_message_dialog_new(
-                    NULL,
-                    GTK_DIALOG_MODAL,
-                    GTK_MESSAGE_WARNING,
-                    GTK_BUTTONS_OK,
-                    "Squirrelchat could not open your user profile: %s.\n"
-                    "As a result, none of your settings can be loaded.",
-                    strerror(error));
-                gtk_window_set_title(GTK_WINDOW(dialog), "SquirrelChat Error");
-                gtk_dialog_run(GTK_DIALOG(dialog));
-                gtk_widget_destroy(dialog);
-            }
-        }
+    cache_settings("settings.conf");
+}
 
-        // Try to read the settings from the user's profile
-        else if (config_read(&sqchat_global_config, config_file) == CONFIG_FALSE) {
-            char * err_msg = strdup(config_error_text(&sqchat_global_config));
-            config_error_t err_type = config_error_type(&sqchat_global_config);
-            char * err_file = (config_error_file(&sqchat_global_config) ?
-                               strdup(config_error_file(&sqchat_global_config)) :
-                               NULL);
-            int err_line = config_error_line(&sqchat_global_config);
+GKeyFile * sqchat_get_keyfile_for_config(const char * filename) {
+    if (g_quark_from_static_string(filename) == main_settings_quark)
+        return sqchat_main_settings;
+    else
+        return NULL;
+}
 
-            /* We can't trust the config structure since the configuration file
-             * most likely has bad syntax, and implementing something to check
-             * for any possible missing settings along with a sane configuration
-             * structure would take way too long for me to implement right now.
-             * Maybe sometime in the future, but for right now we're just going
-             * to destroy the config in the memory and create a new one
-             */
-            config_destroy(&sqchat_global_config);
-            config_init(&sqchat_global_config);
+int sqchat_settings_update_file(const char * filename) {
+    // Update the keyfile struct
+    if (g_quark_from_static_string(filename) == main_settings_quark) {
+        g_key_file_set_string(sqchat_main_settings, "main",
+                              "default_nickname", sqchat_default_nickname);
+        g_key_file_set_string(sqchat_main_settings, "main",
+                              "default_username", sqchat_default_username);
+        g_key_file_set_string(sqchat_main_settings, "main",
+                              "default_real_name", sqchat_default_real_name);
+    }
 
-            set_default_settings();
+    char * config_data =
+        g_key_file_to_data(sqchat_get_keyfile_for_config(filename), NULL, NULL);
+    char * full_file_path = g_strconcat(sqchat_config_dir, "/", filename, NULL);
+    FILE * file = fopen(full_file_path, "w");
+    if (file == NULL) {
+        g_free(config_data);
+        g_free(full_file_path);
+        return -1;
+    }
+    fputs(config_data, file);
+    fclose(file);
+    g_free(config_data);
+    g_free(full_file_path);
+    return 0;
+}
 
-            GtkWidget * dialog;
-            dialog = (err_type == CONFIG_ERR_PARSE) ? 
-                gtk_message_dialog_new(
-                    NULL,
-                    GTK_DIALOG_MODAL,
-                    GTK_MESSAGE_WARNING,
-                    GTK_BUTTONS_OK,
-                    "SquirrelChat could not use your settings due to a syntax "
-                    "error in squirrelchat.conf at line %i.",
-                    err_line) :
-                gtk_message_dialog_new(
-                    NULL,
-                    GTK_DIALOG_MODAL,
-                    GTK_MESSAGE_WARNING,
-                    GTK_BUTTONS_OK,
-                    "Squirrelchat could not read your user profile: %s\n"
-                    "As a result, none of your settings can be loaded.",
-                    err_msg);
+/* Tries to open the configuration file and read in all it's settings into a
+ * keyfile structure
+ */
+void parse_settings(const char * filename, GKeyFile ** out) {
+    char * file_path;
+    GError * error = NULL;
 
-            gtk_window_set_title(GTK_WINDOW(dialog), "SquirrelChat Error");
-            gtk_dialog_run(GTK_DIALOG(dialog));
-            gtk_widget_destroy(dialog);
-            fclose(config_file);
-            free(err_msg);
-            free(err_file);
+    if (g_key_file_load_from_dirs(*out, filename,
+                                  (const char**)&sqchat_config_dir,
+                                  &file_path, G_KEY_FILE_KEEP_COMMENTS, &error)
+        == false) {
+        if (g_error_matches(error, G_KEY_FILE_ERROR,
+                            G_KEY_FILE_ERROR_NOT_FOUND))
+            create_file(filename);
+        else
+            config_file_error(filename, error);
+    }
+}
+
+/* Takes all of the settings in a keyfile structure and writes their values to
+ * the global setting variables in SquirrelChat for faster access
+ */
+void cache_settings(const char * filename) {
+    if (g_quark_from_static_string(filename) == main_settings_quark) {
+        try_to_load_setting_string("settings.conf", sqchat_main_settings,
+                                   "main", "default_nickname",
+                                   g_get_user_name(), &sqchat_default_nickname);
+        try_to_load_setting_string("settings.conf", sqchat_main_settings,
+                                   "main", "default_username",
+                                   g_get_user_name(), &sqchat_default_username);
+        try_to_load_setting_string("settings.conf", sqchat_main_settings,
+                                   "main", "default_real_name",
+                                   g_get_real_name(), &sqchat_default_real_name);
+        try_to_load_setting_string("settings.conf", sqchat_main_settings,
+                                   "main", "fallback_encoding",
+                                   "WINDOWS 1252", &sqchat_fallback_encoding);
+    }
+}
+
+// Creates a default configuration file
+void create_file(const char * filename) {
+    GKeyFile * out;
+    FILE * out_file;
+    char * out_file_path;
+    char * config_data;
+
+    if (g_quark_from_static_string(filename) == main_settings_quark) {
+        out = sqchat_main_settings;
+        g_key_file_set_string(out, "main", "default_nickname",
+                              g_get_user_name());
+        g_key_file_set_string(out, "main", "default_username",
+                              g_get_user_name());
+        g_key_file_set_string(out, "main", "default_real_name",
+                              g_get_real_name());
+        g_key_file_set_string(out, "main", "fallback_encoding",
+                              "WINDOWS-1252");
+    }
+    // placeholder, we should never reach this anyway
+    else 
+        out = NULL;
+
+    // Try to save the settings to a file
+    config_data = g_key_file_to_data(out, NULL, NULL);
+    out_file_path = g_strconcat(sqchat_config_dir, "/", filename, NULL);
+    out_file = fopen(out_file_path, "w");
+    if (out_file == NULL)
+        config_file_error(filename, NULL);
+    fputs(config_data, out_file);
+    fclose(out_file);
+    g_free(config_data);
+    g_free(out_file_path);
+
+    // Cache the new settings
+    cache_settings(filename);
+}
+
+/* Tries to load a string from a configuration value. If the string does not
+ * exist, it assumes the string should be set to the default value.
+ */
+void try_to_load_setting_string(const char * filename,
+                                GKeyFile * keyfile,
+                                const char * group,
+                                const char * setting,
+                                const char * default_value,
+                                char ** out) {
+    GError * error;
+    *out = g_key_file_get_string(keyfile, group, setting, &error);
+    if (*out == NULL) {
+        if (g_error_matches(error, G_KEY_FILE_ERROR,
+                            G_KEY_FILE_ERROR_GROUP_NOT_FOUND) ||
+            g_error_matches(error, G_KEY_FILE_ERROR,
+                            G_KEY_FILE_ERROR_KEY_NOT_FOUND)) {
+            g_key_file_set_string(keyfile, group, setting, default_value);
+            *out = strdup(default_value);
         }
         else
-            fclose(config_file);
-
-        // Cache settings to their global variables
-        sqchat_default_nick = config_setting_get_member(sqchat_global_config_root,
-                                                    "default_nick");
-        sqchat_default_username = config_setting_get_member(sqchat_global_config_root,
-                                                        "default_username");
-        sqchat_default_real_name = config_setting_get_member(sqchat_global_config_root,
-                                                         "default_real_name");
-        sqchat_default_fallback_encoding =
-            config_setting_get_member(sqchat_global_config_root,
-                                      "default_fallback_encoding");
+            config_file_error(filename, error);
     }
 }
 
-static void set_default_settings() {
-    sqchat_default_nick = config_setting_add(sqchat_global_config_root, "default_nick",
-                                         CONFIG_TYPE_STRING);
-    sqchat_default_username =
-        config_setting_add(sqchat_global_config_root, "default_username",
-                           CONFIG_TYPE_STRING);
-    sqchat_default_real_name =
-        config_setting_add(sqchat_global_config_root, "default_real_name",
-                           CONFIG_TYPE_STRING);
-    sqchat_default_fallback_encoding =
-        config_setting_add(sqchat_global_config_root, "default_fallback_encoding",
-                           CONFIG_TYPE_STRING);
-
-    config_setting_set_string(sqchat_default_nick, getlogin());
-    config_setting_set_string(sqchat_default_username, getlogin());
-    config_setting_set_string(sqchat_default_real_name, getlogin());
-    config_setting_set_string(sqchat_default_fallback_encoding, "WINDOWS-1252");
-}
-
-static void create_main_settings_file() {
-    set_default_settings();
-
-    // Write all the settings to a new file
-    char filename_buf[strlen(sqchat_config_dir) + sizeof("/squirrelchat.conf")];
-    sprintf(&filename_buf[0], "%s/squirrelchat.conf", sqchat_config_dir);
-    if (config_write_file(&sqchat_global_config, filename_buf) == CONFIG_FALSE) {
-        // Alert the user
-        GtkWidget * dialog;
-        dialog = gtk_message_dialog_new(
-            NULL,
-            GTK_DIALOG_MODAL,
-            GTK_MESSAGE_WARNING,
-            GTK_BUTTONS_OK,
-            "SquirrelChat did not find a user profile, but failed to create "
-            "one for you (%s).\n"
-            "SquirrelChat can continue, but will not be able to save any "
-            "settings you change from their defaults.",
-            strerror(errno));
-        gtk_window_set_title(GTK_WINDOW(dialog), "SquirrelChat Error");
+/* Error reporting function used internally by this file, since configuration
+ * file errors need to be handled differently then most of the errors in
+ * SquirrelChat
+ */
+void config_file_error(const char * file, const GError * error) {
+    // Rely on errno if error was not specified
+    if (error == NULL) {
+        GtkWidget * dialog =
+            gtk_message_dialog_new(NULL, 0, GTK_MESSAGE_ERROR,
+                                   GTK_BUTTONS_OK,
+                                   _("Could not open the configuration file "
+                                     "'%s' due to the following error:\n"
+                                     "\"%s\"\n"
+                                     "SquirrelChat cannot continue without a "
+                                     "valid configuration file."),
+                                   file, strerror(errno));
         gtk_dialog_run(GTK_DIALOG(dialog));
+        exit(-1);
+    }
+    if (error->domain == G_KEY_FILE_ERROR) {
+        GtkWidget * dialog =
+            gtk_message_dialog_new(NULL, 0, GTK_MESSAGE_WARNING,
+                                   GTK_BUTTONS_YES_NO,
+                                   _("Your settings could not be loaded due to "
+                                     "an issue in the configuration file "
+                                     "'%s':\n"
+                                     "\"%s\"\n"
+                                     "Errors like this are usually caused by "
+                                     "the user incorrectly modifying one of "
+                                     "the configuration files by hand, or by a "
+                                     "bug in SquirrelChat. If you do believe "
+                                     "this is a bug, please file a bug report "
+                                     "and include this message.\n"
+                                     "Would you like SquirrelChat to replace "
+                                     "the broken file with a new file "
+                                     "containing the default settings? If you "
+                                     "do this, all of your previous settings "
+                                     "will be lost.\n"),
+                                     file, error->message);
+        /* Delete the errorneous config file and start from scratch if approved
+         * by the user
+         */
+        if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_YES) {
+            char * file_path = g_strconcat(sqchat_config_dir, "/", file, NULL);
+            if (remove(file_path) == -1) {
+                GtkWidget * dialog =
+                    gtk_message_dialog_new(NULL, 0, GTK_MESSAGE_ERROR,
+                                           GTK_BUTTONS_OK,
+                                           _("Could not delete configuration "
+                                             "file:\n"
+                                             "%s"),
+                                           strerror(errno));
+                gtk_dialog_run(GTK_DIALOG(dialog));
+                exit(-1);
+            }
+            g_free(file_path);
+            create_file(file);
+        }
+        else
+            exit(-1);
         gtk_widget_destroy(dialog);
+    }
+    else {
+        GtkWidget * dialog =
+            gtk_message_dialog_new(NULL, 0, GTK_MESSAGE_ERROR,
+                                   GTK_BUTTONS_OK,
+                                   _("Could not open the configuration "
+                                     "file '%s' due to the following error:\n"
+                                     "\"%s\"\n"
+                                     "SquirrelChat cannot continue without a "
+                                     "valid configuration file."),
+                                   file, error->message);
+        gtk_dialog_run(GTK_DIALOG(dialog));
+        exit(-1);
     }
 }
 
