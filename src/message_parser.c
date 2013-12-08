@@ -212,7 +212,6 @@ void sqchat_process_msg(struct sqchat_network * network, char * msg) {
     char * cursor;
     char * hostmask;
     char * command;
-    char * params;
     short numeric;
     sqchat_msg_cb callback;
 

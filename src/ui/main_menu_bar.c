@@ -100,9 +100,6 @@ void about_menu_item_callback(GtkMenuItem * menuitem,
 // Callback used by the "Connect" menu item
 void connect_current_network(GtkMenuItem * menuitem,
                              struct sqchat_chat_window * window) {
-    GtkTreeIter selected_row;
-    struct sqchat_network * network;
-
     sqchat_network_connect(window->current_buffer->network);
 }
 
