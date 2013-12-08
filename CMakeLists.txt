@@ -50,7 +50,7 @@ if(CMAKE_COMPILER_IS_GNUCC)
     # places depending on the operating system, so we need to find it
     message(STATUS "Checking for uchar.h")
     find_path(UCHAR_H_PATH uchar.h PATH_SUFFIXES unicode)
-    if (${UCHAR_H_PATH} MATCHES "UCHAR_H_PATH-NOTFOUND")
+    if (NOT UCHAR_H_PATH)
         message(FATAL_ERROR "Could not find uchar.h")
     else()
         message(STATUS "Found uchar.h: ${UCHAR_H_PATH}")
