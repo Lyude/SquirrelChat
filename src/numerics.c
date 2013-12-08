@@ -213,7 +213,6 @@ NUMERIC_CB(sqchat_rpl_endofnames) {
 }
 
 NUMERIC_CB(sqchat_rpl_motdstart) {
-    struct sqchat_buffer * output_buffer;
     // Check if the motd was requested in a different window
 
     sqchat_buffer_print((network->claimed_responses) ?

@@ -119,7 +119,6 @@ MSG_CB(sqchat_join_msg_callback) {
     }
     else {
         struct sqchat_buffer * buffer;
-        GtkTreeIter new_user_row;
         if ((buffer = sqchat_trie_get(network->buffers, argv[0])) == NULL) {
             sqchat_buffer_print(network->buffer,
                                 "Error parsing message: received JOIN from %s for "
