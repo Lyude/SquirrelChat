@@ -34,29 +34,10 @@ add_definitions("-imacros ${CMAKE_SOURCE_DIR}/src/attributes.h
                  -D_POSIX_C_SOURCE=200809L -Wno-int-to-pointer-cast
                  -Wno-pointer-to-int-cast
                  -include ${CMAKE_CURRENT_BINARY_DIR}/src/config.h")
-# Although complete in clang, gcc's C11 support is still missing some features,
-# specifically _Generic support. Until this changes, the required header files
-# from P99 that enable the use of the P99_GENERIC macro have been hacked to work
-# with SquirrelChat.
-# In addition, to silence the warnings coming from p99 we want to mark the
-# headers as system headers.
-include_directories(SYSTEM "${CMAKE_SOURCE_DIR}/p99")
 
 # C11 is only partially supported in gcc versions 4.3 and up, and fully
 # supported in versions 4.8 and up. So we need to account for this.
 if(CMAKE_COMPILER_IS_GNUCC)
-    # uchar.h is required for P99 to work, and it happens to be in different
-    # places depending on the operating system, so we need to find it
-    message(STATUS "Checking for uchar.h")
-    find_path(UCHAR_H_PATH uchar.h PATH_SUFFIXES unicode)
-    if (NOT UCHAR_H_PATH)
-        message(FATAL_ERROR "Could not find uchar.h")
-    else()
-        message(STATUS "Found uchar.h: ${UCHAR_H_PATH}")
-    endif()
-
-    include_directories("${UCHAR_H_PATH}")
-
     execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
                     OUTPUT_VARIABLE GCC_VERSION)
     if (GCC_VERSION VERSION_LESS 4.3)

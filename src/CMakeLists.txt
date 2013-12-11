@@ -48,7 +48,6 @@ add_executable(squirrelchat
                ui/user_list.c
                ui/settings_dialog.c)
 
-target_link_libraries(squirrelchat ${GTK3_LIBRARIES} ${GNUTLS_LIBRARIES}
-                      ${LIBCONFIG_LIBRARIES})
+target_link_libraries(squirrelchat ${GTK3_LIBRARIES} ${GNUTLS_LIBRARIES})
 
 # vim: expandtab:tabstop=4:shiftwidth=4:softtabstop=4:tw=80

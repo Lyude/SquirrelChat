@@ -142,13 +142,13 @@ int _sqchat_user_list_user_set_visible_prefix_by_nick(struct sqchat_buffer * buf
 
     if (sqchat_user_list_user_row_find(buffer, nickname, &user) == -1)
         return -1;
-    _sqchat_user_list_user_set_visible_prefix(buffer, &user, prefix);
+    sqchat_user_list_user_set_visible_prefix(buffer, &user, prefix);
     return 0;
 }
 
-void _sqchat_user_list_user_set_visible_prefix(struct sqchat_buffer * buffer,
-                                              GtkTreeIter * user,
-                                              char prefix) {
+void sqchat_user_list_user_set_visible_prefix(struct sqchat_buffer * buffer,
+                                         GtkTreeIter * user,
+                                         char prefix) {
     char new_prefix[2];
     new_prefix[0] = prefix;
     new_prefix[1] = '\0';
@@ -172,8 +172,8 @@ int sqchat_user_list_user_prefix_add(struct sqchat_buffer * buffer,
         current_prefixes = malloc(sizeof(char[2]));
         current_prefixes[0] = *prefix;
         current_prefixes[1] = '\0';
-        sqchat_user_list_user_set_visible_prefix(buffer, &user_row, current_prefixes);
-        _sqchat_user_list_user_set_visible_prefix(buffer, &user_row, *prefix);
+        set_user_prefixes(buffer, &user_row, current_prefixes);
+        sqchat_user_list_user_set_visible_prefix(buffer, &user_row, *prefix);
         return 0;
     }
 
@@ -224,7 +224,6 @@ int sqchat_user_list_user_prefix_subtract(struct sqchat_buffer * buffer,
         return 0;
     else if (current_prefixes_size == 2) { // The user only has one prefix
         free(current_prefixes);
-        sqchat_user_list_user_set_visible_prefix(buffer, &user_row, NULL);
         sqchat_user_list_user_set_visible_prefix(buffer, &user_row, '\0');
     }
     // Remove the prefix from the string
@@ -235,8 +234,8 @@ int sqchat_user_list_user_prefix_subtract(struct sqchat_buffer * buffer,
     current_prefixes = realloc(current_prefixes, current_prefixes_size - 1);
 
     // Update the user's row
-    sqchat_user_list_user_set_visible_prefix(buffer, &user_row, current_prefixes);
-    _sqchat_user_list_user_set_visible_prefix(buffer,
+    set_user_prefixes(buffer, &user_row, current_prefixes);
+    sqchat_user_list_user_set_visible_prefix(buffer,
                                              &user_row, current_prefixes[0]);
     gtk_list_store_set(buffer->chan_data->user_list_store, &user_row, 2,
                        current_prefixes, -1);

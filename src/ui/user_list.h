@@ -19,10 +19,6 @@
 
 #include "chat_window.h"
 
-#ifndef __clang__
-#include <p99_generic.h>
-#endif
-
 extern void sqchat_user_list_new(struct sqchat_chat_window * window)
     _nonnull(1);
 
@@ -52,27 +48,10 @@ extern char * sqchat_user_list_user_get_prefixes(const struct sqchat_buffer * bu
                                                  GtkTreeIter * user)
     _nonnull(1, 2);
 
-extern void _sqchat_user_list_user_set_visible_prefix(struct sqchat_buffer * buffer,
-                                                      GtkTreeIter * user_row,
-                                                      char prefix)
+extern void sqchat_user_list_user_set_visible_prefix(struct sqchat_buffer * buffer,
+                                                     GtkTreeIter * user_row,
+                                                     char prefix)
     _nonnull(1, 2);
-extern int _sqchat_user_list_user_set_visible_prefix_by_nick(struct sqchat_buffer * buffer,
-                                                             const char * nickname,
-                                                             char prefix)
-    _nonnull(1, 2);
-
-/* P99 doesn't seem to work with clang for some reason, so let's avoid it's use
- * here
- */
-#ifdef __clang__
-#define sqchat_user_list_user_set_visible_prefix(_buffer, _user, _prefix)               \
-        _Generic((_user), default: _sqchat_user_list_user_set_visible_prefix_by_nick,   \
-                          GtkTreeIter*: _sqchat_user_list_user_set_visible_prefix)
-#else
-#define sqchat_user_list_user_set_visible_prefix(_buffer, _user, _prefix)       \
-        P99_GENERIC((_user), _sqchat_user_list_user_set_visible_prefix_by_nick, \
-                             (GtkTreeIter*, _sqchat_user_list_user_set_visible_prefix))
-#endif
 
 #endif // __USER_LIST_H__
 // vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:
