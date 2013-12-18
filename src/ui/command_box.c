@@ -23,7 +23,7 @@
 #include <gtk/gtk.h>
 
 void command_box_activated_handler(GtkEntry * entry,
-                                   struct sqchat_chat_window * window) {
+                                   struct sqchat_buffer * buffer) {
     char * input = strdup(gtk_entry_get_text(entry));
     guint16 input_len = gtk_entry_get_text_length(entry);
     // If the input is a blank message or a blank command, do nothing
@@ -66,35 +66,34 @@ void command_box_activated_handler(GtkEntry * entry,
             for (param_start = cursor; *param_start == ' '; ++param_start);
         }
 
-        sqchat_call_command(window->current_buffer, command, param_start);
+        sqchat_call_command(buffer, command, param_start);
     } else {
-        if (window->current_buffer->type == NETWORK)
-            sqchat_buffer_print(window->current_buffer,
+        if (buffer->type == NETWORK)
+            sqchat_buffer_print(buffer,
                                 "You can't say stuff in this buffer!\n");
-        else if (window->current_buffer->network->status != CONNECTED)
-            sqchat_buffer_print(window->current_buffer,
+        else if (buffer->network->status != CONNECTED)
+            sqchat_buffer_print(buffer,
                                 "Not connected!\n");
         else {
-            sqchat_send_privmsg(window->current_buffer->network,
-                         window->current_buffer->buffer_name,
+            sqchat_send_privmsg(buffer->network,
+                         buffer->buffer_name,
                          input);
-            sqchat_buffer_print(window->current_buffer, "<%s> %s\n",
-                                window->current_buffer->network->nickname,
+            sqchat_buffer_print(buffer, "<%s> %s\n",
+                                buffer->network->nickname,
                                 input);
         }
-	}
+    }
 
     free(input);
     gtk_entry_set_text(entry, "");
 }
 
-void sqchat_command_box_new(struct sqchat_chat_window * window) {
-    window->command_box = gtk_entry_new();
-}
-
-void sqchat_command_box_connect_signals(struct sqchat_chat_window * window) {
-    g_signal_connect(window->command_box, "activate",
-                     G_CALLBACK(command_box_activated_handler), window);
+GtkWidget * sqchat_command_box_new(GtkEntryBuffer * entry_buffer,
+                                   struct sqchat_buffer * buffer) {
+    GtkWidget * command_box = gtk_entry_new_with_buffer(entry_buffer);
+    g_signal_connect(command_box, "activate",
+                     G_CALLBACK(command_box_activated_handler), buffer);
+    return command_box;
 }
 
 // vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:

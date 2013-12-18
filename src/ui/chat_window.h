@@ -54,9 +54,7 @@ struct sqchat_chat_window {
 
     GtkWidget * chat_viewer_and_user_list_pane;
 
-    GtkWidget * chat_viewer;
-    GtkWidget * scrolled_window_for_chat_viewer;
-    GtkWidget * command_box;
+    GtkWidget * buffer_and_command_box_container;
 
     GtkWidget * scrolled_window_for_user_list;
     GtkWidget * user_list;

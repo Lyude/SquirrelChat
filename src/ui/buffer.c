@@ -19,6 +19,8 @@
 #include "chat_window.h"
 #include "../commands.h"
 #include "user_list.h"
+#include "buffer_view.h"
+#include "command_box.h"
 
 #include <gtk/gtk.h>
 #include <stdlib.h>
@@ -33,12 +35,28 @@ struct sqchat_buffer * sqchat_buffer_new(const char * buffer_name,
     struct sqchat_buffer * buffer = malloc(sizeof(struct sqchat_buffer));
     buffer->type = type;
     buffer->buffer_name = (type != NETWORK) ? strdup(buffer_name) : NULL;
+
     buffer->row = NULL;
     buffer->network = network;
     buffer->window = network->window;
-    buffer->buffer_scroll_pos = 0;
+    
     buffer->buffer = gtk_text_buffer_new(NULL);
     buffer->command_box_buffer = gtk_entry_buffer_new(NULL, -1);
+    
+    buffer->buffer_view = sqchat_buffer_view_new(buffer->buffer);
+    buffer->command_box_entry =
+        sqchat_command_box_new(buffer->command_box_buffer, buffer);
+
+    buffer->scrolled_container = gtk_scrolled_window_new(NULL, NULL);
+    gtk_container_add(GTK_CONTAINER(buffer->scrolled_container),
+                      buffer->buffer_view);
+
+    g_object_ref(buffer->command_box_entry);
+    g_object_ref(buffer->scrolled_container);
+    /* The textview for the buffer is already referenced by the scrolled
+     * container, so we don't need to reference that
+     */
+
     buffer->out_queue_size = 0;
     buffer->out_queue = NULL;
     g_mutex_init(&buffer->output_mutex);
@@ -86,8 +104,8 @@ void sqchat_buffer_free(struct sqchat_buffer * buffer) {
         g_object_unref(buffer->chan_data->user_list_store);
         sqchat_trie_free(buffer->chan_data->users, destroy_users, buffer);
     }
-    g_object_unref(buffer->buffer);
-    g_object_unref(buffer->command_box_buffer);
+    g_object_unref(buffer->scrolled_container);
+    g_object_unref(buffer->command_box_entry);
 
     free(buffer->buffer_name);
     gtk_tree_row_reference_free(buffer->row);
@@ -152,7 +170,7 @@ static gboolean flush_buffer_output(struct sqchat_buffer * buffer) {
     char * dump_pos = &output_dump[0];
     GtkTextIter end_of_buffer;
     GtkAdjustment * scroll_adjustment =
-        gtk_scrollable_get_vadjustment(GTK_SCROLLABLE(buffer->window->chat_viewer));
+        gtk_scrollable_get_vadjustment(GTK_SCROLLABLE(buffer->buffer_view));
 
     struct __sqchat_queued_output * n;
     // Concatenate all the messages in the queue and clear it
@@ -178,7 +196,7 @@ static gboolean flush_buffer_output(struct sqchat_buffer * buffer) {
         buffer == buffer->window->current_buffer) {
         gtk_text_buffer_insert(buffer->buffer, &end_of_buffer, &output_dump[0],
                                buffer->out_queue_size);
-        gtk_text_view_scroll_to_mark(GTK_TEXT_VIEW(buffer->window->chat_viewer),
+        gtk_text_view_scroll_to_mark(GTK_TEXT_VIEW(buffer->buffer_view),
                                      gtk_text_buffer_get_mark(buffer->buffer,
                                                               "insert"),
                                      0.0, false, 0.0, 0.0);

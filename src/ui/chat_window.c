@@ -21,17 +21,15 @@
 #include "main_menu_bar.h"
 #include "network_tree.h"
 #include "command_box.h"
-#include "chat_viewer.h"
+#include "buffer_view.h"
 #include "user_list.h"
 
 #include <stdlib.h>
 #include <gtk/gtk.h>
 
 struct sqchat_chat_window * sqchat_chat_window_new(struct sqchat_network * network) {
-    // Containers that are only ever referenced here
-    GtkWidget * chat_and_command_box_container;
-
     struct sqchat_chat_window * new_window = malloc(sizeof(struct sqchat_chat_window));
+    memset(new_window, '\0', sizeof(struct sqchat_chat_window));
 
     new_window->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(new_window->window), "SquirrelChat");
@@ -76,27 +74,11 @@ struct sqchat_chat_window * sqchat_chat_window_new(struct sqchat_network * netwo
     gtk_paned_set_position(GTK_PANED(new_window->network_tree_and_buffer_pane),
                            125);
 
-    chat_and_command_box_container =gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    sqchat_chat_viewer_new(new_window);
-
-    new_window->scrolled_window_for_chat_viewer =
-        gtk_scrolled_window_new(NULL, NULL);
-    gtk_scrolled_window_set_kinetic_scrolling(
-            GTK_SCROLLED_WINDOW(new_window->scrolled_window_for_chat_viewer),
-            TRUE);
-    gtk_container_add(GTK_CONTAINER(new_window->scrolled_window_for_chat_viewer),
-                      new_window->chat_viewer);
-
-    sqchat_command_box_new(new_window);
-
-    gtk_box_pack_start(GTK_BOX(chat_and_command_box_container),
-                       new_window->scrolled_window_for_chat_viewer,
-                       TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(chat_and_command_box_container),
-                       new_window->command_box, FALSE, FALSE, 0);
+    new_window->buffer_and_command_box_container =
+        gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
     gtk_paned_add1(GTK_PANED(new_window->chat_viewer_and_user_list_pane),
-                   chat_and_command_box_container);
+                   new_window->buffer_and_command_box_container);
 
     sqchat_user_list_setup(new_window);
     new_window->scrolled_window_for_user_list =
@@ -124,7 +106,6 @@ struct sqchat_chat_window * sqchat_chat_window_new(struct sqchat_network * netwo
     // Connect the signals
     sqchat_network_tree_connect_signals(new_window);
     sqchat_main_menu_bar_connect_signals(new_window);
-    sqchat_command_box_connect_signals(new_window);
 
     // TODO: Destroy sqchat_chat_window struct when windows are destroyed
     g_signal_connect(new_window->window, "destroy", G_CALLBACK(gtk_main_quit),
@@ -140,22 +121,22 @@ void sqchat_chat_window_change_active_buffer(struct sqchat_chat_window * window,
                                              struct sqchat_buffer * new_buffer) {
     GtkTreePath * path_to_buffer = gtk_tree_row_reference_get_path(new_buffer->row);
 
-    // Record the scroll position of the current buffer
-//    window->current_buffer->buffer_scroll_pos = gtk_adjustment_get_value(
-//        gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(
-//            window->scrolled_window_for_chat_viewer)));
-
-    gtk_entry_set_buffer(GTK_ENTRY(window->command_box),
-                         new_buffer->command_box_buffer);
-    gtk_text_view_set_buffer(GTK_TEXT_VIEW(window->chat_viewer),
-                             new_buffer->buffer);
-    gtk_text_view_scroll_to_mark(GTK_TEXT_VIEW(window->chat_viewer),
-                                 gtk_text_buffer_get_mark(new_buffer->buffer,
-                                                          "insert"),
-                                 0.0, false, 0.0, 0.0);
-//    gtk_adjustment_set_value(gtk_scrolled_window_get_vadjustment(
-//        GTK_SCROLLED_WINDOW(window->scrolled_window_for_chat_viewer)),
-//            new_buffer->buffer_scroll_pos);
+    if (window->current_buffer != NULL) {
+        /* Remove the active command box and buffer from the window's container
+         * and replace them with the new ones
+         */
+        gtk_container_remove(
+            GTK_CONTAINER(window->buffer_and_command_box_container),
+            window->current_buffer->scrolled_container);
+        gtk_container_remove(
+            GTK_CONTAINER(window->buffer_and_command_box_container),
+            window->current_buffer->command_box_entry);
+    }
+    gtk_box_pack_start(GTK_BOX(window->buffer_and_command_box_container),
+                       new_buffer->scrolled_container, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(window->buffer_and_command_box_container),
+                       new_buffer->command_box_entry, FALSE, FALSE, 0);
+    gtk_widget_show_all(window->buffer_and_command_box_container);
 
     if (new_buffer->type == CHANNEL) {
         gtk_tree_view_set_model(GTK_TREE_VIEW(window->user_list),

@@ -57,8 +57,13 @@ struct sqchat_buffer {
 
     struct sqchat_network * network;
     struct sqchat_chat_window * window;
+
+    GtkWidget * scrolled_container;
+
+    GtkWidget * buffer_view;
     GtkTextBuffer * buffer;
-    double buffer_scroll_pos;
+
+    GtkWidget * command_box_entry;
     GtkEntryBuffer * command_box_buffer;
 
     union {

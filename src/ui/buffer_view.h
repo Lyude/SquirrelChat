@@ -1,5 +1,4 @@
-/* Creates a new chat viewer
- *
+/*
  * Copyright (C) 2013 Stephen Chandler Paul
  *
  * This file is free software: you may copy it, redistribute it and/or modify it
@@ -14,17 +13,15 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-#include "chat_viewer.h"
-#include "chat_window.h"
+#ifndef __BUFFER_VIEW_H__
+#define __BUFFER_VIEW_H__
 
 #include <gtk/gtk.h>
 
-void sqchat_chat_viewer_new(struct sqchat_chat_window * window) {
-    window->chat_viewer = gtk_text_view_new();
-    gtk_text_view_set_editable(GTK_TEXT_VIEW(window->chat_viewer), FALSE);
-    gtk_text_view_set_cursor_visible(GTK_TEXT_VIEW(window->chat_viewer), FALSE);
-    gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(window->chat_viewer),
-                                GTK_WRAP_WORD_CHAR);
-}
+#include "chat_window.h"
+
+extern GtkWidget * sqchat_buffer_view_new(GtkTextBuffer * text_buffer)
+    _attr_malloc;
+
+#endif // __BUFFER_VIEW_H__
 // vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:

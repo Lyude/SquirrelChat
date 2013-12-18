@@ -44,7 +44,7 @@ add_executable(squirrelchat
                ui/buffer.c
                ui/main_menu_bar.c
                ui/command_box.c
-               ui/chat_viewer.c
+               ui/buffer_view.c
                ui/user_list.c
                ui/settings_dialog.c)
 
