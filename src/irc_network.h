@@ -27,7 +27,6 @@
 #include <netdb.h>
 #include <stdbool.h>
 #include <string.h>
-#include <pthread.h>
 
 #include <gnutls/gnutls.h>
 
@@ -79,7 +78,7 @@ struct sqchat_network {
     gnutls_session_t ssl_session;
     gnutls_certificate_credentials_t ssl_cred;
     int socket;
-    pthread_t addr_res_thread;
+    GThread * addr_res_thread;
 
     enum {
         DISCONNECTED,

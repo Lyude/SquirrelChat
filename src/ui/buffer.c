@@ -20,7 +20,6 @@
 #include "../commands.h"
 #include "user_list.h"
 
-#include <pthread.h>
 #include <gtk/gtk.h>
 #include <stdlib.h>
 #include <string.h>
@@ -42,7 +41,7 @@ struct sqchat_buffer * sqchat_buffer_new(const char * buffer_name,
     buffer->command_box_buffer = gtk_entry_buffer_new(NULL, -1);
     buffer->out_queue_size = 0;
     buffer->out_queue = NULL;
-    pthread_mutex_init(&buffer->output_mutex, NULL);
+    g_mutex_init(&buffer->output_mutex);
 
     // Add a userlist if the buffer is a channel buffer
     if (type == CHANNEL) {
@@ -94,7 +93,7 @@ void sqchat_buffer_free(struct sqchat_buffer * buffer) {
     gtk_tree_row_reference_free(buffer->row);
     free(buffer->extra_data);
 
-    pthread_mutex_destroy(&buffer->output_mutex);
+    g_mutex_clear(&buffer->output_mutex);
 
     /* If there was still data waiting to be outputted, destroy it and remove
      * idle function from the event loop
@@ -131,7 +130,7 @@ void sqchat_buffer_print(struct sqchat_buffer * buffer,
     va_end(args);
 
     // Add the message to the end of the queue and update the end pointer
-    pthread_mutex_lock(&buffer->output_mutex);
+    g_mutex_lock(&buffer->output_mutex);
     if (buffer->out_queue == NULL) {
         g_idle_add((GSourceFunc)flush_buffer_output, buffer);
         buffer->out_queue = parsed_msg;
@@ -143,11 +142,11 @@ void sqchat_buffer_print(struct sqchat_buffer * buffer,
     }
     buffer->out_queue_size += parsed_msg_len;
     parsed_msg->msg_len = parsed_msg_len;
-    pthread_mutex_unlock(&buffer->output_mutex);
+    g_mutex_unlock(&buffer->output_mutex);
 }
 
 static gboolean flush_buffer_output(struct sqchat_buffer * buffer) {
-    pthread_mutex_lock(&buffer->output_mutex);
+    g_mutex_lock(&buffer->output_mutex);
 
     char output_dump[buffer->out_queue_size + 1];
     char * dump_pos = &output_dump[0];
@@ -190,7 +189,7 @@ static gboolean flush_buffer_output(struct sqchat_buffer * buffer) {
 
     buffer->out_queue = NULL;
     buffer->out_queue_size = 0;
-    pthread_mutex_unlock(&buffer->output_mutex);
+    g_mutex_unlock(&buffer->output_mutex);
     return false;
 }
 

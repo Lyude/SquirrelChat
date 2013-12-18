@@ -29,7 +29,6 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
-#include <pthread.h>
 
 static void connection_setup_thread(struct sqchat_network * network);
 static gboolean connection_final_setup_phase(struct sqchat_network * network);
@@ -39,9 +38,9 @@ void sqchat_begin_connection(struct sqchat_network * network) {
     network->status = ADDR_RES;
     sqchat_buffer_print(network->buffer,
                         "Looking up \"%s\"...\n", network->address);
-    pthread_create(&network->addr_res_thread, NULL,
-                   (void*(*)(void*))&connection_setup_thread,
-                   network);
+    network->addr_res_thread =
+        g_thread_new("Address Resolution",
+                     (GThreadFunc)&connection_setup_thread, network);
 }
 
 static void connection_setup_thread(struct sqchat_network * network) {

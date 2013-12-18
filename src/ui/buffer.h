@@ -21,7 +21,6 @@
 #include "chat_window.h"
 #include "../trie.h"
 
-#include <pthread.h>
 #include <gtk/gtk.h>
 
 enum sqchat_buffer_type {
@@ -51,7 +50,7 @@ struct sqchat_buffer {
     char * buffer_name;
     GtkTreeRowReference * row;
 
-    pthread_mutex_t output_mutex;
+    GMutex output_mutex;
     struct __sqchat_queued_output * out_queue;
     struct __sqchat_queued_output * out_queue_end;
     size_t out_queue_size;
