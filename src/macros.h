@@ -14,11 +14,11 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __IRC_MACROS_H__
-#define __IRC_MACROS_H__
+#ifndef __SQCHAT_MACROS_H__
+#define __SQCHAT_MACROS_H__
 
 #define SQCHAT_IRC_MSG_LEN 512
 #define SQCHAT_MSG_BUF_LEN 513
 
-#endif /* __IRC_MACROS_H__ */
+#endif /* __SQCHAT_MACROS_H__ */
 // vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:

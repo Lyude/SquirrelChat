@@ -19,7 +19,7 @@
 #ifndef __IRC_NETWORK_H__
 #define __IRC_NETWORK_H__
 
-#include "irc_macros.h"
+#include "macros.h"
 #include "trie.h"
 
 #include <gtk/gtk.h>

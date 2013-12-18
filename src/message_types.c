@@ -19,7 +19,7 @@
 #include "ui/user_list.h"
 #include "ui/network_tree.h"
 #include "net_io.h"
-#include "irc_macros.h"
+#include "macros.h"
 #include "cmd_responses.h"
 #include "errors.h"
 #include "trie.h"

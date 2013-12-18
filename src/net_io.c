@@ -24,7 +24,7 @@
 #include <errno.h>
 #include "irc_network.h"
 #include "net_io.h"
-#include "irc_macros.h"
+#include "macros.h"
 
 #include <stdbool.h>
 #include <string.h>
