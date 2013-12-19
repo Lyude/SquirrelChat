@@ -21,7 +21,7 @@
 #include "irc_network.h"
 
 extern void sqchat_begin_ssl_handshake(struct sqchat_network * network)
-    _nonnull(1);
+    _attr_nonnull(1);
 
 #endif // __SQ_SSL_H__
 

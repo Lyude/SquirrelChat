@@ -72,14 +72,14 @@ extern struct sqchat_buffer * sqchat_buffer_new(const char * buffer_name,
                                                 enum sqchat_buffer_type type,
                                                 struct sqchat_network * network);
 extern void sqchat_buffer_free(struct sqchat_buffer * buffer)
-    _nonnull(1);
+    _attr_nonnull(1);
 
 extern void sqchat_buffer_destroy(struct sqchat_buffer * buffer)
-    _nonnull(1);
+    _attr_nonnull(1);
 
 extern void sqchat_buffer_print(struct sqchat_buffer * buffer,
                                 const char * msg, ...)
-    _nonnull(1, 2) _format(printf, 2, 3);
+    _attr_nonnull(1, 2) _attr_format(printf, 2, 3);
 
 #endif /* __BUFFER_H__ */
 // vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:

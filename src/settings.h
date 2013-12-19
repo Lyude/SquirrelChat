@@ -23,9 +23,9 @@ extern char * sqchat_config_main_file_path;
 
 extern void sqchat_init_settings();
 extern GKeyFile * sqchat_get_keyfile_for_config(const char * filename)
-    _nonnull(1);
+    _attr_nonnull(1);
 extern int sqchat_settings_update_file(const char * filename)
-    _nonnull(1);
+    _attr_nonnull(1);
 
 extern GKeyFile * sqchat_main_settings;
 extern char * sqchat_default_nickname;

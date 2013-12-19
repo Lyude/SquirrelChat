@@ -20,38 +20,38 @@
 #include "chat_window.h"
 
 extern void sqchat_user_list_new(struct sqchat_chat_window * window)
-    _nonnull(1);
+    _attr_nonnull(1);
 
 extern void sqchat_user_list_user_add(struct sqchat_buffer * buffer,
                                       const char * nickname,
                                       const char * prefix_str,
                                       size_t prefix_len)
-    _nonnull(1, 2);
+    _attr_nonnull(1, 2);
 extern int sqchat_user_list_user_remove(struct sqchat_buffer * buffer,
                                         const char * nickname)
-    _nonnull(1, 2);
+    _attr_nonnull(1, 2);
 
 extern int sqchat_user_list_user_prefix_add(struct sqchat_buffer * buffer,
                                             const char * nickname,
                                             const char * prefix)
-    _nonnull(1, 2, 3);
+    _attr_nonnull(1, 2, 3);
 extern int sqchat_user_list_user_prefix_subtract(struct sqchat_buffer * buffer,
                                                  const char * nickname,
                                                  char prefix)
-    _nonnull(1, 2);
+    _attr_nonnull(1, 2);
 
 extern int sqchat_user_list_user_row_find(const struct sqchat_buffer * buffer,
                                           const char * nickname,
                                           GtkTreeIter * user_row)
-    _nonnull(1, 2, 3);
+    _attr_nonnull(1, 2, 3);
 extern char * sqchat_user_list_user_get_prefixes(const struct sqchat_buffer * buffer,
                                                  GtkTreeIter * user)
-    _nonnull(1, 2);
+    _attr_nonnull(1, 2);
 
 extern void sqchat_user_list_user_set_visible_prefix(struct sqchat_buffer * buffer,
                                                      GtkTreeIter * user_row,
                                                      char prefix)
-    _nonnull(1, 2);
+    _attr_nonnull(1, 2);
 
 #endif // __USER_LIST_H__
 // vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:

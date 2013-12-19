@@ -24,7 +24,7 @@ extern void sqchat_init_message_types();
                            char * hostmask,                     \
                            short argc,                          \
                            char * argv[])                       \
-    _nonnull(1)
+    _attr_nonnull(1)
 
 MSG_CB(sqchat_cap_msg_callback);
 MSG_CB(sqchat_join_msg_callback);

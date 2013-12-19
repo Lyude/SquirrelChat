@@ -102,13 +102,13 @@ struct sqchat_network {
 
 extern struct sqchat_network * sqchat_network_new();
 extern void sqchat_network_destroy(struct sqchat_network * network)
-    _nonnull(1);
+    _attr_nonnull(1);
 
 extern void sqchat_network_connect(struct sqchat_network * network)
-    _nonnull(1);
+    _attr_nonnull(1);
 extern void sqchat_network_disconnect(struct sqchat_network * network,
                                       const char * msg)
-    _nonnull(1);
+    _attr_nonnull(1);
 
 #define SQCHAT_IS_CHAN(_network, _str) (strchr((_network)->chantypes, *(_str)))
 

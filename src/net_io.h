@@ -22,7 +22,7 @@
 
 extern void sqchat_network_send(struct sqchat_network * buffer,
                                 const char * msg, ...)
-    _nonnull(1, 2) _format(printf, 2, 3);
+    _attr_nonnull(1, 2) _attr_format(printf, 2, 3);
 
 #endif /* __NET_IO_H__ */
 // vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:

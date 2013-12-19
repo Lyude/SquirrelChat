@@ -69,7 +69,7 @@ extern struct sqchat_chat_window * sqchat_chat_window_new(struct sqchat_network 
 
 extern void sqchat_chat_window_change_active_buffer(struct sqchat_chat_window * window,
                                                     struct sqchat_buffer * new_buffer)
-    _nonnull(1, 2);
+    _attr_nonnull(1, 2);
 
 #endif // CHAT_WINDOW_H
 

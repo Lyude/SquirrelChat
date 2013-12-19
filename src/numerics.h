@@ -25,7 +25,7 @@ extern void sqchat_init_numerics();
                       char * hostmask,                      \
                       short argc,                           \
                       char * argv[])                        \
-    _nonnull(1)
+    _attr_nonnull(1)
 
 NUMERIC_CB(sqchat_echo_argv_1);
 NUMERIC_CB(sqchat_rpl_myinfo);

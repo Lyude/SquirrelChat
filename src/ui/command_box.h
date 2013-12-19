@@ -19,9 +19,9 @@
 #include "chat_window.h"
 
 extern void sqchat_command_box_new(struct sqchat_chat_window * window)
-    _nonnull(1);
+    _attr_nonnull(1);
 extern void sqchat_command_box_connect_signals(struct sqchat_chat_window * window)
-    _nonnull(1);
+    _attr_nonnull(1);
 
 #endif // __COMMAND_BOX_H__
 // vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:

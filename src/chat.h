@@ -22,7 +22,7 @@
 void sqchat_send_privmsg(struct sqchat_network * network,
                          const char * recepient,
                          const char * message)
-    _nonnull(1, 2, 3);
+    _attr_nonnull(1, 2, 3);
 
 #endif /* __CHAT_H__ */
 // vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:

@@ -34,14 +34,14 @@ extern void sqchat_claim_response(struct sqchat_network * network,
                                   struct sqchat_buffer * buffer,
                                   void * data,
                                   void (*data_free_func)(void *))
-    _nonnull(1, 2);
+    _attr_nonnull(1, 2);
 extern void sqchat_remove_last_response_claim(struct sqchat_network * network)
-    _nonnull(1);
+    _attr_nonnull(1);
 
 extern struct sqchat_buffer * sqchat_route_rpl(const struct sqchat_network * network)
-    _nonnull(1);
+    _attr_nonnull(1);
 extern struct sqchat_buffer * sqchat_route_rpl_end(struct sqchat_network * network)
-    _nonnull(1);
+    _attr_nonnull(1);
 
 #endif // __CMD_RESPONSES_H__
 // vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:

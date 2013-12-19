@@ -24,7 +24,7 @@
 extern gboolean sqchat_net_input_handler(GIOChannel *source,
                                          GIOCondition condition,
                                          struct sqchat_network * buffer)
-    _nonnull(3);
+    _attr_nonnull(3);
 
 #endif // __NET_INPUT_HANDLER__
 // vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:

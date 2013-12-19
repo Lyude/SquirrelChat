@@ -22,12 +22,12 @@ extern void sqchat_dump_msg_to_buffer(struct sqchat_buffer * buffer,
                                       char * hostmask,
                                       short argc,
                                       char * argv[])
-    _nonnull(1);
+    _attr_nonnull(1);
 
 #ifdef WITH_SSL
 #if GNUTLS_DEBUG_LEVEL > 0
 extern void _sqchat_gnutls_debug_log(int level, const char * msg)
-    _nonnull(2);
+    _attr_nonnull(2);
 #endif
 #endif
 

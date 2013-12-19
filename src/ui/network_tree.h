@@ -22,23 +22,23 @@
 #include "buffer.h"
 
 extern void sqchat_network_tree_new(struct sqchat_chat_window * window)
-    _nonnull(1);
+    _attr_nonnull(1);
 extern void sqchat_network_tree_connect_signals(struct sqchat_chat_window * window)
-    _nonnull(1);
+    _attr_nonnull(1);
 
 extern struct sqchat_network * sqchat_network_tree_get_current(struct sqchat_chat_window * window)
-    _nonnull(1);
+    _attr_nonnull(1);
 
 extern void sqchat_network_tree_network_add(struct sqchat_chat_window * window,
                                             struct sqchat_network * network)
-    _nonnull(1, 2);
+    _attr_nonnull(1, 2);
 extern void sqchat_network_tree_network_remove(struct sqchat_network * network);
 
 extern void sqchat_network_tree_buffer_add(struct sqchat_buffer * buffer,
                                            struct sqchat_network * network)
-    _nonnull(1, 2);
+    _attr_nonnull(1, 2);
 extern void sqchat_network_tree_buffer_remove(struct sqchat_buffer * buffer)
-    _nonnull(1);
+    _attr_nonnull(1);
 
 #endif /* __NETWORK_TREE_H__ */
 

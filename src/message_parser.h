@@ -30,9 +30,9 @@ typedef short (*sqchat_msg_cb)(struct sqchat_network *,
 extern void sqchat_init_msg_parser();
 
 extern void sqchat_process_msg(struct sqchat_network * network, char * msg)
-    _nonnull(1, 2);
+    _attr_nonnull(1, 2);
 void sqchat_split_hostmask(char * hostmask, char ** nickname, char ** address)
-    _nonnull(1, 2, 3);
+    _attr_nonnull(1, 2, 3);
 
 #endif
 // vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:

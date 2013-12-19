@@ -31,10 +31,10 @@ typedef void (*sqchat_ctcp_callback)(struct sqchat_network * network,
 extern void sqchat_ctcp_init();
 
 extern void sqchat_add_ctcp_request(const char * type, sqchat_ctcp_callback cb)
-    _nonnull(1, 2);
+    _attr_nonnull(1, 2);
 
 extern void sqchat_add_ctcp_response(const char * type, sqchat_ctcp_callback cb)
-    _nonnull(1, 2);
+    _attr_nonnull(1, 2);
 
 enum _ctcp_type {
     REQUEST,
@@ -46,7 +46,7 @@ extern void sqchat_process_ctcp(struct sqchat_network * network,
                                 char * hostmask,
                                 char * target,
                                 char * msg)
-    _nonnull(1, 3, 4, 5);
+    _attr_nonnull(1, 3, 4, 5);
 
 #define sqchat_network_send_ctcp(_network, _target, _type)                  \
     sqchat_network_send(_network,                                           \

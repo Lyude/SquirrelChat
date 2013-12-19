@@ -18,7 +18,7 @@
 #define __CONNECTION_SETUP_H__
 
 extern void sqchat_begin_connection(struct sqchat_network * network)
-    _nonnull(1);
+    _attr_nonnull(1);
 
 #endif __CONNECTION_SETUP_H__
 // vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:

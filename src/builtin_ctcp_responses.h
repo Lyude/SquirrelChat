@@ -22,7 +22,7 @@
                           char * hostmask,                      \
                           char * target,                        \
                           char * msg)                           \
-    _nonnull(1, 2)
+    _attr_nonnull(1, 2)
 
 BUILTIN_CTCP_RESP(sqchat_ctcp_version_resp_handler);
 BUILTIN_CTCP_RESP(sqchat_ctcp_ping_resp_handler);

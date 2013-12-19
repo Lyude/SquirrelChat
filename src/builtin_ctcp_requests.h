@@ -23,7 +23,7 @@
                           char * hostmask,                      \
                           char * target,                        \
                           char * msg)                           \
-    _nonnull(1, 2)
+    _attr_nonnull(1, 2)
 
 CTCP_REQ_HANDLER(sqchat_ctcp_version_req_handler);
 CTCP_REQ_HANDLER(sqchat_ctcp_action_req_handler);

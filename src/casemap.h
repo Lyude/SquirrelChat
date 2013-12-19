@@ -20,7 +20,7 @@
 extern char sqchat_rfc1459_tolower(const char c);
 extern char sqchat_rfc1459_toupper(const char c);
 extern int sqchat_rfc1459_strcasecmp(const char * s1, const char * s2)
-    _nonnull(1, 2);
+    _attr_nonnull(1, 2);
 
 #endif // __CASEMAP_H__
 // vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:

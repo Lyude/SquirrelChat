@@ -17,11 +17,13 @@
 #ifndef __SQ_ATTRIBUTES_H__
 
 #ifdef __GNUC__
-#define _nonnull(...)               __attribute__((nonnull(__VA_ARGS__)))
-#define _format(type, str, start)   __attribute__((format(type, str, start)))
+#define _attr_nonnull(...)              __attribute__((nonnull(__VA_ARGS__)))
+#define _attr_format(type, str, start)	__attribute__((format(type, str, start)))
+#define _attr_malloc			__attribute__((malloc()))
 #else
-#define _nonnull(...)
-#define _format(type, str, start)
+#define _attr_nonnull(...)
+#define _attr_format(type, str, start)
+#define _attr_malloc
 #endif
 
 #endif // __SQ_ATTRIBUTES_H__

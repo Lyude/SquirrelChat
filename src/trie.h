@@ -58,25 +58,25 @@ struct sqchat_trie {
 
 extern sqchat_trie *sqchat_trie_new(void (*canonize)());
 extern void sqchat_trie_free(sqchat_trie * sqchat_trie, void (*cb)(), void * priv)
-    _nonnull(1);
+    _attr_nonnull(1);
 extern void sqchat_trie_set(sqchat_trie * sqchat_trie, const char * key, void * val)
-    _nonnull(1, 2, 3);
+    _attr_nonnull(1, 2, 3);
 extern void *sqchat_trie_get(sqchat_trie * sqchat_trie, const char * key)
-    _nonnull(1, 2);
+    _attr_nonnull(1, 2);
 /* void cb(void *value, void *priv); */
 extern void sqchat_trie_each(sqchat_trie * sqchat_trie, void(*cb)(), void * priv)
-    _nonnull(1, 2);
+    _attr_nonnull(1, 2);
 extern void *sqchat_trie_del(sqchat_trie * sqchat_trie, const char * key);
 
 extern void sqchat_trie_strtolower(char * s)
-    _nonnull(1);
+    _attr_nonnull(1);
 extern void sqchat_trie_strtoupper(char * s)
-    _nonnull(1);
+    _attr_nonnull(1);
 
 extern void sqchat_trie_rfc1459_strtoupper(char * s)
-    _nonnull(1);
+    _attr_nonnull(1);
 extern void sqchat_trie_rfc1459_strtolower(char * s)
-    _nonnull(1);
+    _attr_nonnull(1);
 
 #endif
 // vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:

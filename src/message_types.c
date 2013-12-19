@@ -498,7 +498,7 @@ static void announce_quit(struct sqchat_buffer * buffer,
                                     params->nickname, params->quit_msg);
         }
     }
-} _nonnull(1, 2)
+} _attr_nonnull(1, 2)
 
 MSG_CB(sqchat_quit_msg_callback) {
     char * nickname;

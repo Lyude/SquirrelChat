@@ -40,19 +40,19 @@ extern void sqchat_add_irc_command(char * command,
                                    unsigned short argc_max,
                                    char * syntax_msg,
                                    char * help_msg)
-    _nonnull(1, 2, 4, 5);
+    _attr_nonnull(1, 2, 4, 5);
 extern void sqchat_del_irc_command(char * command)
-    _nonnull(1);
+    _attr_nonnull(1);
 extern void sqchat_call_command(struct sqchat_buffer * buffer,
                                 char * command,
                                 char * params)
-    _nonnull(1, 2);
+    _attr_nonnull(1, 2);
 extern void sqchat_print_command_syntax(struct sqchat_buffer * buffer,
                                         char * command)
-    _nonnull(1, 2);
+    _attr_nonnull(1, 2);
 extern void sqchat_print_command_help(struct sqchat_buffer * buffer,
                                       char * command)
-    _nonnull(1, 2);
+    _attr_nonnull(1, 2);
 
 #endif // __COMMANDS_H__
 // vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:

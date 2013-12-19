@@ -25,7 +25,7 @@ extern void sqchat_add_builtin_commands();
                            unsigned short argc,             \
                            char * argv[],                   \
                            char * trailing)                 \
-    _nonnull(1)
+    _attr_nonnull(1)
 
 BI_CMD(sqchat_cmd_help);
 BI_CMD(sqchat_cmd_nick);
