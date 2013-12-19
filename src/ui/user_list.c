@@ -54,7 +54,7 @@ static inline void set_user_prefixes(struct sqchat_buffer * buffer,
                        prefixes, -1);
 }
 
-void sqchat_user_list_new(struct sqchat_chat_window * window) {
+void sqchat_user_list_setup(struct sqchat_chat_window * window) {
     GtkCellRenderer * renderer = gtk_cell_renderer_text_new();
 
     GtkTreeViewColumn * prefix_column =

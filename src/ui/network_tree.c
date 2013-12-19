@@ -26,7 +26,7 @@
 GtkTreeIter network_tree_toplevel;
 
 // Sets up the network tree
-void sqchat_network_tree_new(struct sqchat_chat_window * window) {
+void sqchat_network_tree_setup(struct sqchat_chat_window * window) {
     GtkCellRenderer * network_tree_renderer;
 
     GtkTreeViewColumn *network_tree_title_column;

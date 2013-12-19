@@ -23,7 +23,7 @@
 #include "main_menu_bar.h"
 #include "settings_dialog.h"
 
-void sqchat_main_menu_bar_new(struct sqchat_chat_window * window) {
+void sqchat_main_menu_bar_setup(struct sqchat_chat_window * window) {
     /* Menu items and submenus that don't need to be referenced outside of this
      * scope
      */

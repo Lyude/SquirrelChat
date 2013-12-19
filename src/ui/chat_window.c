@@ -42,7 +42,7 @@ struct sqchat_chat_window * sqchat_chat_window_new(struct sqchat_network * netwo
     gtk_container_add(GTK_CONTAINER(new_window->window),
                       new_window->top_vertical_container);
 
-    sqchat_main_menu_bar_new(new_window);
+    sqchat_main_menu_bar_setup(new_window);
     gtk_box_pack_start(GTK_BOX(new_window->top_vertical_container),
                        new_window->main_menu_bar, FALSE, FALSE, 0);
 
@@ -52,7 +52,7 @@ struct sqchat_chat_window * sqchat_chat_window_new(struct sqchat_network * netwo
                        new_window->network_tree_and_buffer_pane,
                        TRUE, TRUE, 0);
 
-    sqchat_network_tree_new(new_window);
+    sqchat_network_tree_setup(new_window);
     new_window->scrolled_window_for_network_tree =
         gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_kinetic_scrolling(
@@ -98,7 +98,7 @@ struct sqchat_chat_window * sqchat_chat_window_new(struct sqchat_network * netwo
     gtk_paned_add1(GTK_PANED(new_window->chat_viewer_and_user_list_pane),
                    chat_and_command_box_container);
 
-    sqchat_user_list_new(new_window);
+    sqchat_user_list_setup(new_window);
     new_window->scrolled_window_for_user_list =
         gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_kinetic_scrolling(

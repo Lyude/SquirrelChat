@@ -21,7 +21,7 @@
 
 #include "buffer.h"
 
-extern void sqchat_network_tree_new(struct sqchat_chat_window * window)
+extern void sqchat_network_tree_setup(struct sqchat_chat_window * window)
     _attr_nonnull(1);
 extern void sqchat_network_tree_connect_signals(struct sqchat_chat_window * window)
     _attr_nonnull(1);
