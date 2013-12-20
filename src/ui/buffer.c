@@ -192,8 +192,7 @@ static gboolean flush_buffer_output(struct sqchat_buffer * buffer) {
      */
     if (gtk_adjustment_get_value(scroll_adjustment) >=
         gtk_adjustment_get_upper(scroll_adjustment) -
-        gtk_adjustment_get_page_size(scroll_adjustment) - 1e-12 &&
-        buffer == buffer->window->current_buffer) {
+        gtk_adjustment_get_page_size(scroll_adjustment) - 1e-12) {
         gtk_text_buffer_insert(buffer->buffer, &end_of_buffer, &output_dump[0],
                                buffer->out_queue_size);
         gtk_text_view_scroll_to_mark(GTK_TEXT_VIEW(buffer->buffer_view),
