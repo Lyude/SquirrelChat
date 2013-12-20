@@ -118,10 +118,10 @@ void sqchat_network_disconnect(struct sqchat_network * network,
         network->ssl_cred = NULL;
 #endif
 
-    for (struct __sqchat_queued_output * c = network->claimed_responses;
+    for (sqchat_cmd_response_claim * c = network->claimed_responses;
          c != NULL;) {
-        struct __sqchat_queued_output * next_c = c->next;
-        free(c->msg);
+        sqchat_cmd_response_claim * next_c = c->next;
+        c->data_free_func(c->data);
         free(c);
         c = next_c;
     }
