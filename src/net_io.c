@@ -32,7 +32,7 @@
 #include <gnutls/gnutls.h>
 
 // Sends a message to a currently connected IRC network
-void sqchat_network_send(struct sqchat_network * buffer,
+void sqchat_network_send(struct sqchat_network * network,
                          const char * msg, ...) {
     va_list args;
     size_t msg_len;
@@ -43,12 +43,12 @@ void sqchat_network_send(struct sqchat_network * buffer,
     va_end(args);
 
 #ifdef WITH_SSL
-    if (buffer->ssl)
-        gnutls_write(buffer->ssl_session, &send_buffer, msg_len);
+    if (network->ssl)
+        gnutls_write(network->ssl_session, &send_buffer, msg_len);
     else
-        send(buffer->socket, &send_buffer, msg_len, 0);
+        send(network->socket, &send_buffer, msg_len, 0);
 #else
-    send(buffer->socket, &send_buffer, msg_len, 0);
+    send(network->socket, &send_buffer, msg_len, 0);
 #endif
 }
 
