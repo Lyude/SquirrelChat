@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <strings.h>
+#include <glib/gi18n.h>
 
 #include "chat.h"
 #include "builtin_commands.h"
@@ -38,11 +39,39 @@ void sqchat_add_builtin_commands() {
     sqchat_add_irc_command("nick", sqchat_cmd_nick, 1,
                            "/nick <new_nickname>",
                            "Changes your nickname.\n");
-    sqchat_add_irc_command("server", sqchat_cmd_server, 1,
-                           "/server <address>[:[+]<port>] [password]",
-                           "Sets the server for the current buffer.\n"
-                           "A + in the port number indicates the server uses "
-                           "SSL.\n");
+    sqchat_add_irc_command("server", sqchat_cmd_server, 2,
+                           _("/server <command> [<args>]"),
+                           _("Used to manipulate the list of servers. Valid "
+                             "commands that may be used are as follows:\n"
+                             "LIST:\n"
+                             "Prints a list of all the servers currently added "
+                             "for the network.\n"
+                             "\n"
+                             "ADD <address[:[+]<port>]>:\n"
+                             "Adds a server to the list of servers for the "
+                             "current network. A '+' before the port indicates "
+                             "that SquirrelChat should use SSL when connecting "
+                             "to the server.\n"
+                             "If the address is a plain IPv6 address, then "
+                             "surround IPv6 portion with braces.\n"
+                             "\n"
+                             "REMOVE <server_number>:\n"
+                             "Removes the server from the list for the current "
+                             "network.\n"
+                             "'server_number' refers to the number assigned to "
+                             "the server, which may be retreived with "
+                             "\"/server list\".\n"
+                             "\n"
+                             "SELECT <server_number>:\n"
+                             "Tells SquirrelChat to use a specific server the "
+                             "next time it tries connecting to this network.\n"
+                             "'server_number' refers to the number assigned to "
+                             "the server, which may be retreived with "
+                             "\"/server list\".\n"
+                             "\n"
+                             "PASSWORD <password>\n"
+                             "Sets the password to be used for connecting to "
+                             "each server.\n"));
     sqchat_add_irc_command("msg", sqchat_cmd_msg, 1,
                            "/msg <recepient>",
                            "Sends a message to a person or a channel.\n");
@@ -267,38 +296,102 @@ BI_CMD(sqchat_cmd_server) {
     if (argc < 1)
         return SQCHAT_CMD_SYNTAX_ERR;
 
-    char * saveptr;
-    char * address = strtok_r(argv[0], ":", &saveptr);
-    char * port = strtok_r(NULL, ":", &saveptr);
+    if (strcasecmp(argv[0], "list") == 0) {
+        GSList * current;
+        int i;
 
-    free(buffer->network->address);
-    free(buffer->network->port);
-    free(buffer->network->password);
-    buffer->network->address = strdup(address);
+        sqchat_buffer_print(buffer, "--- Server List ---\n");
+        for (current = buffer->network->servers, i = 1;
+             current != NULL;
+             current = g_slist_next(current), i++) {
+            sqchat_server * server = current->data;
 
-    if (port != NULL) {
-        if (port[0] == '+') {
-            port++;
-            buffer->network->ssl = true;
+            sqchat_buffer_print(buffer,
+                                "Server #%i:%s\n"
+                                "\tAddress:\t%s\n"
+                                "\tPort:\t%s\n"
+                                "\tSSL:\t%s\n",
+                                i,
+                                (buffer->network->current_server == current) ?
+                                " *" : "",
+                                server->address,
+                                server->port,
+                                server->ssl ? "Yes" : "No");
         }
-        else
-            buffer->network->ssl = false;
-
-        buffer->network->port = strdup(port);
+        sqchat_buffer_print(buffer, "--- End of Server List ---\n");
     }
-    else {
-        buffer->network->ssl = false;
-        buffer->network->port = strdup("6667");
-    }
+    else if (strcasecmp(argv[0], "add") == 0) {
+        if (argc < 2)
+            return SQCHAT_CMD_SYNTAX_ERR;
 
-    if (trailing != NULL)
-        buffer->network->password = strdup(trailing);
+        sqchat_server * server = sqchat_parse_server_string(argv[1]);
+        if (server == NULL)
+            return SQCHAT_CMD_SYNTAX_ERR;
+
+        buffer->network->servers =
+            g_slist_append(buffer->network->servers, server);
+        sqchat_buffer_print(buffer, "Server added\n");
+    }
+    else if (strcasecmp(argv[0], "remove") == 0) {
+        int index;
+        GSList * target;
+
+        if (argc < 2)
+            return SQCHAT_CMD_SYNTAX_ERR;
+
+        // Try to convert the index provided to an integer
+        index = strtod(argv[1], NULL) - 1;
+        if (index < 0)
+            return SQCHAT_CMD_SYNTAX_ERR;
+
+        // Check to see if a server exists at the index provided
+        target = g_slist_nth(buffer->network->servers, index);
+        if (target == NULL) {
+            sqchat_buffer_print(buffer,
+                                "Error: Could not remove server: No such "
+                                "server.\n");
+            return 0;
+        }
+
+        buffer->network->servers =
+            g_slist_delete_link(buffer->network->servers, target);
+
+        sqchat_buffer_print(buffer, "Server removed\n");
+    }
+    else if (strcasecmp(argv[0], "select") == 0) {
+        int index;
+        GSList * new_current;
+        
+        if (argc < 2)
+            return SQCHAT_CMD_SYNTAX_ERR;
+
+        index = strtod(argv[1], NULL) - 1;
+        if (index < 0)
+            return SQCHAT_CMD_SYNTAX_ERR;
+
+        new_current = g_slist_nth(buffer->network->servers, index);
+        if (new_current == NULL) {
+            sqchat_buffer_print(buffer, "Error: No such server\n");
+            return 0;
+        }
+        
+        buffer->network->current_server = new_current;
+        sqchat_buffer_print(buffer,
+                            "Server to use for connection is now set to %s\n",
+                            argv[1]);
+    }
+    else if (strcasecmp(argv[0], "password") == 0) {
+        if (argc < 2)
+            return SQCHAT_CMD_SYNTAX_ERR;
+
+        g_free(buffer->network->password);
+        buffer->network->password = g_strdup(argv[1]);
+
+        sqchat_buffer_print(buffer, "Password changed\n");
+    }
     else
-        buffer->network->password = NULL;
+        return SQCHAT_CMD_SYNTAX_ERR;
 
-    sqchat_buffer_print(buffer, "Server set to %s:%s\n",
-                        buffer->network->address,
-                        buffer->network->port);
     return 0;
 }
 

@@ -30,11 +30,19 @@
 
 #include <gnutls/gnutls.h>
 
-struct sqchat_network {
-    // Network information
-    char * name;
+struct sqchat_server {
     char * address;
     char * port;
+    bool ssl;
+};
+
+typedef struct sqchat_server sqchat_server;
+
+struct sqchat_network {
+    // Network information
+    GSList * servers;
+    GSList * current_server;
+    char * name;
     char * password;
     // TODO: Add flags here
 
@@ -70,8 +78,6 @@ struct sqchat_network {
 
     bool away                           : 1;
 
-    bool ssl                            : 1;
-
     bool destroy_on_disconnect          : 1;
     bool                                : 0;
 
@@ -99,6 +105,9 @@ struct sqchat_network {
     sqchat_trie * buffers;
     struct sqchat_cmd_response_claim * claimed_responses;
 };
+
+extern sqchat_server * sqchat_parse_server_string(char * input)
+    _attr_nonnull(1);
 
 extern struct sqchat_network * sqchat_network_new();
 extern void sqchat_network_destroy(struct sqchat_network * network)

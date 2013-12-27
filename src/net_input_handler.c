@@ -108,10 +108,11 @@ gboolean sqchat_net_input_handler(GIOChannel *source,
                                   struct sqchat_network * network) {
     char * msg;
     int result;
+    sqchat_server * server = network->current_server->data;
 
     errno = 0;
 #ifdef WITH_SSL
-    if (network->ssl) {
+    if (server->ssl) {
         if (network->status == DISCONNECTED) {
             finish_network_disconnect(network);
 

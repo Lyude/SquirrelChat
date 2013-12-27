@@ -37,13 +37,14 @@ void sqchat_network_send(struct sqchat_network * network,
     va_list args;
     size_t msg_len;
     char send_buffer[SQCHAT_MSG_BUF_LEN];
+    sqchat_server * server = network->current_server->data;
 
     va_start(args, msg);
     msg_len = vsnprintf(&send_buffer[0], SQCHAT_IRC_MSG_LEN, msg, args);
     va_end(args);
 
 #ifdef WITH_SSL
-    if (network->ssl)
+    if (server->ssl)
         gnutls_write(network->ssl_session, &send_buffer, msg_len);
     else
         send(network->socket, &send_buffer, msg_len, 0);

@@ -29,13 +29,14 @@ static int verify_certificate_cb(gnutls_session_t session);
 void sqchat_begin_ssl_handshake(struct sqchat_network * network) {
     int ret;
     const char * err;
+    sqchat_server * server = network->current_server->data;
 
     int gtls = gnutls_init(&network->ssl_session, GNUTLS_CLIENT);
     gnutls_certificate_allocate_credentials(&network->ssl_cred);
 
     gnutls_session_set_ptr(network->ssl_session, network);
     gnutls_server_name_set(network->ssl_session, GNUTLS_NAME_DNS,
-                           network->address, strlen(network->address));
+                           server->address, strlen(server->address));
 
     // Setup the trusted CAS file
     gnutls_certificate_set_x509_trust_file(network->ssl_cred,
@@ -89,6 +90,7 @@ static int verify_certificate_cb(gnutls_session_t session) {
     int ret;
     time_t expiration_time;
     struct sqchat_network * network = gnutls_session_get_ptr(session);
+    sqchat_server * server = network->current_server->data;
     unsigned int chain_size;
     const gnutls_datum_t * chain;
     gnutls_x509_crt_t * cert;
@@ -103,7 +105,7 @@ static int verify_certificate_cb(gnutls_session_t session) {
 
     // Make sure the certificate checks out
 #if GNUTLS_VERSION_NUMBER >= 0x030104
-    ret = gnutls_certificate_verify_peers3(session, network->address, &status);
+    ret = gnutls_certificate_verify_peers3(session, server->address, &status);
     if (ret < 0)
         goto verification_error;
 #else
@@ -113,7 +115,7 @@ static int verify_certificate_cb(gnutls_session_t session) {
 
     // Pre GnuTLS version 3.1.4, hostname checking was done seperately
     // Check the subject
-    ret = gnutls_x509_crt_check_hostname(cert[0], network->address);
+    ret = gnutls_x509_crt_check_hostname(cert[0], server->address);
     if (ret < 0)
         goto verification_error;
     // TODO: Check to see if we have to check the rest of the chain

@@ -17,7 +17,7 @@
 #ifndef __CONNECTION_SETUP_H__
 #define __CONNECTION_SETUP_H__
 
-extern void sqchat_begin_connection(struct sqchat_network * network)
+extern void sqchat_begin_connection_attempt(struct sqchat_network * network)
     _attr_nonnull(1);
 
 #endif __CONNECTION_SETUP_H__

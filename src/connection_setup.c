@@ -29,15 +29,19 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
+#include <glib/gi18n.h>
 
 static void connection_setup_thread(struct sqchat_network * network);
 static gboolean connection_final_setup_phase(struct sqchat_network * network);
+static void try_next_server_in_list(struct sqchat_network * network);
 
 // Starts a thread to resolve the hostname given and connects to the given host
-void sqchat_begin_connection(struct sqchat_network * network) {
+void sqchat_begin_connection_attempt(struct sqchat_network * network) {
+    sqchat_server * server = network->current_server->data;
+
     network->status = ADDR_RES;
     sqchat_buffer_print(network->buffer,
-                        "Looking up \"%s\"...\n", network->address);
+                        _("Looking up \"%s\"...\n"), server->address);
     network->addr_res_thread =
         g_thread_new("Address Resolution",
                      (GThreadFunc)&connection_setup_thread, network);
@@ -48,25 +52,26 @@ static void connection_setup_thread(struct sqchat_network * network) {
     struct addrinfo * results;
     struct addrinfo * rp;
     int func_result;
+    sqchat_server * server = network->current_server->data;
     
     // Try to get the addrinfo for the server
     memset(&hints, 0, sizeof(struct addrinfo));
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
 
-    func_result = getaddrinfo(network->address, network->port, &hints,
+    func_result = getaddrinfo(server->address, server->port, &hints,
                               &results);
     if (func_result != 0) {
         sqchat_buffer_print(network->buffer,
-                            "Failed to look up \"%s\": %s\n",
-                            network->address, gai_strerror(func_result));
-        network->status = DISCONNECTED;
+                            _("Failed to look up \"%s\": %s\n"),
+                            server->address, gai_strerror(func_result));
+        try_next_server_in_list(network);
         return;
     }
 
     sqchat_buffer_print(network->buffer,
-                        "Lookup successful, attempting to connect to "
-                        "host...\n");
+                        _("Lookup successful, attempting to connect to "
+                          "host...\n"));
 
     /* Attempt to connect to the results given by getaddrinfo(), this might
      * later be moved into the main application loop, but for the time being
@@ -88,12 +93,12 @@ static void connection_setup_thread(struct sqchat_network * network) {
     freeaddrinfo(results);
     
     if (rp == NULL) {
-        sqchat_buffer_print(network->buffer, "Connection failed!\n");
-        network->status = DISCONNECTED;
+        sqchat_buffer_print(network->buffer, _("Connection failed!\n"));
+        try_next_server_in_list(network);
         return;
     }
 
-    sqchat_buffer_print(network->buffer, "Connection successful!\n");
+    sqchat_buffer_print(network->buffer, _("Connection successful!\n"));
 
     /* We've completed the basic connection portion, now for simplicity sake we
      * pass the rest of the work for setting up the connection back to the main
@@ -102,9 +107,27 @@ static void connection_setup_thread(struct sqchat_network * network) {
     g_idle_add((GSourceFunc) connection_final_setup_phase, network);
 }
 
+void try_next_server_in_list(struct sqchat_network * network) {
+    // Make sure there is another server in the list that we can try
+    if (g_slist_next(network->current_server) == NULL) {
+        sqchat_buffer_print(network->buffer,
+                            _("No more servers left to try, giving up.\n"));
+        network->current_server = NULL;
+        network->status = DISCONNECTED;
+        return;
+    }
+
+    sqchat_buffer_print(network->buffer,
+                        _("Trying the next server in the list...\n"));
+    network->current_server = g_slist_next(network->current_server);
+    sqchat_begin_connection_attempt(network);
+}
+
 static gboolean connection_final_setup_phase(struct sqchat_network * network) {
+    sqchat_server * server = network->current_server->data;
+
 #ifdef WITH_SSL
-    if (network->ssl)
+    if (server->ssl)
         sqchat_begin_ssl_handshake(network);
     else
 #endif
