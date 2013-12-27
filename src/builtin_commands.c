@@ -499,11 +499,8 @@ BI_CMD(sqchat_cmd_ctcp) {
      * was sent
      */
     if (strcasecmp(argv[1], "PING") == 0) {
-        struct timespec current_time;
-        clock_gettime(CLOCK_REALTIME, &current_time);
         sqchat_network_sendf_ctcp(buffer->network, argv[0], "PING", "%li",
-                                  (current_time.tv_sec * 1000000000) +
-                                  current_time.tv_nsec);
+                                  g_get_monotonic_time());
     }
     else {
         if (trailing == NULL)

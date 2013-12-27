@@ -88,7 +88,6 @@ static int verify_certificate_cb(gnutls_session_t session) {
     unsigned int status;
     int ret;
     time_t expiration_time;
-    struct timespec current_time;
     struct sqchat_network * network = gnutls_session_get_ptr(session);
     unsigned int chain_size;
     const gnutls_datum_t * chain;
@@ -122,8 +121,7 @@ static int verify_certificate_cb(gnutls_session_t session) {
 
     // Make sure the certificate is not expired
     expiration_time = gnutls_x509_crt_get_expiration_time(cert[0]);
-    clock_gettime(CLOCK_REALTIME, &current_time);
-    if (expiration_time <= current_time.tv_sec)
+    if (expiration_time <= (time_t)g_get_real_time() * 1.0e-6)
         status |= GNUTLS_CERT_EXPIRED;
 
 verification_error:

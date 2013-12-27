@@ -47,10 +47,7 @@ BUILTIN_CTCP_RESP(sqchat_ctcp_ping_resp_handler) {
     char * nickname;
     char * address;
     sqchat_split_hostmask(hostmask, &nickname, &address);
-    struct timespec current_time;
     long response_time;
-
-    clock_gettime(CLOCK_REALTIME, &current_time);
 
     errno = 0;
     response_time = strtol(msg, NULL, 10);
@@ -59,7 +56,6 @@ BUILTIN_CTCP_RESP(sqchat_ctcp_ping_resp_handler) {
         sqchat_buffer_print(network->window->current_buffer,
                             "* Received PING from %s, response time: %.2lfms.\n",
                             nickname,
-                            ((current_time.tv_sec * 1.0e+9 +
-                              current_time.tv_nsec) - response_time) * 1.0e-6);
+                            (g_get_monotonic_time() - response_time) * 1.0e-3);
 }
 // vim: set expandtab tw=80 shiftwidth=4 softtabstop=4 cinoptions=(0,W4:
