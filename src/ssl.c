@@ -96,7 +96,7 @@ static int verify_certificate_cb(gnutls_session_t session) {
     // Retreive the peer's certificate chain and import it
     chain = gnutls_certificate_get_peers(session, &chain_size);
     cert = calloc(sizeof(*chain), chain_size);
-    for (int i = 0; i < chain_size; i++) {
+    for (unsigned int i = 0; i < chain_size; i++) {
         gnutls_x509_crt_init(&cert[i]);
         gnutls_x509_crt_import(cert[i], &chain[i], GNUTLS_X509_FMT_DER);
     }
@@ -262,14 +262,14 @@ verification_error:
         }
 
         if (fatal) {
-            for (int i = 0; i < chain_size; i++)
+            for (unsigned int i = 0; i < chain_size; i++)
                 gnutls_x509_crt_deinit(cert[i]);
             sqchat_network_disconnect(network, "SSL error");
             return GNUTLS_E_CERTIFICATE_ERROR;
         }
     }
 
-    for (int i = 0; i < chain_size; i++)
+    for (unsigned int i = 0; i < chain_size; i++)
         gnutls_x509_crt_deinit(cert[i]);
     return 0;
 }
