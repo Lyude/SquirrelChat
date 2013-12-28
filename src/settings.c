@@ -41,7 +41,7 @@ char * sqchat_default_username;
 char * sqchat_default_real_name;
 char * sqchat_fallback_encoding;
 
-static void config_file_error(const char * file, const GError * error);
+static void config_file_error(const char * file, GError * error);
 static void parse_settings(const char * filename, GKeyFile ** out);
 static void cache_settings(const char * filename);
 static void create_file(const char * filename);
@@ -214,7 +214,7 @@ void try_to_load_setting_string(const char * filename,
  * file errors need to be handled differently then most of the errors in
  * SquirrelChat
  */
-void config_file_error(const char * file, const GError * error) {
+void config_file_error(const char * file, GError * error) {
     // Rely on errno if error was not specified
     if (error == NULL) {
         GtkWidget * dialog =
@@ -267,6 +267,7 @@ void config_file_error(const char * file, const GError * error) {
             }
             g_free(file_path);
             create_file(file);
+            g_error_free(error);
         }
         else
             exit(-1);
