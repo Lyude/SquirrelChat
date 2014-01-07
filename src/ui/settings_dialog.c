@@ -131,23 +131,9 @@ static void settings_dialog_result_handler(GtkDialog * dialog,
                 strdup(gtk_entry_get_text(GTK_ENTRY(default_username_entry)));
             sqchat_default_real_name =
                 strdup(gtk_entry_get_text(GTK_ENTRY(default_real_name_entry)));
-
-            // Save the options to the configuration file
-            if (sqchat_settings_update_file("settings.conf") == -1) {
-                GtkWidget * dialog;
-                dialog = gtk_message_dialog_new(
-                    GTK_WINDOW(parent->window),
-                    GTK_DIALOG_MODAL,
-                    GTK_MESSAGE_ERROR,
-                    GTK_BUTTONS_OK,
-                    "Failed to write to your user profile: %s.",
-                    strerror(errno));
-                gtk_window_set_title(GTK_WINDOW(dialog), "SquirrelChat Error");
-                gtk_dialog_run(GTK_DIALOG(dialog));
-                gtk_widget_destroy(dialog);
-            }
-            else
-                gtk_widget_destroy(settings_dialog);
+            
+            sqchat_settings_update_file("settings.conf",
+                                        GTK_WINDOW(parent->window));
         }
     }
     else

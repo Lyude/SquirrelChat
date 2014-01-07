@@ -15,6 +15,7 @@
  */
 
 #include "settings.h"
+#include "ui/dialog_macros.h"
 
 #include <stdbool.h>
 #include <sys/stat.h>
@@ -83,7 +84,13 @@ GKeyFile * sqchat_get_keyfile_for_config(const char * filename) {
         return NULL;
 }
 
-int sqchat_settings_update_file(const char * filename) {
+void sqchat_settings_update_file(const char * filename,
+                                 GtkWindow * parent) {
+    char * keyfile_data;
+    char * keyfile_path;
+    gsize keyfile_data_len;
+    GError * error = NULL;
+
     // Update the keyfile struct
     if (g_quark_from_static_string(filename) == main_settings_quark) {
         g_key_file_set_string(sqchat_main_settings, "main",
@@ -94,20 +101,44 @@ int sqchat_settings_update_file(const char * filename) {
                               "default_real_name", sqchat_default_real_name);
     }
 
-    char * config_data =
-        g_key_file_to_data(sqchat_get_keyfile_for_config(filename), NULL, NULL);
-    char * full_file_path = g_strconcat(sqchat_config_dir, "/", filename, NULL);
-    FILE * file = fopen(full_file_path, "w");
-    if (file == NULL) {
-        g_free(config_data);
-        g_free(full_file_path);
-        return -1;
+    keyfile_data = g_key_file_to_data(sqchat_get_keyfile_for_config(filename),
+                                      &keyfile_data_len, NULL);
+    keyfile_path = g_strconcat(sqchat_config_dir, "/", filename, NULL);
+
+    for (bool success = g_file_set_contents(keyfile_path, keyfile_data,
+                                            keyfile_data_len, &error);
+         !success;
+         success = g_file_set_contents(keyfile_path, keyfile_data,
+                                       keyfile_data_len, &error)) {
+        GtkResponseType result;
+
+        GtkWidget * dialog =
+            gtk_message_dialog_new(parent,
+                                   GTK_DIALOG_MODAL |
+                                   GTK_DIALOG_DESTROY_WITH_PARENT,
+                                   GTK_MESSAGE_WARNING, GTK_BUTTONS_OK,
+                                   _("Could not save settings"));
+        gtk_message_dialog_format_secondary_text(
+            GTK_MESSAGE_DIALOG(dialog),
+            _("%s\n"
+              "SquirrelChat could not update '%s', as a result your settings "
+              "here cannot be saved."),
+            error->message, filename);
+        gtk_dialog_add_button(GTK_DIALOG(dialog), _("_Retry"), SQCHAT_RESPONSE_RETRY);
+
+        result = gtk_dialog_run(GTK_DIALOG(dialog));
+        gtk_widget_destroy(dialog);
+
+        if (result == SQCHAT_RESPONSE_RETRY) {
+            error = NULL;
+            continue;
+        }
+        else
+            break;
     }
-    fputs(config_data, file);
-    fclose(file);
-    g_free(config_data);
-    g_free(full_file_path);
-    return 0;
+
+    g_free(keyfile_data);
+    g_free(keyfile_path);
 }
 
 /* Tries to open the configuration file and read in all it's settings into a
